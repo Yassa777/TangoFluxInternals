@@ -87,6 +87,44 @@ Key result:
   (`single_blocks.14`), high/low energy +0.60 (`transformer_blocks.4`), decay +0.33
   (`single_blocks.17`).
 
+## Percussive/Sustained Causal Patch Cross-Check
+
+Directory: `percussive-sustained-patch-v1/` (6 pairs, both directions, alpha 1.0).
+
+Patches source-side activations into the target generation at the probe's top sites and
+measures audio-metric movement toward the source (`toward_source` = fraction of the
+source-target gap covered; 1.0 = fully reached the source).
+
+Key result:
+
+- **Onset is causally controllable**: onset-strength moved toward the source in **12/12**
+  generations at every tested site (mean fraction 0.90–0.97). The sites that *predict*
+  onset also *cause* it — the probe map and the causal map agree.
+- **Stream specificity**: single-stream blocks move *everything* (onset and off-target
+  metrics both ≈0.98; specificity gap ≈0), because the merged stream carries the whole
+  representation. The dual block (`transformer_blocks.4`) is more targeted — onset moves
+  more than off-target metrics (gap +0.07).
+
+## Percussive/Sustained Steering Specificity
+
+Directory: `percussive-sustained-steer-v1/` (5 sustained prompts, scales 1 and 2).
+
+Builds per-site steering vectors (percussive − sustained) from the captured features and
+adds them during generation, measuring movement relative to the population gap.
+
+Key result (a deliberate negative/contrast finding):
+
+- Simple additive steering with the mean-difference vector does **not** specifically move
+  onset (toward-source ≈0.06–0.08) while it moves off-target spectral/energy metrics a lot
+  (≈0.85–0.91). The linear difference direction is dominated by spectral content, not the
+  transient onset structure.
+- Contrast with patching: replacing the activation trajectory moves onset strongly, but a
+  constant additive bias broadcast over tokens/timesteps does not. Onset looks like a
+  trajectory/temporal property rather than a single additive direction at these sites.
+- Caveat: only scales 1–2 and a token-broadcast scheme were tested. Audio-token-only
+  application, a wider scale sweep, or per-timestep steering are open follow-ups before
+  concluding onset is un-steerable.
+
 ## Artifact Policy
 
 Tracked:

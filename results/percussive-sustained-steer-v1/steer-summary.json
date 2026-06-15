@@ -1,0 +1,38 @@
+{
+  "cfg_row": 0,
+  "n_prompts": 5,
+  "on_target": "onset_strength_max",
+  "population_gap": {
+    "decay_time_to_minus_20db_ms": -1367.0748299319728,
+    "high_to_low_db": 26.66805103226274,
+    "onset_strength_max": 10.89388574361801,
+    "spectral_centroid_mean_hz": 1068.3674377441407,
+    "tail_energy_fraction_500ms": -0.2906193920562814
+  },
+  "scales": [
+    0.0,
+    1.0,
+    2.0
+  ],
+  "sites": [
+    "transformer.transformer_blocks.4",
+    "transformer.single_transformer_blocks.8"
+  ],
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.8": {
+        "off_target_toward_source_mean": 0.9051200261884431,
+        "on_target": "onset_strength_max",
+        "on_target_toward_source_mean": 0.06086311728989433,
+        "specificity_gap": -0.8442569088985488
+      },
+      "transformer.transformer_blocks.4": {
+        "off_target_toward_source_mean": 0.8490437678966556,
+        "on_target": "onset_strength_max",
+        "on_target_toward_source_mean": 0.08472824364725048,
+        "specificity_gap": -0.7643155242494051
+      }
+    },
+    "on_target": "onset_strength_max"
+  }
+}

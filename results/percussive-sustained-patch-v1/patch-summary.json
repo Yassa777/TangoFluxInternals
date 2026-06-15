@@ -1,0 +1,33 @@
+{
+  "alpha": 1.0,
+  "n_pairs": 6,
+  "on_target": "onset_strength_max",
+  "sites": [
+    "transformer.single_transformer_blocks.8",
+    "transformer.transformer_blocks.4",
+    "transformer.single_transformer_blocks.15"
+  ],
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.15": {
+        "off_target_toward_source_mean": 0.9848932326511568,
+        "on_target": "onset_strength_max",
+        "on_target_toward_source_mean": 0.9743586717063022,
+        "specificity_gap": -0.01053456094485461
+      },
+      "transformer.single_transformer_blocks.8": {
+        "off_target_toward_source_mean": 0.9767067338563402,
+        "on_target": "onset_strength_max",
+        "on_target_toward_source_mean": 0.9745200083556594,
+        "specificity_gap": -0.002186725500680775
+      },
+      "transformer.transformer_blocks.4": {
+        "off_target_toward_source_mean": 0.829668341852417,
+        "on_target": "onset_strength_max",
+        "on_target_toward_source_mean": 0.9023342376011888,
+        "specificity_gap": 0.0726658957487718
+      }
+    },
+    "on_target": "onset_strength_max"
+  }
+}
