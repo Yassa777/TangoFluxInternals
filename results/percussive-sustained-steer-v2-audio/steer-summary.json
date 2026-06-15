@@ -1,0 +1,42 @@
+{
+  "audio_only": true,
+  "audio_tokens": 645,
+  "cfg_row": 0,
+  "n_prompts": 5,
+  "on_target": "onset_strength_max",
+  "population_gap": {
+    "decay_time_to_minus_20db_ms": -1367.0748299319728,
+    "high_to_low_db": 26.66805103226274,
+    "onset_strength_max": 10.89388574361801,
+    "spectral_centroid_mean_hz": 1068.3674377441407,
+    "tail_energy_fraction_500ms": -0.2906193920562814
+  },
+  "scales": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    4.0
+  ],
+  "sites": [
+    "transformer.transformer_blocks.4",
+    "transformer.single_transformer_blocks.8"
+  ],
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.8": {
+        "off_target_toward_source_mean": 0.7678341173412702,
+        "on_target": "onset_strength_max",
+        "on_target_toward_source_mean": 0.1801716985991058,
+        "specificity_gap": -0.5876624187421644
+      },
+      "transformer.transformer_blocks.4": {
+        "off_target_toward_source_mean": 0.8167857142982473,
+        "on_target": "onset_strength_max",
+        "on_target_toward_source_mean": 0.139949595477023,
+        "specificity_gap": -0.6768361188212243
+      }
+    },
+    "on_target": "onset_strength_max"
+  }
+}

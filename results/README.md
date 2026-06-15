@@ -137,6 +137,18 @@ Key result (a deliberate negative/contrast finding):
   application, a wider scale sweep, or per-timestep steering are open follow-ups before
   concluding onset is un-steerable.
 
+### Audio-token-only steering follow-up (`percussive-sustained-steer-v2-audio/`)
+
+Restricting steering to the trailing audio tokens and sweeping scale 0.5–4 (the open
+follow-up above) gives onset a fair shot. Onset response roughly doubled (toward-source
+0.06→0.18 at `single_blocks.8`) but stays dominated by off-target movement at every scale:
+at scale 0.5, onset moves 0.28 while spectral centroid moves 0.72; at larger scales centroid
+overshoots (≈1.5) while onset stays ≤0.3. There is no scale where onset moves cleanly on its
+own. Interpretation: the linear percussive−sustained activation direction is essentially a
+*spectral* (brightness) direction — additive steering drives centroid, while the transient
+onset is only moved by full-trajectory patching. This sharpens, rather than overturns, the
+earlier steering result.
+
 ## Artifact Policy
 
 Tracked:
