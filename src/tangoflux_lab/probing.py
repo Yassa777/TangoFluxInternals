@@ -31,6 +31,13 @@ DEFAULT_TARGETS: tuple[str, ...] = (
 
 POSITIVE_SIDE = "positive"  # percussive
 
+# Heavy-tailed, strictly-positive targets that are better modeled in log space.
+# Linear ridge on raw milliseconds/fractions tends to give negative R^2 because a
+# few long-decay outliers dominate the squared error.
+LOG1P_TARGETS: frozenset[str] = frozenset(
+    {"decay_time_to_minus_20db_ms", "tail_energy_fraction_500ms"}
+)
+
 
 def load_feature_bundle(path: str) -> dict[str, Any]:
     data = np.load(path, allow_pickle=False)
@@ -119,6 +126,7 @@ def build_probe_map(
     n_splits: int = 5,
     C: float = 1.0,
     alpha: float = 1.0,
+    log_targets: Iterable[str] = LOG1P_TARGETS,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     features = bundle["features"]  # [N, n_sites, batch, d_model]
     labels = bundle["labels"].astype(int)
@@ -143,11 +151,16 @@ def build_probe_map(
     else:
         chosen = int(cfg_row)
 
-    target_vectors = {
-        name: target_array(metrics_lookups[name], pair_ids, sides, exclude_pairs=exclude_pairs)
-        for name in targets
-        if name in metrics_lookups
-    }
+    log_set = {str(name) for name in log_targets}
+    target_vectors: dict[str, np.ndarray] = {}
+    for name in targets:
+        if name not in metrics_lookups:
+            continue
+        vec = target_array(metrics_lookups[name], pair_ids, sides, exclude_pairs=exclude_pairs)
+        if name in log_set:
+            with np.errstate(invalid="ignore"):
+                vec = np.where(np.isfinite(vec) & (vec > -1.0), np.log1p(vec), np.nan)
+        target_vectors[name] = vec
 
     rows: list[dict[str, Any]] = []
     for j in range(n_sites):
@@ -176,6 +189,7 @@ def build_probe_map(
         "n_sites": int(n_sites),
         "targets": [name for name in targets if name in metrics_lookups],
         "excluded_pairs": sorted({str(p) for p in exclude_pairs}),
+        "log1p_targets": sorted(log_set & {t for t in targets if t in metrics_lookups}),
         "n_splits": int(max(2, min(n_splits, np.unique(pair_ids).size))),
     }
     return rows, meta

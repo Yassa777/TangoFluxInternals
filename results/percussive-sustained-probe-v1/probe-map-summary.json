@@ -5,6 +5,10 @@
     "excluded_pairs": [
       "19"
     ],
+    "log1p_targets": [
+      "decay_time_to_minus_20db_ms",
+      "tail_energy_fraction_500ms"
+    ],
     "n_observations": 40,
     "n_pairs": 20,
     "n_sites": 24,
@@ -29,7 +33,7 @@
         "block": 17,
         "site": "transformer.single_transformer_blocks.17",
         "stack": "single",
-        "value": -0.1360164517403078
+        "value": 0.332939623267717
       },
       "high_to_low_db": {
         "block": 4,
@@ -53,20 +57,20 @@
         "block": 0,
         "site": "transformer.single_transformer_blocks.0",
         "stack": "single",
-        "value": -0.07049768349588534
+        "value": -0.19909425061789104
       }
     },
     "decode_accuracy_dual_mean": 0.9125,
     "decode_accuracy_single_mean": 0.9041666666666668,
-    "r2_decay_time_to_minus_20db_ms_dual_mean": -1.2837722743727034,
-    "r2_decay_time_to_minus_20db_ms_single_mean": -0.43099681505324533,
+    "r2_decay_time_to_minus_20db_ms_dual_mean": -1.0436168136424777,
+    "r2_decay_time_to_minus_20db_ms_single_mean": 0.007214881087410446,
     "r2_high_to_low_db_dual_mean": 0.46525894847771704,
     "r2_high_to_low_db_single_mean": 0.35237998863720493,
     "r2_onset_strength_max_dual_mean": -0.37935867347748564,
     "r2_onset_strength_max_single_mean": 0.23161649399308215,
     "r2_spectral_centroid_mean_hz_dual_mean": 0.23968432316199575,
     "r2_spectral_centroid_mean_hz_single_mean": 0.38623729510264915,
-    "r2_tail_energy_fraction_500ms_dual_mean": -1.4357238039264324,
-    "r2_tail_energy_fraction_500ms_single_mean": -0.5172256380680644
+    "r2_tail_energy_fraction_500ms_dual_mean": -1.7588093958860984,
+    "r2_tail_energy_fraction_500ms_single_mean": -0.7013607816306265
   }
 }

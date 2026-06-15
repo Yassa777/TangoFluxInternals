@@ -79,8 +79,13 @@ Key result:
   single mean +0.23; best 0.35 at `single_transformer_blocks.8`).
 - Together this is a measurable semantic→acoustic handoff: the label is linearly present
   early, but the realized percussive attack only becomes linearly readable in the merged
-  single stream. Decay/tail targets are not linearly predictable here (negative R²) and
-  likely need a log transform or larger N before steering claims.
+  single stream.
+- Decay/tail targets are log1p-transformed (heavy-tailed in ms). Decay then becomes
+  predictable in the single stream (best R² +0.33 at `single_transformer_blocks.17`),
+  while tail energy stays not linearly accessible (best R² −0.20).
+- Best predictability per target: onset +0.35 (`single_blocks.8`), spectral centroid +0.55
+  (`single_blocks.14`), high/low energy +0.60 (`transformer_blocks.4`), decay +0.33
+  (`single_blocks.17`).
 
 ## Artifact Policy
 
