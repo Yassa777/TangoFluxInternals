@@ -36,11 +36,16 @@ if [ -n "$CERTIFI_BUNDLE" ] && [ -d "$CUSTOM_CA_DIR" ]; then
     shopt -s nullglob
     cas=("$CUSTOM_CA_DIR"/*.crt)
     if [ ${#cas[@]} -gt 0 ]; then
-      {
-        echo ""
-        echo "$MARKER"
-        cat "${cas[@]}"
-      } >> "$CERTIFI_BUNDLE"
+      # Append each cert separately with surrounding newlines. The source .crt
+      # files have no trailing newline, so a bare `cat file1 file2` would glue
+      # one cert's END line to the next cert's BEGIN line and produce an invalid
+      # PEM bundle (X509 PEM lib error). Per-file echoes guarantee separation.
+      printf '\n%s\n' "$MARKER" >> "$CERTIFI_BUNDLE"
+      for c in "${cas[@]}"; do
+        printf '\n# %s\n' "$(basename "$c")" >> "$CERTIFI_BUNDLE"
+        cat "$c" >> "$CERTIFI_BUNDLE"
+        printf '\n' >> "$CERTIFI_BUNDLE"
+      done
       echo "[session-start] Appended ${#cas[@]} egress CA cert(s) to certifi bundle."
     else
       echo "[session-start] No custom CA certs found; skipping certifi patch."
