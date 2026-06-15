@@ -385,6 +385,49 @@ def capture_activations(
     timeout=60 * 60,
     scaledown_window=600,
 )
+def capture_probe_features(
+    record: dict[str, Any],
+    sites: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Capture audio-token-pooled features at every site for one generation.
+
+    Returns one ``[batch, d_model]`` feature per site (batch keeps the CFG rows),
+    averaged over denoising steps. No WAV is written; this is feature-only.
+    """
+    from tangoflux_lab.hooks import ProbeFeatureRecorder
+
+    record = normalize_generation_record(record)
+    runner = _load_runner(MODEL_NAME)
+    site_output_indices = {s["site"]: int(s["output_index"]) for s in sites}
+    site_stacks = {s["site"]: str(s["stack"]) for s in sites}
+    with ProbeFeatureRecorder(runner.model, site_output_indices, site_stacks) as recorder:
+        _generate_wave(runner, record)
+
+    features = {
+        name: tensor.numpy().astype("float32") for name, tensor in recorder.features().items()
+    }
+    batch = int(next(iter(features.values())).shape[0]) if features else 0
+    return {
+        "status": "ok",
+        "job_id": record["job_id"],
+        "pair_id": str(record.get("pair_id", "")),
+        "side": str(record.get("side", "")),
+        "prompt": record.get("prompt"),
+        "audio_tokens": recorder.audio_tokens,
+        "token_dims": recorder.token_dims,
+        "calls": recorder.calls,
+        "batch": batch,
+        "features": features,
+    }
+
+
+@app.function(
+    image=image,
+    gpu=GPU_TYPE,
+    volumes=COMMON_VOLUMES,
+    timeout=60 * 60,
+    scaledown_window=600,
+)
 def make_steering_vector(
     positive_activation_path: str,
     negative_activation_path: str,
@@ -1367,3 +1410,131 @@ def centroid_movement_test(
         f"Downloaded {sum(1 for row in download_manifest if row['status'] == 'ok')} "
         f"subset audio files to {download_dir}"
     )
+
+
+@app.local_entrypoint()
+def probe_capture(
+    prompts_path: str = "prompts/percussive_sustained_pairs.jsonl",
+    output_prefix: str = "percussive-sustained-probe-v1",
+    samples_per_prompt: int = 1,
+    max_pairs: int = 0,
+    steps: int = 0,
+) -> None:
+    """Capture audio-token-pooled DiT features for every pair at all 24 sites.
+
+    Writes a single compact ``outputs/<prefix>/probe-features.npz`` (gitignored)
+    holding ``features[N, n_sites, batch, d_model]`` plus labels and pair ids.
+    Use ``--max-pairs`` and ``--steps`` for a cheap smoke run.
+    """
+    import numpy as np
+
+    records = _records_from_prompt_file(
+        prompts_path,
+        samples_per_prompt=samples_per_prompt,
+        default_duration=3.5,
+        default_steps=50,
+        default_guidance_scale=4.0,
+    )
+    pair_groups = _records_by_pair(records)
+    if max_pairs > 0:
+        pair_groups = pair_groups[:max_pairs]
+    flat = [record for group in pair_groups for record in group]
+    if steps > 0:
+        for record in flat:
+            record["steps"] = steps
+
+    sites = dit_layer_patch_sites()
+    site_names = [s["site"] for s in sites]
+    print(f"Capturing probe features: {len(flat)} generations x {len(sites)} sites")
+
+    results = list(
+        capture_probe_features.map(flat, kwargs={"sites": sites}, order_outputs=True)
+    )
+
+    first = results[0]
+    batch = int(first["batch"])
+    d_model = int(first["features"][site_names[0]].shape[1])
+    n_obs, n_sites = len(results), len(sites)
+    features = np.zeros((n_obs, n_sites, batch, d_model), dtype="float32")
+    labels = np.zeros(n_obs, dtype="int64")
+    pair_ids: list[str] = []
+    sides: list[str] = []
+    job_ids: list[str] = []
+    for i, result in enumerate(results):
+        for j, name in enumerate(site_names):
+            features[i, j] = result["features"][name]
+        labels[i] = 1 if result["side"] == "positive" else 0
+        pair_ids.append(result["pair_id"])
+        sides.append(result["side"])
+        job_ids.append(result["job_id"])
+
+    out_dir = Path("outputs") / output_prefix
+    out_dir.mkdir(parents=True, exist_ok=True)
+    npz_path = out_dir / "probe-features.npz"
+    np.savez(
+        npz_path,
+        features=features,
+        labels=labels,
+        pair_ids=np.array(pair_ids, dtype="U32"),
+        sides=np.array(sides, dtype="U16"),
+        job_ids=np.array(job_ids, dtype="U128"),
+        sites=np.array(site_names, dtype="U64"),
+        stacks=np.array([s["stack"] for s in sites], dtype="U16"),
+        blocks=np.array([s["block"] for s in sites], dtype="int64"),
+        audio_tokens=np.array(int(first["audio_tokens"] or 0)),
+    )
+    print(f"Wrote {npz_path}  features shape={features.shape}  cfg_batch={batch}")
+
+
+@app.local_entrypoint()
+def probe_train(
+    features_path: str = "outputs/percussive-sustained-probe-v1/probe-features.npz",
+    metrics_path: str = "results/percussive-sustained-v1/percussive-sustained-v1-audio-metrics.csv",
+    output_prefix: str = "percussive-sustained-probe-v1",
+    cfg_row: str = "auto",
+    exclude_pairs: str = "19",
+    n_splits: int = 5,
+) -> None:
+    """Fit pair-grouped logistic + ridge probes and write the decodability/R^2 map.
+
+    Runs locally (CPU); no Modal/GPU needed. Reads the captured features and the
+    audio-metric CSV, then writes ``results/<prefix>/probe-map-rows.csv`` and a
+    ``probe-map-summary.json``.
+    """
+    import csv
+
+    from tangoflux_lab.probing import (
+        DEFAULT_TARGETS,
+        build_probe_map,
+        load_feature_bundle,
+        summarize_probe_map,
+    )
+
+    bundle = load_feature_bundle(features_path)
+    lookups: dict[str, dict[tuple[str, str], float]] = {target: {} for target in DEFAULT_TARGETS}
+    with open(metrics_path, encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            key = (str(row.get("pair_id", "")), str(row.get("side", "")))
+            for target in DEFAULT_TARGETS:
+                try:
+                    lookups[target][key] = float(row[target])
+                except (KeyError, TypeError, ValueError):
+                    continue
+
+    exclude = [p for p in exclude_pairs.split(",") if p]
+    cfg: str | int = cfg_row if cfg_row == "auto" else int(cfg_row)
+    rows, meta = build_probe_map(
+        bundle, lookups, cfg_row=cfg, exclude_pairs=exclude, n_splits=n_splits
+    )
+    summary = summarize_probe_map(rows)
+
+    out_dir = Path("results") / output_prefix
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rows_path = out_dir / "probe-map-rows.csv"
+    summary_path = out_dir / "probe-map-summary.json"
+    write_manifest_csv(str(rows_path), rows)
+    write_json(str(summary_path), {"meta": meta, "summary": summary})
+
+    print(json.dumps({"meta": meta, "summary": summary}, indent=2, sort_keys=True))
+    print(f"Wrote probe map rows: {rows_path}")
+    print(f"Wrote probe map summary: {summary_path}")

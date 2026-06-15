@@ -208,6 +208,93 @@ class MultiSiteActivationRecorder(AbstractContextManager["MultiSiteActivationRec
         return hook
 
 
+class ProbeFeatureRecorder(AbstractContextManager["ProbeFeatureRecorder"]):
+    """Capture audio-token-pooled features at many sites in a single forward pass.
+
+    For each hooked site the recorder selects the configured output tensor, keeps
+    only the audio tokens, mean-pools over them, and accumulates a running mean
+    across denoising-step calls. The batch dimension is preserved so the caller
+    can later select the classifier-free-guidance row that carries the prompt
+    conditioning (TangoFlux batches the conditional and unconditional passes).
+
+    Audio-token handling:
+      - ``dual`` blocks expose the audio stream directly (output_index=1), so the
+        whole token axis is audio. The audio length is recorded from the first
+        dual site seen (dual blocks run before single blocks in the forward pass).
+      - ``single`` blocks output the merged ``[text || audio]`` sequence, so the
+        trailing ``audio_tokens`` tokens are pooled. Text-token counts differ
+        between prompts, so pooling the suffix keeps features comparable.
+    """
+
+    def __init__(
+        self,
+        model: torch.nn.Module,
+        site_output_indices: dict[str, int],
+        site_stacks: dict[str, str],
+        *,
+        audio_tokens: int | None = None,
+    ):
+        self.model = model
+        self.site_output_indices = site_output_indices
+        self.site_stacks = site_stacks
+        self.audio_tokens = audio_tokens
+        self.handles: list[Any] = []
+        self.calls: dict[str, int] = {}
+        self.sums: dict[str, torch.Tensor] = {}
+        self.token_dims: dict[str, int] = {}
+        self.module_types: dict[str, str] = {}
+
+    def __enter__(self) -> "ProbeFeatureRecorder":
+        for name, module in self.model.named_modules():
+            if name not in self.site_output_indices:
+                continue
+            self.module_types[name] = module.__class__.__name__
+            self.handles.append(module.register_forward_hook(self._hook(name)))
+        missing = sorted(set(self.site_output_indices) - set(self.module_types))
+        if missing:
+            raise ValueError(f"Missing module sites: {missing}")
+        return self
+
+    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+        for handle in self.handles:
+            handle.remove()
+        self.handles.clear()
+
+    def _audio_slice(self, name: str, tensor: torch.Tensor) -> torch.Tensor:
+        stack = self.site_stacks.get(name)
+        if stack == "dual":
+            if self.audio_tokens is None:
+                self.audio_tokens = int(tensor.shape[1])
+            return tensor
+        # single (merged text+audio): pool the trailing audio tokens
+        n_audio = self.audio_tokens
+        if n_audio is not None and tensor.shape[1] >= n_audio:
+            return tensor[:, -n_audio:, :]
+        return tensor
+
+    def _hook(self, name: str):
+        def hook(_module: torch.nn.Module, _inputs: tuple[Any, ...], output: Any) -> None:
+            tensor = _get_tensor(output, self.site_output_indices[name]).detach().float()
+            if tensor.ndim != 3:
+                return
+            audio = self._audio_slice(name, tensor)
+            self.token_dims[name] = int(audio.shape[1])
+            pooled = audio.mean(dim=1).to(device="cpu")  # [batch, d_model]
+            if name in self.sums:
+                self.sums[name] = self.sums[name] + pooled
+            else:
+                self.sums[name] = pooled
+            self.calls[name] = self.calls.get(name, 0) + 1
+
+        return hook
+
+    def features(self) -> dict[str, torch.Tensor]:
+        """Return ``name -> [batch, d_model]`` features averaged over calls."""
+        return {
+            name: self.sums[name] / max(self.calls.get(name, 1), 1) for name in self.sums
+        }
+
+
 class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
     def __init__(
         self,

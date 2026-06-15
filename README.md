@@ -135,6 +135,8 @@ modal run modal_app.py::inspect --pattern "transformer_blocks" --limit 200
 | `layer_patch_probe` | Probe one or a few patch sites on one pair. | `modal run modal_app.py::layer_patch_probe --pair-id 01 --site-limit 1` |
 | `layer_patch_sweep` | Run a layer-only activation patching sweep. | `modal run modal_app.py::layer_patch_sweep --output-prefix brightness-layer-sweep-v1` |
 | `centroid_movement_test` | Regenerate patched audio for top brightness sites and measure movement. | `modal run modal_app.py::centroid_movement_test --output-prefix brightness-centroid-movement-v1` |
+| `probe_capture` | Capture audio-token-pooled DiT features at all 24 sites for a prompt set. | `modal run modal_app.py::probe_capture --prompts-path prompts/percussive_sustained_pairs.jsonl` |
+| `probe_train` | Fit pair-grouped logistic + ridge probes and write the decodability/R² map. | `modal run modal_app.py::probe_train` |
 
 These commands can incur Modal GPU costs. Start with `smoke`, small `--max-pairs`, or short
 prompt files before launching full sweeps.
@@ -171,6 +173,44 @@ The intended workflow is:
 4. Use `generate_with_steering.remote(...)` to apply a steering vector at selected hook sites.
 
 The hook utilities are deliberately shape-conservative. Start with one or two module sites and short duration/step counts before scaling capture jobs.
+
+## Linear Probe Map
+
+The probe pipeline asks, at each of the 24 DiT block sites, two independent questions:
+
+- **Decodability**: is the prompt label (`percussive=1` / `sustained=0`) linearly readable
+  from the site's activations? Scored by cross-validated accuracy (logistic probe).
+- **Predictability**: is the *realized* audio metric (onset, decay, tail, ...) linearly
+  predictable from the same activations? Scored by cross-validated R² (ridge probe).
+
+Comparing where these two maps peak across the dual→single stream boundary localizes the
+semantic-to-acoustic handoff.
+
+```bash
+# 1. Capture audio-token-pooled features at all 24 sites for the 20 pairs.
+modal run modal_app.py::probe_capture \
+  --prompts-path prompts/percussive_sustained_pairs.jsonl \
+  --output-prefix percussive-sustained-probe-v1
+
+# 2. Fit pair-grouped probes locally (CPU) and write the map.
+modal run modal_app.py::probe_train --output-prefix percussive-sustained-probe-v1
+```
+
+Implementation notes:
+
+- Features are pooled over the **audio tokens only** (dual blocks expose the audio stream
+  directly; single blocks keep the trailing audio tokens), so prompts of different text
+  length stay comparable.
+- The CFG batch is preserved; `probe_train --cfg-row auto` selects the conditional row by
+  picking whichever batch row is most decodable on average.
+- Cross-validation is **grouped by `pair_id`** (`GroupKFold`) so the two sides of a pair never
+  straddle the train/test split, which would let a probe memorize a shared seed/source
+  fingerprint instead of generalizing the concept.
+- The clipped pair (`--exclude-pairs 19`) is dropped from the ridge metric targets.
+- Raw pooled features land in `outputs/<prefix>/probe-features.npz` (gitignored); the compact
+  map is written to `results/<prefix>/probe-map-rows.csv` and `probe-map-summary.json`.
+
+The local probe trainer needs the `analysis` extra: `pip install -e ".[dev,analysis]"`.
 
 ## Current Results
 

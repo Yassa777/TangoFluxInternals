@@ -11,6 +11,12 @@ dependencies = [
 dev = [
   "ruff>=0.6.0",
 ]
+# Local (CPU) analysis deps for the linear-probe trainer. Heavy ML/audio deps
+# stay inside the Modal image; these run on the captured feature vectors.
+analysis = [
+  "numpy>=1.26",
+  "scikit-learn>=1.4",
+]
 
 [build-system]
 requires = ["setuptools>=68"]

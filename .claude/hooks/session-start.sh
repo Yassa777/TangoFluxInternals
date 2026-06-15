@@ -17,8 +17,8 @@ if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
 
-echo "[session-start] Installing local package (modal + ruff)..."
-python3 -m pip install -q -e ".[dev]"
+echo "[session-start] Installing local package (modal + ruff + analysis deps)..."
+python3 -m pip install -q -e ".[dev,analysis]"
 
 # --- Modal connectivity fix ---------------------------------------------------
 # Modal's grpclib client verifies TLS against certifi's bundle, which does NOT
