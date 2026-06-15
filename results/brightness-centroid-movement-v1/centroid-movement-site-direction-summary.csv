@@ -1,0 +1,9 @@
+site,direction,n,mean_signed_brightness_effect_hz,median_signed_brightness_effect_hz,mean_source_shift_fraction,toward_source_count,closer_to_source_count,overshot_source_count
+transformer.single_transformer_blocks.13,bright_to_dark,20,486.5108215332031,274.8951110839844,0.07889744215848157,19,19,5
+transformer.single_transformer_blocks.13,dark_to_bright,20,539.9457061767578,310.924072265625,2.7854030431768955,19,18,9
+transformer.single_transformer_blocks.14,bright_to_dark,20,495.8655731201172,272.6295471191406,0.08000358028315584,19,19,5
+transformer.single_transformer_blocks.14,dark_to_bright,20,545.1915954589844,309.6238708496094,3.5042181323464114,19,18,9
+transformer.single_transformer_blocks.17,bright_to_dark,20,540.7976348876953,321.3936462402344,3.4677838380772092,20,19,11
+transformer.single_transformer_blocks.17,dark_to_bright,20,562.1796600341797,318.1407470703125,4.165623477189318,20,19,11
+transformer.transformer_blocks.1,bright_to_dark,20,445.01873474121095,238.01193237304688,3.003668289092449,20,19,4
+transformer.transformer_blocks.1,dark_to_bright,20,537.5401245117188,359.3041076660156,-2.164413805100138,19,18,4

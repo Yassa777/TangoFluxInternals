@@ -1,0 +1,143 @@
+{
+  "closer_to_source_count": 149,
+  "mean_signed_brightness_effect_hz": 519.1312313079834,
+  "mean_source_shift_fraction": 1.8651479996529734,
+  "median_signed_brightness_effect_hz": 296.58941650390625,
+  "n_rows": 160,
+  "n_sites": 4,
+  "n_valid_rows": 160,
+  "overshot_source_count": 58,
+  "site_direction_rows": [
+    {
+      "closer_to_source_count": 19,
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 486.5108215332031,
+      "mean_source_shift_fraction": 0.07889744215848157,
+      "median_signed_brightness_effect_hz": 274.8951110839844,
+      "n": 20,
+      "overshot_source_count": 5,
+      "site": "transformer.single_transformer_blocks.13",
+      "toward_source_count": 19
+    },
+    {
+      "closer_to_source_count": 18,
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 539.9457061767578,
+      "mean_source_shift_fraction": 2.7854030431768955,
+      "median_signed_brightness_effect_hz": 310.924072265625,
+      "n": 20,
+      "overshot_source_count": 9,
+      "site": "transformer.single_transformer_blocks.13",
+      "toward_source_count": 19
+    },
+    {
+      "closer_to_source_count": 19,
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 495.8655731201172,
+      "mean_source_shift_fraction": 0.08000358028315584,
+      "median_signed_brightness_effect_hz": 272.6295471191406,
+      "n": 20,
+      "overshot_source_count": 5,
+      "site": "transformer.single_transformer_blocks.14",
+      "toward_source_count": 19
+    },
+    {
+      "closer_to_source_count": 18,
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 545.1915954589844,
+      "mean_source_shift_fraction": 3.5042181323464114,
+      "median_signed_brightness_effect_hz": 309.6238708496094,
+      "n": 20,
+      "overshot_source_count": 9,
+      "site": "transformer.single_transformer_blocks.14",
+      "toward_source_count": 19
+    },
+    {
+      "closer_to_source_count": 19,
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 540.7976348876953,
+      "mean_source_shift_fraction": 3.4677838380772092,
+      "median_signed_brightness_effect_hz": 321.3936462402344,
+      "n": 20,
+      "overshot_source_count": 11,
+      "site": "transformer.single_transformer_blocks.17",
+      "toward_source_count": 20
+    },
+    {
+      "closer_to_source_count": 19,
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 562.1796600341797,
+      "mean_source_shift_fraction": 4.165623477189318,
+      "median_signed_brightness_effect_hz": 318.1407470703125,
+      "n": 20,
+      "overshot_source_count": 11,
+      "site": "transformer.single_transformer_blocks.17",
+      "toward_source_count": 20
+    },
+    {
+      "closer_to_source_count": 19,
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 445.01873474121095,
+      "mean_source_shift_fraction": 3.003668289092449,
+      "median_signed_brightness_effect_hz": 238.01193237304688,
+      "n": 20,
+      "overshot_source_count": 4,
+      "site": "transformer.transformer_blocks.1",
+      "toward_source_count": 20
+    },
+    {
+      "closer_to_source_count": 18,
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 537.5401245117188,
+      "mean_source_shift_fraction": -2.164413805100138,
+      "median_signed_brightness_effect_hz": 359.3041076660156,
+      "n": 20,
+      "overshot_source_count": 4,
+      "site": "transformer.transformer_blocks.1",
+      "toward_source_count": 19
+    }
+  ],
+  "site_rows": [
+    {
+      "closer_to_source_count": 38,
+      "mean_signed_brightness_effect_hz": 551.4886474609375,
+      "mean_source_shift_fraction": 3.8167036576332634,
+      "median_signed_brightness_effect_hz": 318.1407470703125,
+      "n": 40,
+      "overshot_source_count": 22,
+      "site": "transformer.single_transformer_blocks.17",
+      "toward_source_count": 40
+    },
+    {
+      "closer_to_source_count": 37,
+      "mean_signed_brightness_effect_hz": 520.5285842895507,
+      "mean_source_shift_fraction": 1.792110856314784,
+      "median_signed_brightness_effect_hz": 293.3524169921875,
+      "n": 40,
+      "overshot_source_count": 14,
+      "site": "transformer.single_transformer_blocks.14",
+      "toward_source_count": 38
+    },
+    {
+      "closer_to_source_count": 37,
+      "mean_signed_brightness_effect_hz": 513.2282638549805,
+      "mean_source_shift_fraction": 1.4321502426676884,
+      "median_signed_brightness_effect_hz": 293.5548400878906,
+      "n": 40,
+      "overshot_source_count": 14,
+      "site": "transformer.single_transformer_blocks.13",
+      "toward_source_count": 38
+    },
+    {
+      "closer_to_source_count": 37,
+      "mean_signed_brightness_effect_hz": 491.27942962646483,
+      "mean_source_shift_fraction": 0.4196272419961554,
+      "median_signed_brightness_effect_hz": 296.58941650390625,
+      "n": 40,
+      "overshot_source_count": 8,
+      "site": "transformer.transformer_blocks.1",
+      "toward_source_count": 39
+    }
+  ],
+  "toward_source_count": 155
+}

@@ -1,0 +1,733 @@
+{
+  "mean_signed_brightness_effect_hz": 498.1234073638916,
+  "median_signed_brightness_effect_hz": 284.0264587402344,
+  "n_rows": 960,
+  "n_site_direction_rows": 48,
+  "n_sites": 24,
+  "n_valid_rows": 960,
+  "site_direction_rows": [
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 471.5330108642578,
+      "mean_source_shift_fraction": -3.2913316689808894,
+      "mean_target_delta_hz": 471.5330108642578,
+      "median_signed_brightness_effect_hz": 261.8987731933594,
+      "median_target_delta_hz": 261.8987731933594,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.0",
+      "success_count": 15
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 532.7170654296875,
+      "mean_source_shift_fraction": -5.70795444387739,
+      "mean_target_delta_hz": -532.7170654296875,
+      "median_signed_brightness_effect_hz": 274.3192443847656,
+      "median_target_delta_hz": -274.3192443847656,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.0",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 462.198876953125,
+      "mean_source_shift_fraction": -3.573352802881581,
+      "mean_target_delta_hz": 462.198876953125,
+      "median_signed_brightness_effect_hz": 247.10635375976562,
+      "median_target_delta_hz": 247.10635375976562,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.1",
+      "success_count": 15
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 528.3357177734375,
+      "mean_source_shift_fraction": -6.762683642852929,
+      "mean_target_delta_hz": -528.3357177734375,
+      "median_signed_brightness_effect_hz": 267.9602966308594,
+      "median_target_delta_hz": -267.9602966308594,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.1",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 469.9131225585937,
+      "mean_source_shift_fraction": -1.3844954760032648,
+      "mean_target_delta_hz": 469.9131225585937,
+      "median_signed_brightness_effect_hz": 255.68991088867188,
+      "median_target_delta_hz": 255.68991088867188,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.10",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 538.036865234375,
+      "mean_source_shift_fraction": -1.1581265914884846,
+      "mean_target_delta_hz": -538.036865234375,
+      "median_signed_brightness_effect_hz": 292.2381896972656,
+      "median_target_delta_hz": -292.2381896972656,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.10",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 474.1505096435547,
+      "mean_source_shift_fraction": -1.0846303922872909,
+      "mean_target_delta_hz": 474.1505096435547,
+      "median_signed_brightness_effect_hz": 247.86520385742188,
+      "median_target_delta_hz": 247.86520385742188,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.11",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 530.3701141357421,
+      "mean_source_shift_fraction": 0.013713656125423173,
+      "mean_target_delta_hz": -530.3701141357421,
+      "median_signed_brightness_effect_hz": 292.18231201171875,
+      "median_target_delta_hz": -292.18231201171875,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.11",
+      "success_count": 12
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 482.97023315429686,
+      "mean_source_shift_fraction": 0.3850260317608274,
+      "mean_target_delta_hz": 482.97023315429686,
+      "median_signed_brightness_effect_hz": 269.1315612792969,
+      "median_target_delta_hz": 269.1315612792969,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.12",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 541.0949127197266,
+      "mean_source_shift_fraction": 1.9533830978077844,
+      "mean_target_delta_hz": -541.0949127197266,
+      "median_signed_brightness_effect_hz": 305.3536682128906,
+      "median_target_delta_hz": -305.3536682128906,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.12",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 486.5108337402344,
+      "mean_source_shift_fraction": 0.07890766292708336,
+      "mean_target_delta_hz": 486.5108337402344,
+      "median_signed_brightness_effect_hz": 274.8951110839844,
+      "median_target_delta_hz": 274.8951110839844,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.13",
+      "success_count": 13
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 539.9456909179687,
+      "mean_source_shift_fraction": 2.78539282109132,
+      "mean_target_delta_hz": -539.9456909179687,
+      "median_signed_brightness_effect_hz": 310.924072265625,
+      "median_target_delta_hz": -310.924072265625,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.13",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 495.86558532714844,
+      "mean_source_shift_fraction": 0.08001380105175762,
+      "mean_target_delta_hz": 495.86558532714844,
+      "median_signed_brightness_effect_hz": 272.6295471191406,
+      "median_target_delta_hz": 272.6295471191406,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.14",
+      "success_count": 13
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 545.1915893554688,
+      "mean_source_shift_fraction": 3.504218129712464,
+      "mean_target_delta_hz": -545.1915893554688,
+      "median_signed_brightness_effect_hz": 309.6238708496094,
+      "median_target_delta_hz": -309.6238708496094,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.14",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 483.4654205322266,
+      "mean_source_shift_fraction": -0.3891520266492698,
+      "mean_target_delta_hz": 483.4654205322266,
+      "median_signed_brightness_effect_hz": 260.5217590332031,
+      "median_target_delta_hz": 260.5217590332031,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.15",
+      "success_count": 13
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 534.7090484619141,
+      "mean_source_shift_fraction": 3.245265084449138,
+      "mean_target_delta_hz": -534.7090484619141,
+      "median_signed_brightness_effect_hz": 312.0446472167969,
+      "median_target_delta_hz": -312.0446472167969,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.15",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 483.22539978027345,
+      "mean_source_shift_fraction": -0.5885831658758849,
+      "mean_target_delta_hz": 483.22539978027345,
+      "median_signed_brightness_effect_hz": 247.03598022460938,
+      "median_target_delta_hz": 247.03598022460938,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.16",
+      "success_count": 13
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 521.5424865722656,
+      "mean_source_shift_fraction": 1.6572698850773264,
+      "mean_target_delta_hz": -521.5424865722656,
+      "median_signed_brightness_effect_hz": 290.5400390625,
+      "median_target_delta_hz": -290.5400390625,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.16",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 540.7976470947266,
+      "mean_source_shift_fraction": 3.4677940588458114,
+      "mean_target_delta_hz": 540.7976470947266,
+      "median_signed_brightness_effect_hz": 321.3936462402344,
+      "median_target_delta_hz": 321.3936462402344,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.17",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 562.1796417236328,
+      "mean_source_shift_fraction": 4.165613253786769,
+      "mean_target_delta_hz": -562.1796417236328,
+      "median_signed_brightness_effect_hz": 318.1407470703125,
+      "median_target_delta_hz": -318.1407470703125,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.17",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 459.4850616455078,
+      "mean_source_shift_fraction": -3.954871287830001,
+      "mean_target_delta_hz": 459.4850616455078,
+      "median_signed_brightness_effect_hz": 244.88223266601562,
+      "median_target_delta_hz": 244.88223266601562,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.2",
+      "success_count": 15
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 523.4639892578125,
+      "mean_source_shift_fraction": -7.119708376929125,
+      "mean_target_delta_hz": -523.4639892578125,
+      "median_signed_brightness_effect_hz": 262.23419189453125,
+      "median_target_delta_hz": -262.23419189453125,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.2",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 467.8488037109375,
+      "mean_source_shift_fraction": -2.7743367556204785,
+      "mean_target_delta_hz": 467.8488037109375,
+      "median_signed_brightness_effect_hz": 246.16384887695312,
+      "median_target_delta_hz": 246.16384887695312,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.3",
+      "success_count": 15
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 527.5714111328125,
+      "mean_source_shift_fraction": -5.577501244805498,
+      "mean_target_delta_hz": -527.5714111328125,
+      "median_signed_brightness_effect_hz": 275.8499450683594,
+      "median_target_delta_hz": -275.8499450683594,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.3",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 472.11878356933596,
+      "mean_source_shift_fraction": -1.944191128153366,
+      "mean_target_delta_hz": 472.11878356933596,
+      "median_signed_brightness_effect_hz": 250.68899536132812,
+      "median_target_delta_hz": 250.68899536132812,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.4",
+      "success_count": 15
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 525.2759582519532,
+      "mean_source_shift_fraction": -5.309481736371724,
+      "mean_target_delta_hz": -525.2759582519532,
+      "median_signed_brightness_effect_hz": 275.0982666015625,
+      "median_target_delta_hz": -275.0982666015625,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.4",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 473.8275421142578,
+      "mean_source_shift_fraction": -1.5823833323223837,
+      "mean_target_delta_hz": 473.8275421142578,
+      "median_signed_brightness_effect_hz": 238.90267944335938,
+      "median_target_delta_hz": 238.90267944335938,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.5",
+      "success_count": 15
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 523.3728607177734,
+      "mean_source_shift_fraction": -4.553799676711263,
+      "mean_target_delta_hz": -523.3728607177734,
+      "median_signed_brightness_effect_hz": 267.3186950683594,
+      "median_target_delta_hz": -267.3186950683594,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.5",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 467.6198394775391,
+      "mean_source_shift_fraction": -2.045091982510421,
+      "mean_target_delta_hz": 467.6198394775391,
+      "median_signed_brightness_effect_hz": 232.53652954101562,
+      "median_target_delta_hz": 232.53652954101562,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.6",
+      "success_count": 15
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 519.5675445556641,
+      "mean_source_shift_fraction": -5.2928412230048725,
+      "mean_target_delta_hz": -519.5675445556641,
+      "median_signed_brightness_effect_hz": 269.85247802734375,
+      "median_target_delta_hz": -269.85247802734375,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.6",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 467.80869445800784,
+      "mean_source_shift_fraction": -1.9224500153164914,
+      "mean_target_delta_hz": 467.80869445800784,
+      "median_signed_brightness_effect_hz": 242.22579956054688,
+      "median_target_delta_hz": 242.22579956054688,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.7",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 526.8585357666016,
+      "mean_source_shift_fraction": -3.7594278366998695,
+      "mean_target_delta_hz": -526.8585357666016,
+      "median_signed_brightness_effect_hz": 277.3250732421875,
+      "median_target_delta_hz": -277.3250732421875,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.7",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 470.1971832275391,
+      "mean_source_shift_fraction": -0.672436647674682,
+      "mean_target_delta_hz": 470.1971832275391,
+      "median_signed_brightness_effect_hz": 244.11343383789062,
+      "median_target_delta_hz": 244.11343383789062,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.8",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 532.7781860351563,
+      "mean_source_shift_fraction": -1.9982921956918642,
+      "mean_target_delta_hz": -532.7781860351563,
+      "median_signed_brightness_effect_hz": 287.30084228515625,
+      "median_target_delta_hz": -287.30084228515625,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.8",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 470.7926483154297,
+      "mean_source_shift_fraction": -0.5221976517430946,
+      "mean_target_delta_hz": 470.7926483154297,
+      "median_signed_brightness_effect_hz": 248.19412231445312,
+      "median_target_delta_hz": 248.19412231445312,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.9",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 535.9935638427735,
+      "mean_source_shift_fraction": -0.799182028912078,
+      "mean_target_delta_hz": -535.9935638427735,
+      "median_signed_brightness_effect_hz": 293.8800048828125,
+      "median_target_delta_hz": -293.8800048828125,
+      "n": 20,
+      "site": "transformer.single_transformer_blocks.9",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 401.4784454345703,
+      "mean_source_shift_fraction": 1.9724720988222397,
+      "mean_target_delta_hz": 401.4784454345703,
+      "median_signed_brightness_effect_hz": 235.83206176757812,
+      "median_target_delta_hz": 235.83206176757812,
+      "n": 20,
+      "site": "transformer.transformer_blocks.0",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 509.9134185791016,
+      "mean_source_shift_fraction": -3.2332083009340202,
+      "mean_target_delta_hz": -509.9134185791016,
+      "median_signed_brightness_effect_hz": 297.67578125,
+      "median_target_delta_hz": -297.67578125,
+      "n": 20,
+      "site": "transformer.transformer_blocks.0",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 445.0187469482422,
+      "mean_source_shift_fraction": 3.003678509861051,
+      "mean_target_delta_hz": 445.0187469482422,
+      "median_signed_brightness_effect_hz": 238.01193237304688,
+      "median_target_delta_hz": 238.01193237304688,
+      "n": 20,
+      "site": "transformer.transformer_blocks.1",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 537.5401123046875,
+      "mean_source_shift_fraction": -2.164424025868739,
+      "mean_target_delta_hz": -537.5401123046875,
+      "median_signed_brightness_effect_hz": 359.3041076660156,
+      "median_target_delta_hz": -359.3041076660156,
+      "n": 20,
+      "site": "transformer.transformer_blocks.1",
+      "success_count": 13
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 428.74249877929685,
+      "mean_source_shift_fraction": 0.3474083850956212,
+      "mean_target_delta_hz": 428.74249877929685,
+      "median_signed_brightness_effect_hz": 249.04843139648438,
+      "median_target_delta_hz": 249.04843139648438,
+      "n": 20,
+      "site": "transformer.transformer_blocks.2",
+      "success_count": 13
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 514.149072265625,
+      "mean_source_shift_fraction": -4.812352601107734,
+      "mean_target_delta_hz": -514.149072265625,
+      "median_signed_brightness_effect_hz": 290.9246520996094,
+      "median_target_delta_hz": -290.9246520996094,
+      "n": 20,
+      "site": "transformer.transformer_blocks.2",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 434.6822265625,
+      "mean_source_shift_fraction": -0.3044694291351161,
+      "mean_target_delta_hz": 434.6822265625,
+      "median_signed_brightness_effect_hz": 248.58639526367188,
+      "median_target_delta_hz": 248.58639526367188,
+      "n": 20,
+      "site": "transformer.transformer_blocks.3",
+      "success_count": 13
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 518.4696350097656,
+      "mean_source_shift_fraction": -3.5344589381005656,
+      "mean_target_delta_hz": -518.4696350097656,
+      "median_signed_brightness_effect_hz": 302.6142883300781,
+      "median_target_delta_hz": -302.6142883300781,
+      "n": 20,
+      "site": "transformer.transformer_blocks.3",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 434.13843688964846,
+      "mean_source_shift_fraction": -1.8838053967210562,
+      "mean_target_delta_hz": 434.13843688964846,
+      "median_signed_brightness_effect_hz": 248.42117309570312,
+      "median_target_delta_hz": 248.42117309570312,
+      "n": 20,
+      "site": "transformer.transformer_blocks.4",
+      "success_count": 13
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 519.7490875244141,
+      "mean_source_shift_fraction": -4.506270983165735,
+      "mean_target_delta_hz": -519.7490875244141,
+      "median_signed_brightness_effect_hz": 279.10565185546875,
+      "median_target_delta_hz": -279.10565185546875,
+      "n": 20,
+      "site": "transformer.transformer_blocks.4",
+      "success_count": 14
+    },
+    {
+      "direction": "bright_to_dark",
+      "mean_signed_brightness_effect_hz": 452.2989135742188,
+      "mean_source_shift_fraction": -3.3316772569095385,
+      "mean_target_delta_hz": 452.2989135742188,
+      "median_signed_brightness_effect_hz": 250.35824584960938,
+      "median_target_delta_hz": 250.35824584960938,
+      "n": 20,
+      "site": "transformer.transformer_blocks.5",
+      "success_count": 14
+    },
+    {
+      "direction": "dark_to_bright",
+      "mean_signed_brightness_effect_hz": 524.4085815429687,
+      "mean_source_shift_fraction": -6.155587899837039,
+      "mean_target_delta_hz": -524.4085815429687,
+      "median_signed_brightness_effect_hz": 266.87725830078125,
+      "median_target_delta_hz": -266.87725830078125,
+      "n": 20,
+      "site": "transformer.transformer_blocks.5",
+      "success_count": 14
+    }
+  ],
+  "site_rows": [
+    {
+      "mean_signed_brightness_effect_hz": 551.4886444091796,
+      "mean_source_shift_fraction": 3.8167036563162897,
+      "median_signed_brightness_effect_hz": 318.1407470703125,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.17",
+      "success_count": 28
+    },
+    {
+      "mean_signed_brightness_effect_hz": 520.5285873413086,
+      "mean_source_shift_fraction": 1.7921159653821115,
+      "median_signed_brightness_effect_hz": 293.3524169921875,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.14",
+      "success_count": 26
+    },
+    {
+      "mean_signed_brightness_effect_hz": 513.2282623291015,
+      "mean_source_shift_fraction": 1.4321502420092018,
+      "median_signed_brightness_effect_hz": 293.5548400878906,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.13",
+      "success_count": 26
+    },
+    {
+      "mean_signed_brightness_effect_hz": 512.0325729370118,
+      "mean_source_shift_fraction": 1.1692045647843057,
+      "median_signed_brightness_effect_hz": 281.81158447265625,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.12",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 509.0872344970703,
+      "mean_source_shift_fraction": 1.4280565288999343,
+      "median_signed_brightness_effect_hz": 292.0006408691406,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.15",
+      "success_count": 26
+    },
+    {
+      "mean_signed_brightness_effect_hz": 503.97499389648436,
+      "mean_source_shift_fraction": -1.2713110337458748,
+      "median_signed_brightness_effect_hz": 290.0523376464844,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.10",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 503.3931060791016,
+      "mean_source_shift_fraction": -0.6606898403275865,
+      "median_signed_brightness_effect_hz": 282.6991271972656,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.9",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 502.38394317626955,
+      "mean_source_shift_fraction": 0.5343433596007208,
+      "median_signed_brightness_effect_hz": 274.9556884765625,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.16",
+      "success_count": 26
+    },
+    {
+      "mean_signed_brightness_effect_hz": 502.26031188964845,
+      "mean_source_shift_fraction": -0.5354583680809339,
+      "median_signed_brightness_effect_hz": 280.2303771972656,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.11",
+      "success_count": 26
+    },
+    {
+      "mean_signed_brightness_effect_hz": 502.12503814697266,
+      "mean_source_shift_fraction": -4.499643056429141,
+      "median_signed_brightness_effect_hz": 274.3192443847656,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.0",
+      "success_count": 29
+    },
+    {
+      "mean_signed_brightness_effect_hz": 501.48768463134763,
+      "mean_source_shift_fraction": -1.335364421683273,
+      "median_signed_brightness_effect_hz": 277.4650573730469,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.8",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 498.6973709106445,
+      "mean_source_shift_fraction": -3.6268364322625457,
+      "median_signed_brightness_effect_hz": 275.0982666015625,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.4",
+      "success_count": 29
+    },
+    {
+      "mean_signed_brightness_effect_hz": 498.60020141601564,
+      "mean_source_shift_fraction": -3.068091504516823,
+      "median_signed_brightness_effect_hz": 267.3186950683594,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.5",
+      "success_count": 29
+    },
+    {
+      "mean_signed_brightness_effect_hz": 497.710107421875,
+      "mean_source_shift_fraction": -4.175919000212987,
+      "median_signed_brightness_effect_hz": 275.8499450683594,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.3",
+      "success_count": 29
+    },
+    {
+      "mean_signed_brightness_effect_hz": 497.3336151123047,
+      "mean_source_shift_fraction": -2.84093892600818,
+      "median_signed_brightness_effect_hz": 270.4542541503906,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.7",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 495.2672973632813,
+      "mean_source_shift_fraction": -5.168018222867255,
+      "median_signed_brightness_effect_hz": 267.9602966308594,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.1",
+      "success_count": 29
+    },
+    {
+      "mean_signed_brightness_effect_hz": 493.59369201660155,
+      "mean_source_shift_fraction": -3.668966602757647,
+      "median_signed_brightness_effect_hz": 262.3113708496094,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.6",
+      "success_count": 28
+    },
+    {
+      "mean_signed_brightness_effect_hz": 491.47452545166016,
+      "mean_source_shift_fraction": -5.537289832379562,
+      "median_signed_brightness_effect_hz": 262.23419189453125,
+      "n": 40,
+      "site": "transformer.single_transformer_blocks.2",
+      "success_count": 29
+    },
+    {
+      "mean_signed_brightness_effect_hz": 491.27942962646483,
+      "mean_source_shift_fraction": 0.4196272419961556,
+      "median_signed_brightness_effect_hz": 296.58941650390625,
+      "n": 40,
+      "site": "transformer.transformer_blocks.1",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 488.35374755859374,
+      "mean_source_shift_fraction": -4.743632578373289,
+      "median_signed_brightness_effect_hz": 266.87725830078125,
+      "n": 40,
+      "site": "transformer.transformer_blocks.5",
+      "success_count": 28
+    },
+    {
+      "mean_signed_brightness_effect_hz": 476.9437622070312,
+      "mean_source_shift_fraction": -3.1950381899433955,
+      "median_signed_brightness_effect_hz": 279.10565185546875,
+      "n": 40,
+      "site": "transformer.transformer_blocks.4",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 476.5759307861328,
+      "mean_source_shift_fraction": -1.9194641836178412,
+      "median_signed_brightness_effect_hz": 294.8811340332031,
+      "n": 40,
+      "site": "transformer.transformer_blocks.3",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 471.44578552246094,
+      "mean_source_shift_fraction": -2.232472108006056,
+      "median_signed_brightness_effect_hz": 287.3795471191406,
+      "n": 40,
+      "site": "transformer.transformer_blocks.2",
+      "success_count": 27
+    },
+    {
+      "mean_signed_brightness_effect_hz": 455.69593200683596,
+      "mean_source_shift_fraction": -0.6303681010558913,
+      "median_signed_brightness_effect_hz": 280.6562805175781,
+      "n": 40,
+      "site": "transformer.transformer_blocks.0",
+      "success_count": 27
+    }
+  ],
+  "success_count": 658
+}

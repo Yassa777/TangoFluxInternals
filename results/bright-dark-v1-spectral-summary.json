@@ -1,0 +1,154 @@
+{
+  "bright_mean_centroid_hz": 1851.5704498291016,
+  "dark_mean_centroid_hz": 1308.5735137939453,
+  "mean_paired_difference_hz": 542.9969360351563,
+  "median_paired_difference_hz": 298.8604431152344,
+  "n_bright": 20,
+  "n_dark": 20,
+  "n_pairs": 20,
+  "n_rows": 40,
+  "n_valid_rows": 40,
+  "paired_rows": [
+    {
+      "bright_centroid_mean_hz": 1249.017822265625,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 919.0073852539062,
+      "difference_hz": 330.01043701171875,
+      "pair_id": "01"
+    },
+    {
+      "bright_centroid_mean_hz": 3518.71875,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 1935.193359375,
+      "difference_hz": 1583.525390625,
+      "pair_id": "02"
+    },
+    {
+      "bright_centroid_mean_hz": 918.7551879882812,
+      "bright_gt_dark": false,
+      "dark_centroid_mean_hz": 963.7725830078125,
+      "difference_hz": -45.01739501953125,
+      "pair_id": "03"
+    },
+    {
+      "bright_centroid_mean_hz": 1398.101806640625,
+      "bright_gt_dark": false,
+      "dark_centroid_mean_hz": 1719.439208984375,
+      "difference_hz": -321.33740234375,
+      "pair_id": "04"
+    },
+    {
+      "bright_centroid_mean_hz": 1563.31494140625,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 1097.778564453125,
+      "difference_hz": 465.536376953125,
+      "pair_id": "05"
+    },
+    {
+      "bright_centroid_mean_hz": 1207.377685546875,
+      "bright_gt_dark": false,
+      "dark_centroid_mean_hz": 1386.683837890625,
+      "difference_hz": -179.30615234375,
+      "pair_id": "06"
+    },
+    {
+      "bright_centroid_mean_hz": 2389.673828125,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 1078.0107421875,
+      "difference_hz": 1311.6630859375,
+      "pair_id": "07"
+    },
+    {
+      "bright_centroid_mean_hz": 2107.773193359375,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 2106.578857421875,
+      "difference_hz": 1.1943359375,
+      "pair_id": "08"
+    },
+    {
+      "bright_centroid_mean_hz": 1497.996826171875,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 1278.8392333984375,
+      "difference_hz": 219.1575927734375,
+      "pair_id": "09"
+    },
+    {
+      "bright_centroid_mean_hz": 1814.2838134765625,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 663.26611328125,
+      "difference_hz": 1151.0177001953125,
+      "pair_id": "10"
+    },
+    {
+      "bright_centroid_mean_hz": 1148.04541015625,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 880.3349609375,
+      "difference_hz": 267.71044921875,
+      "pair_id": "11"
+    },
+    {
+      "bright_centroid_mean_hz": 1964.24658203125,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 974.3965454101562,
+      "difference_hz": 989.8500366210938,
+      "pair_id": "12"
+    },
+    {
+      "bright_centroid_mean_hz": 1775.6761474609375,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 1008.8287353515625,
+      "difference_hz": 766.847412109375,
+      "pair_id": "13"
+    },
+    {
+      "bright_centroid_mean_hz": 2209.56103515625,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 2091.044677734375,
+      "difference_hz": 118.516357421875,
+      "pair_id": "14"
+    },
+    {
+      "bright_centroid_mean_hz": 1077.8778076171875,
+      "bright_gt_dark": false,
+      "dark_centroid_mean_hz": 1176.032958984375,
+      "difference_hz": -98.1551513671875,
+      "pair_id": "15"
+    },
+    {
+      "bright_centroid_mean_hz": 1658.6729736328125,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 1054.4742431640625,
+      "difference_hz": 604.19873046875,
+      "pair_id": "16"
+    },
+    {
+      "bright_centroid_mean_hz": 3296.32373046875,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 979.0730590820312,
+      "difference_hz": 2317.2506713867188,
+      "pair_id": "17"
+    },
+    {
+      "bright_centroid_mean_hz": 3301.8857421875,
+      "bright_gt_dark": true,
+      "dark_centroid_mean_hz": 1677.6182861328125,
+      "difference_hz": 1624.2674560546875,
+      "pair_id": "18"
+    },
+    {
+      "bright_centroid_mean_hz": 1626.734375,
+      "bright_gt_dark": false,
+      "dark_centroid_mean_hz": 1724.774658203125,
+      "difference_hz": -98.040283203125,
+      "pair_id": "19"
+    },
+    {
+      "bright_centroid_mean_hz": 1307.371337890625,
+      "bright_gt_dark": false,
+      "dark_centroid_mean_hz": 1456.322265625,
+      "difference_hz": -148.950927734375,
+      "pair_id": "20"
+    }
+  ],
+  "pairs_bright_higher": 14
+}

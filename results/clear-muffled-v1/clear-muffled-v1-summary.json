@@ -1,0 +1,327 @@
+{
+  "local_manifest": "outputs/clear-muffled-v1-manifest.csv",
+  "output_prefix": "clear-muffled-v1",
+  "records": 40,
+  "results": [
+    {
+      "elapsed_seconds": 19.648,
+      "job_id": "01-positive-sample-000-seed-301",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/01/positive/01-positive-sample-000-seed-301.wav"
+    },
+    {
+      "elapsed_seconds": 20.378,
+      "job_id": "01-negative-sample-000-seed-301",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/01/negative/01-negative-sample-000-seed-301.wav"
+    },
+    {
+      "elapsed_seconds": 41.529,
+      "job_id": "02-positive-sample-000-seed-302",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/02/positive/02-positive-sample-000-seed-302.wav"
+    },
+    {
+      "elapsed_seconds": 29.35,
+      "job_id": "02-negative-sample-000-seed-302",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/02/negative/02-negative-sample-000-seed-302.wav"
+    },
+    {
+      "elapsed_seconds": 21.114,
+      "job_id": "03-positive-sample-000-seed-303",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/03/positive/03-positive-sample-000-seed-303.wav"
+    },
+    {
+      "elapsed_seconds": 20.444,
+      "job_id": "03-negative-sample-000-seed-303",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/03/negative/03-negative-sample-000-seed-303.wav"
+    },
+    {
+      "elapsed_seconds": 41.258,
+      "job_id": "04-positive-sample-000-seed-304",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/04/positive/04-positive-sample-000-seed-304.wav"
+    },
+    {
+      "elapsed_seconds": 20.716,
+      "job_id": "04-negative-sample-000-seed-304",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/04/negative/04-negative-sample-000-seed-304.wav"
+    },
+    {
+      "elapsed_seconds": 39.923,
+      "job_id": "05-positive-sample-000-seed-305",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/05/positive/05-positive-sample-000-seed-305.wav"
+    },
+    {
+      "elapsed_seconds": 39.321,
+      "job_id": "05-negative-sample-000-seed-305",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/05/negative/05-negative-sample-000-seed-305.wav"
+    },
+    {
+      "elapsed_seconds": 1.939,
+      "job_id": "06-positive-sample-000-seed-306",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/06/positive/06-positive-sample-000-seed-306.wav"
+    },
+    {
+      "elapsed_seconds": 1.918,
+      "job_id": "06-negative-sample-000-seed-306",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/06/negative/06-negative-sample-000-seed-306.wav"
+    },
+    {
+      "elapsed_seconds": 1.873,
+      "job_id": "07-positive-sample-000-seed-307",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/07/positive/07-positive-sample-000-seed-307.wav"
+    },
+    {
+      "elapsed_seconds": 1.978,
+      "job_id": "07-negative-sample-000-seed-307",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/07/negative/07-negative-sample-000-seed-307.wav"
+    },
+    {
+      "elapsed_seconds": 1.909,
+      "job_id": "08-positive-sample-000-seed-308",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/08/positive/08-positive-sample-000-seed-308.wav"
+    },
+    {
+      "elapsed_seconds": 2.122,
+      "job_id": "08-negative-sample-000-seed-308",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/08/negative/08-negative-sample-000-seed-308.wav"
+    },
+    {
+      "elapsed_seconds": 1.96,
+      "job_id": "09-positive-sample-000-seed-309",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/09/positive/09-positive-sample-000-seed-309.wav"
+    },
+    {
+      "elapsed_seconds": 2.069,
+      "job_id": "09-negative-sample-000-seed-309",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/09/negative/09-negative-sample-000-seed-309.wav"
+    },
+    {
+      "elapsed_seconds": 1.979,
+      "job_id": "10-positive-sample-000-seed-310",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/10/positive/10-positive-sample-000-seed-310.wav"
+    },
+    {
+      "elapsed_seconds": 1.89,
+      "job_id": "10-negative-sample-000-seed-310",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/10/negative/10-negative-sample-000-seed-310.wav"
+    },
+    {
+      "elapsed_seconds": 1.97,
+      "job_id": "11-positive-sample-000-seed-311",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/11/positive/11-positive-sample-000-seed-311.wav"
+    },
+    {
+      "elapsed_seconds": 1.795,
+      "job_id": "11-negative-sample-000-seed-311",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/11/negative/11-negative-sample-000-seed-311.wav"
+    },
+    {
+      "elapsed_seconds": 1.939,
+      "job_id": "12-positive-sample-000-seed-312",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/12/positive/12-positive-sample-000-seed-312.wav"
+    },
+    {
+      "elapsed_seconds": 1.93,
+      "job_id": "12-negative-sample-000-seed-312",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/12/negative/12-negative-sample-000-seed-312.wav"
+    },
+    {
+      "elapsed_seconds": 2.189,
+      "job_id": "13-positive-sample-000-seed-313",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/13/positive/13-positive-sample-000-seed-313.wav"
+    },
+    {
+      "elapsed_seconds": 1.889,
+      "job_id": "13-negative-sample-000-seed-313",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/13/negative/13-negative-sample-000-seed-313.wav"
+    },
+    {
+      "elapsed_seconds": 1.912,
+      "job_id": "14-positive-sample-000-seed-314",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/14/positive/14-positive-sample-000-seed-314.wav"
+    },
+    {
+      "elapsed_seconds": 2.079,
+      "job_id": "14-negative-sample-000-seed-314",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/14/negative/14-negative-sample-000-seed-314.wav"
+    },
+    {
+      "elapsed_seconds": 2.016,
+      "job_id": "15-positive-sample-000-seed-315",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/15/positive/15-positive-sample-000-seed-315.wav"
+    },
+    {
+      "elapsed_seconds": 2.13,
+      "job_id": "15-negative-sample-000-seed-315",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/15/negative/15-negative-sample-000-seed-315.wav"
+    },
+    {
+      "elapsed_seconds": 1.937,
+      "job_id": "16-positive-sample-000-seed-316",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/16/positive/16-positive-sample-000-seed-316.wav"
+    },
+    {
+      "elapsed_seconds": 1.9,
+      "job_id": "16-negative-sample-000-seed-316",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/16/negative/16-negative-sample-000-seed-316.wav"
+    },
+    {
+      "elapsed_seconds": 2.013,
+      "job_id": "17-positive-sample-000-seed-317",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/17/positive/17-positive-sample-000-seed-317.wav"
+    },
+    {
+      "elapsed_seconds": 2.78,
+      "job_id": "17-negative-sample-000-seed-317",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/17/negative/17-negative-sample-000-seed-317.wav"
+    },
+    {
+      "elapsed_seconds": 2.257,
+      "job_id": "18-positive-sample-000-seed-318",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/18/positive/18-positive-sample-000-seed-318.wav"
+    },
+    {
+      "elapsed_seconds": 1.958,
+      "job_id": "18-negative-sample-000-seed-318",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/18/negative/18-negative-sample-000-seed-318.wav"
+    },
+    {
+      "elapsed_seconds": 2.046,
+      "job_id": "19-positive-sample-000-seed-319",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/19/positive/19-positive-sample-000-seed-319.wav"
+    },
+    {
+      "elapsed_seconds": 1.805,
+      "job_id": "19-negative-sample-000-seed-319",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/19/negative/19-negative-sample-000-seed-319.wav"
+    },
+    {
+      "elapsed_seconds": 2.014,
+      "job_id": "20-positive-sample-000-seed-320",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/20/positive/20-positive-sample-000-seed-320.wav"
+    },
+    {
+      "elapsed_seconds": 2.157,
+      "job_id": "20-negative-sample-000-seed-320",
+      "model_name": "declare-lab/TangoFlux",
+      "sample_rate": 44100,
+      "status": "ok",
+      "wav_path": "/outputs/clear-muffled-v1/20/negative/20-negative-sample-000-seed-320.wav"
+    }
+  ]
+}

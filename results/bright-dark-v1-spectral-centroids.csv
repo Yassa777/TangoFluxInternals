@@ -1,0 +1,41 @@
+job_id,pair_id,label,side,sample_index,seed,duration,steps,guidance_scale,prompt,wav_path,status,error,sample_rate,spectral_centroid_mean_hz,spectral_centroid_median_hz
+01-bright-sample-000-seed-101,01,bright,bright,0,101,3.0,25,4.5,a bright cheerful piano melody,/outputs/bright-dark-v1/01/bright/01-bright-sample-000-seed-101.wav,ok,,44100,1249.017822265625,1222.3958740234375
+01-dark-sample-000-seed-101,01,dark,dark,0,101,3.0,25,4.5,a dark somber piano melody,/outputs/bright-dark-v1/01/dark/01-dark-sample-000-seed-101.wav,ok,,44100,919.0073852539062,881.9724731445312
+02-bright-sample-000-seed-102,02,bright,bright,0,102,3.0,25,4.5,bright shimmering bells ringing,/outputs/bright-dark-v1/02/bright/02-bright-sample-000-seed-102.wav,ok,,44100,3518.71875,3670.11669921875
+02-dark-sample-000-seed-102,02,dark,dark,0,102,3.0,25,4.5,dark muffled bells ringing,/outputs/bright-dark-v1/02/dark/02-dark-sample-000-seed-102.wav,ok,,44100,1935.193359375,1963.2586669921875
+03-bright-sample-000-seed-103,03,bright,bright,0,103,3.0,25,4.5,a bright sparkling acoustic guitar fingerpicking,/outputs/bright-dark-v1/03/bright/03-bright-sample-000-seed-103.wav,ok,,44100,918.7551879882812,873.0423583984375
+03-dark-sample-000-seed-103,03,dark,dark,0,103,3.0,25,4.5,a dark brooding acoustic guitar fingerpicking,/outputs/bright-dark-v1/03/dark/03-dark-sample-000-seed-103.wav,ok,,44100,963.7725830078125,950.9376220703125
+04-bright-sample-000-seed-104,04,bright,bright,0,104,3.0,25,4.5,a bright airy flute solo,/outputs/bright-dark-v1/04/bright/04-bright-sample-000-seed-104.wav,ok,,44100,1398.101806640625,1362.8201904296875
+04-dark-sample-000-seed-104,04,dark,dark,0,104,3.0,25,4.5,a dark heavy flute solo,/outputs/bright-dark-v1/04/dark/04-dark-sample-000-seed-104.wav,ok,,44100,1719.439208984375,1706.737548828125
+05-bright-sample-000-seed-105,05,bright,bright,0,105,3.0,25,4.5,a bright crisp violin passage,/outputs/bright-dark-v1/05/bright/05-bright-sample-000-seed-105.wav,ok,,44100,1563.31494140625,1562.4078369140625
+05-dark-sample-000-seed-105,05,dark,dark,0,105,3.0,25,4.5,a dark muted violin passage,/outputs/bright-dark-v1/05/dark/05-dark-sample-000-seed-105.wav,ok,,44100,1097.778564453125,1072.0966796875
+06-bright-sample-000-seed-106,06,bright,bright,0,106,3.0,25,4.5,a bright uplifting string quartet,/outputs/bright-dark-v1/06/bright/06-bright-sample-000-seed-106.wav,ok,,44100,1207.377685546875,1190.107177734375
+06-dark-sample-000-seed-106,06,dark,dark,0,106,3.0,25,4.5,a dark mournful string quartet,/outputs/bright-dark-v1/06/dark/06-dark-sample-000-seed-106.wav,ok,,44100,1386.683837890625,1373.2646484375
+07-bright-sample-000-seed-107,07,bright,bright,0,107,3.0,25,4.5,a bright glittering harp glissando,/outputs/bright-dark-v1/07/bright/07-bright-sample-000-seed-107.wav,ok,,44100,2389.673828125,2375.10693359375
+07-dark-sample-000-seed-107,07,dark,dark,0,107,3.0,25,4.5,a dark resonant harp glissando,/outputs/bright-dark-v1/07/dark/07-dark-sample-000-seed-107.wav,ok,,44100,1078.0107421875,1028.826171875
+08-bright-sample-000-seed-108,08,bright,bright,0,108,3.0,25,4.5,a bright cheerful music box melody,/outputs/bright-dark-v1/08/bright/08-bright-sample-000-seed-108.wav,ok,,44100,2107.773193359375,2040.0172119140625
+08-dark-sample-000-seed-108,08,dark,dark,0,108,3.0,25,4.5,a dark eerie music box melody,/outputs/bright-dark-v1/08/dark/08-dark-sample-000-seed-108.wav,ok,,44100,2106.578857421875,2060.817138671875
+09-bright-sample-000-seed-109,09,bright,bright,0,109,3.0,25,4.5,a bright punchy electric guitar riff,/outputs/bright-dark-v1/09/bright/09-bright-sample-000-seed-109.wav,ok,,44100,1497.996826171875,1417.7666015625
+09-dark-sample-000-seed-109,09,dark,dark,0,109,3.0,25,4.5,a dark heavy electric guitar riff,/outputs/bright-dark-v1/09/dark/09-dark-sample-000-seed-109.wav,ok,,44100,1278.8392333984375,1171.4664306640625
+10-bright-sample-000-seed-110,10,bright,bright,0,110,3.0,25,4.5,a bright energetic synth lead,/outputs/bright-dark-v1/10/bright/10-bright-sample-000-seed-110.wav,ok,,44100,1814.2838134765625,1834.867431640625
+10-dark-sample-000-seed-110,10,dark,dark,0,110,3.0,25,4.5,a dark gloomy synth lead,/outputs/bright-dark-v1/10/dark/10-dark-sample-000-seed-110.wav,ok,,44100,663.26611328125,624.9639282226562
+11-bright-sample-000-seed-111,11,bright,bright,0,111,3.0,25,4.5,a bright clear trumpet fanfare,/outputs/bright-dark-v1/11/bright/11-bright-sample-000-seed-111.wav,ok,,44100,1148.04541015625,1110.6539306640625
+11-dark-sample-000-seed-111,11,dark,dark,0,111,3.0,25,4.5,a dark muffled trumpet fanfare,/outputs/bright-dark-v1/11/dark/11-dark-sample-000-seed-111.wav,ok,,44100,880.3349609375,874.9457397460938
+12-bright-sample-000-seed-112,12,bright,bright,0,112,3.0,25,4.5,a bright lively marimba pattern,/outputs/bright-dark-v1/12/bright/12-bright-sample-000-seed-112.wav,ok,,44100,1964.24658203125,2062.015380859375
+12-dark-sample-000-seed-112,12,dark,dark,0,112,3.0,25,4.5,a dark slow marimba pattern,/outputs/bright-dark-v1/12/dark/12-dark-sample-000-seed-112.wav,ok,,44100,974.3965454101562,773.6642456054688
+13-bright-sample-000-seed-113,13,bright,bright,0,113,3.0,25,4.5,a bright sharp xylophone melody,/outputs/bright-dark-v1/13/bright/13-bright-sample-000-seed-113.wav,ok,,44100,1775.6761474609375,1764.940185546875
+13-dark-sample-000-seed-113,13,dark,dark,0,113,3.0,25,4.5,a dark hollow xylophone melody,/outputs/bright-dark-v1/13/dark/13-dark-sample-000-seed-113.wav,ok,,44100,1008.8287353515625,989.9093627929688
+14-bright-sample-000-seed-114,14,bright,bright,0,114,3.0,25,4.5,a bright twinkling celesta passage,/outputs/bright-dark-v1/14/bright/14-bright-sample-000-seed-114.wav,ok,,44100,2209.56103515625,2228.4658203125
+14-dark-sample-000-seed-114,14,dark,dark,0,114,3.0,25,4.5,a dark heavy celesta passage,/outputs/bright-dark-v1/14/dark/14-dark-sample-000-seed-114.wav,ok,,44100,2091.044677734375,2047.9210205078125
+15-bright-sample-000-seed-115,15,bright,bright,0,115,3.0,25,4.5,a bright open church organ chord,/outputs/bright-dark-v1/15/bright/15-bright-sample-000-seed-115.wav,ok,,44100,1077.8778076171875,1001.0546875
+15-dark-sample-000-seed-115,15,dark,dark,0,115,3.0,25,4.5,a dark thunderous church organ chord,/outputs/bright-dark-v1/15/dark/15-dark-sample-000-seed-115.wav,ok,,44100,1176.032958984375,1145.2388916015625
+16-bright-sample-000-seed-116,16,bright,bright,0,116,3.0,25,4.5,a bright lively folk fiddle tune,/outputs/bright-dark-v1/16/bright/16-bright-sample-000-seed-116.wav,ok,,44100,1658.6729736328125,1639.5892333984375
+16-dark-sample-000-seed-116,16,dark,dark,0,116,3.0,25,4.5,a dark slow folk fiddle tune,/outputs/bright-dark-v1/16/dark/16-dark-sample-000-seed-116.wav,ok,,44100,1054.4742431640625,1036.9410400390625
+17-bright-sample-000-seed-117,17,bright,bright,0,117,3.0,25,4.5,a bright pop synth arpeggio,/outputs/bright-dark-v1/17/bright/17-bright-sample-000-seed-117.wav,ok,,44100,3296.32373046875,3227.23974609375
+17-dark-sample-000-seed-117,17,dark,dark,0,117,3.0,25,4.5,a dark cinematic synth arpeggio,/outputs/bright-dark-v1/17/dark/17-dark-sample-000-seed-117.wav,ok,,44100,979.0730590820312,952.545166015625
+18-bright-sample-000-seed-118,18,bright,bright,0,118,3.0,25,4.5,a bright crisp snare drum roll,/outputs/bright-dark-v1/18/bright/18-bright-sample-000-seed-118.wav,ok,,44100,3301.8857421875,3573.47216796875
+18-dark-sample-000-seed-118,18,dark,dark,0,118,3.0,25,4.5,a dark muffled snare drum roll,/outputs/bright-dark-v1/18/dark/18-dark-sample-000-seed-118.wav,ok,,44100,1677.6182861328125,1512.0789794921875
+19-bright-sample-000-seed-119,19,bright,bright,0,119,3.0,25,4.5,a bright clean jazz saxophone phrase,/outputs/bright-dark-v1/19/bright/19-bright-sample-000-seed-119.wav,ok,,44100,1626.734375,1572.469970703125
+19-dark-sample-000-seed-119,19,dark,dark,0,119,3.0,25,4.5,a dark smoky jazz saxophone phrase,/outputs/bright-dark-v1/19/dark/19-dark-sample-000-seed-119.wav,ok,,44100,1724.774658203125,1684.0616455078125
+20-bright-sample-000-seed-120,20,bright,bright,0,120,3.0,25,4.5,a bright airy choir voicing,/outputs/bright-dark-v1/20/bright/20-bright-sample-000-seed-120.wav,ok,,44100,1307.371337890625,1265.539794921875
+20-dark-sample-000-seed-120,20,dark,dark,0,120,3.0,25,4.5,a dark heavy choir voicing,/outputs/bright-dark-v1/20/dark/20-dark-sample-000-seed-120.wav,ok,,44100,1456.322265625,1440.2779541015625

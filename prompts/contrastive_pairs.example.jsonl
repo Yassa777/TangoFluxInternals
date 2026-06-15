@@ -1,0 +1,4 @@
+{"pair_id":"waves_intensity","a":"Gentle ocean waves rolling onto a quiet sandy beach at dawn","b":"Violent storm waves crashing into rocks with heavy wind and spray","duration":5,"steps":25,"guidance_scale":4.5,"seed":1000}
+{"pair_id":"room_size","a":"A single hand clap in a small dry recording booth","b":"A single hand clap echoing through a vast empty cathedral","duration":5,"steps":25,"guidance_scale":4.5,"seed":2000}
+{"pair_id":"material_impact","a":"A ceramic mug softly placed on a wooden table","b":"A ceramic mug shattering on a concrete floor","duration":5,"steps":25,"guidance_scale":4.5,"seed":3000}
+

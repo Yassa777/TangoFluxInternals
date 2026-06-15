@@ -1,0 +1,5 @@
+site,n,mean_signed_brightness_effect_hz,median_signed_brightness_effect_hz,mean_source_shift_fraction,toward_source_count,closer_to_source_count,overshot_source_count
+transformer.single_transformer_blocks.17,40,551.4886474609375,318.1407470703125,3.8167036576332634,40,38,22
+transformer.single_transformer_blocks.14,40,520.5285842895507,293.3524169921875,1.792110856314784,38,37,14
+transformer.single_transformer_blocks.13,40,513.2282638549805,293.5548400878906,1.4321502426676884,38,37,14
+transformer.transformer_blocks.1,40,491.27942962646483,296.58941650390625,0.4196272419961554,39,37,8

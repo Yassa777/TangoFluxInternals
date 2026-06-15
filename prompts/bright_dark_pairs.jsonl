@@ -1,0 +1,20 @@
+{"pair_id":"01","bright":"a bright cheerful piano melody","dark":"a dark somber piano melody","duration":3,"steps":25,"guidance_scale":4.5,"seed":101}
+{"pair_id":"02","bright":"bright shimmering bells ringing","dark":"dark muffled bells ringing","duration":3,"steps":25,"guidance_scale":4.5,"seed":102}
+{"pair_id":"03","bright":"a bright sparkling acoustic guitar fingerpicking","dark":"a dark brooding acoustic guitar fingerpicking","duration":3,"steps":25,"guidance_scale":4.5,"seed":103}
+{"pair_id":"04","bright":"a bright airy flute solo","dark":"a dark heavy flute solo","duration":3,"steps":25,"guidance_scale":4.5,"seed":104}
+{"pair_id":"05","bright":"a bright crisp violin passage","dark":"a dark muted violin passage","duration":3,"steps":25,"guidance_scale":4.5,"seed":105}
+{"pair_id":"06","bright":"a bright uplifting string quartet","dark":"a dark mournful string quartet","duration":3,"steps":25,"guidance_scale":4.5,"seed":106}
+{"pair_id":"07","bright":"a bright glittering harp glissando","dark":"a dark resonant harp glissando","duration":3,"steps":25,"guidance_scale":4.5,"seed":107}
+{"pair_id":"08","bright":"a bright cheerful music box melody","dark":"a dark eerie music box melody","duration":3,"steps":25,"guidance_scale":4.5,"seed":108}
+{"pair_id":"09","bright":"a bright punchy electric guitar riff","dark":"a dark heavy electric guitar riff","duration":3,"steps":25,"guidance_scale":4.5,"seed":109}
+{"pair_id":"10","bright":"a bright energetic synth lead","dark":"a dark gloomy synth lead","duration":3,"steps":25,"guidance_scale":4.5,"seed":110}
+{"pair_id":"11","bright":"a bright clear trumpet fanfare","dark":"a dark muffled trumpet fanfare","duration":3,"steps":25,"guidance_scale":4.5,"seed":111}
+{"pair_id":"12","bright":"a bright lively marimba pattern","dark":"a dark slow marimba pattern","duration":3,"steps":25,"guidance_scale":4.5,"seed":112}
+{"pair_id":"13","bright":"a bright sharp xylophone melody","dark":"a dark hollow xylophone melody","duration":3,"steps":25,"guidance_scale":4.5,"seed":113}
+{"pair_id":"14","bright":"a bright twinkling celesta passage","dark":"a dark heavy celesta passage","duration":3,"steps":25,"guidance_scale":4.5,"seed":114}
+{"pair_id":"15","bright":"a bright open church organ chord","dark":"a dark thunderous church organ chord","duration":3,"steps":25,"guidance_scale":4.5,"seed":115}
+{"pair_id":"16","bright":"a bright lively folk fiddle tune","dark":"a dark slow folk fiddle tune","duration":3,"steps":25,"guidance_scale":4.5,"seed":116}
+{"pair_id":"17","bright":"a bright pop synth arpeggio","dark":"a dark cinematic synth arpeggio","duration":3,"steps":25,"guidance_scale":4.5,"seed":117}
+{"pair_id":"18","bright":"a bright crisp snare drum roll","dark":"a dark muffled snare drum roll","duration":3,"steps":25,"guidance_scale":4.5,"seed":118}
+{"pair_id":"19","bright":"a bright clean jazz saxophone phrase","dark":"a dark smoky jazz saxophone phrase","duration":3,"steps":25,"guidance_scale":4.5,"seed":119}
+{"pair_id":"20","bright":"a bright airy choir voicing","dark":"a dark heavy choir voicing","duration":3,"steps":25,"guidance_scale":4.5,"seed":120}
