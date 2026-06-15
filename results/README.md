@@ -58,6 +58,30 @@ Best current non-brightness target:
 
 - `percussive-sustained-v1`, with onset strength max in the expected direction for 20/20 pairs and strong decay/tail movement.
 
+## Percussive/Sustained Linear Probe Map
+
+Directory: `percussive-sustained-probe-v1/`
+
+- `probe-map-rows.csv`: per-site decodability (logistic accuracy) and predictability
+  (ridge R²) for onset, decay, tail, centroid, and high/low-energy targets.
+- `probe-map-summary.json`: CFG-row choice, best sites, and dual-vs-single means.
+
+Captured at all 24 DiT sites for the 20 percussive/sustained pairs (audio-token pooling,
+conditional CFG row, `GroupKFold` by `pair_id`, pair 19 excluded from metric targets).
+
+Key result:
+
+- Decodability of the prompt label is high and roughly flat across the whole stack
+  (dual mean 0.91, single mean 0.90; best 0.95 at `transformer_blocks.3`). The model
+  represents the concept almost everywhere.
+- Predictability of the realized *onset strength* is negative/near-zero in the early
+  dual blocks and only becomes positive after the streams merge (dual mean −0.38 vs
+  single mean +0.23; best 0.35 at `single_transformer_blocks.8`).
+- Together this is a measurable semantic→acoustic handoff: the label is linearly present
+  early, but the realized percussive attack only becomes linearly readable in the merged
+  single stream. Decay/tail targets are not linearly predictable here (negative R²) and
+  likely need a log transform or larger N before steering claims.
+
 ## Artifact Policy
 
 Tracked:
