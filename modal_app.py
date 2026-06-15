@@ -991,6 +991,186 @@ def layer_patch_pair_sweep(
     return rows
 
 
+PROBE_METRIC_NAMES = (
+    "onset_strength_max",
+    "spectral_centroid_mean_hz",
+    "decay_time_to_minus_20db_ms",
+    "high_to_low_db",
+    "tail_energy_fraction_500ms",
+)
+
+
+@app.function(
+    image=image,
+    gpu=GPU_TYPE,
+    volumes=COMMON_VOLUMES,
+    timeout=60 * 60,
+    scaledown_window=600,
+)
+def concept_patch_pair(
+    pair_records: list[dict[str, Any]],
+    sites: list[dict[str, Any]],
+    *,
+    alpha: float = 1.0,
+    metric_names: list[str] | None = None,
+) -> list[dict[str, Any]]:
+    """Patch source-side activations into the target generation and measure metrics.
+
+    Concept-agnostic counterpart to ``layer_patch_pair_sweep`` (which is centroid /
+    bright-dark specific). For a percussive/sustained pair it patches each site in
+    both directions and reports the full audio-metric suite on baseline and patched
+    audio, so causal movement can be checked against the probe's predictability map.
+    """
+    from tangoflux_lab.audio_features import all_core_metrics
+    from tangoflux_lab.hooks import ActivationPatcher, HookSpec, MultiSiteActivationRecorder
+
+    names = list(metric_names) if metric_names else list(PROBE_METRIC_NAMES)
+    runner = _load_runner(MODEL_NAME)
+    records = [normalize_generation_record(record) for record in pair_records]
+    by_side = {str(record["side"]): record for record in records}
+    if set(by_side) != {"positive", "negative"}:
+        raise ValueError(f"Expected positive/negative records, got sides: {sorted(by_side)}")
+
+    site_output_indices = {str(site["site"]): int(site["output_index"]) for site in sites}
+    needs_audio_suffix = any(str(site.get("stack")) == "single" for site in sites)
+    audio_token_site = "transformer.transformer_blocks.0"
+    if needs_audio_suffix and audio_token_site not in site_output_indices:
+        site_output_indices[audio_token_site] = 1
+    site_meta = {str(site["site"]): site for site in sites}
+
+    activations_by_side: dict[str, dict[str, list[Any]]] = {}
+    audio_tokens_by_side: dict[str, int] = {}
+    baseline_by_side: dict[str, dict[str, Any]] = {}
+    for side in ("positive", "negative"):
+        record = by_side[side]
+        with MultiSiteActivationRecorder(
+            runner.model, site_output_indices, capture="full"
+        ) as recorder:
+            audio, sample_rate = _generate_wave(runner, record)
+        activations_by_side[side] = recorder.activations
+        metrics = all_core_metrics(audio, sample_rate)
+        baseline_by_side[side] = {name: metrics.get(name) for name in names}
+        if needs_audio_suffix:
+            audio_values = recorder.activations.get(audio_token_site, [])
+            if not audio_values:
+                raise ValueError(f"Could not infer audio-token count from {audio_token_site}")
+            audio_tokens_by_side[side] = int(audio_values[0].shape[1])
+
+    directions = [
+        ("sustained_to_percussive", "positive", "negative"),
+        ("percussive_to_sustained", "negative", "positive"),
+    ]
+    rows: list[dict[str, Any]] = []
+    for site in sites:
+        site_name = str(site["site"])
+        output_index = int(site["output_index"])
+        for direction, source_side, target_side in directions:
+            target_record = by_side[target_side]
+            source_values = activations_by_side[source_side].get(site_name, [])
+            suffix_tokens = (
+                min(audio_tokens_by_side[source_side], audio_tokens_by_side[target_side])
+                if site_meta[site_name]["stack"] == "single"
+                else None
+            )
+            try:
+                spec = HookSpec(
+                    patterns=(site_name,),
+                    regex=False,
+                    output_index=output_index,
+                    max_calls=None,
+                    capture="full",
+                )
+                with ActivationPatcher(
+                    runner.model,
+                    spec,
+                    {site_name: source_values},
+                    alpha=alpha,
+                    suffix_tokens=suffix_tokens,
+                ):
+                    audio, sample_rate = _generate_wave(runner, target_record)
+                patched = all_core_metrics(audio, sample_rate)
+                row: dict[str, Any] = {
+                    "status": "ok",
+                    "error": "",
+                    "pair_id": target_record["pair_id"],
+                    "site": site_name,
+                    "stack": site_meta[site_name]["stack"],
+                    "block": site_meta[site_name]["block"],
+                    "direction": direction,
+                    "source_side": source_side,
+                    "target_side": target_side,
+                    "alpha": alpha,
+                    "suffix_tokens": suffix_tokens,
+                }
+                for name in names:
+                    row[f"patched_{name}"] = patched.get(name)
+                    row[f"target_baseline_{name}"] = baseline_by_side[target_side].get(name)
+                    row[f"source_baseline_{name}"] = baseline_by_side[source_side].get(name)
+                rows.append(row)
+            except Exception as exc:  # noqa: BLE001
+                rows.append(
+                    {
+                        "status": "error",
+                        "error": repr(exc),
+                        "pair_id": target_record["pair_id"],
+                        "site": site_name,
+                        "stack": site_meta[site_name]["stack"],
+                        "block": site_meta[site_name]["block"],
+                        "direction": direction,
+                    }
+                )
+    return rows
+
+
+@app.function(
+    image=image,
+    gpu=GPU_TYPE,
+    volumes=COMMON_VOLUMES,
+    timeout=60 * 60,
+    scaledown_window=600,
+)
+def concept_steer_generate(
+    record: dict[str, Any],
+    site: dict[str, Any],
+    vector: list[float],
+    scale: float,
+    *,
+    metric_names: list[str] | None = None,
+) -> dict[str, Any]:
+    """Add ``scale * vector`` at one site during generation and measure metrics.
+
+    ``vector`` is a per-site steering direction (percussive - sustained), applied
+    via ``SteeringApplier`` and broadcast over the token axis. ``scale=0`` recovers
+    the unsteered baseline.
+    """
+    import torch
+    from tangoflux_lab.audio_features import all_core_metrics
+    from tangoflux_lab.hooks import SteeringApplier, compile_spec
+
+    names = list(metric_names) if metric_names else list(PROBE_METRIC_NAMES)
+    record = normalize_generation_record(record)
+    runner = _load_runner(MODEL_NAME)
+    site_name = str(site["site"])
+    spec = compile_spec(
+        [site_name], regex=False, output_index=int(site["output_index"]), capture="full"
+    )
+    vectors = {site_name: torch.tensor(vector, dtype=torch.float32)}
+    with SteeringApplier(runner.model, spec, vectors, scale=float(scale)):
+        audio, sample_rate = _generate_wave(runner, record)
+    metrics = all_core_metrics(audio, sample_rate)
+    result: dict[str, Any] = {
+        "status": "ok",
+        "pair_id": record.get("pair_id", ""),
+        "site": site_name,
+        "stack": site.get("stack"),
+        "block": site.get("block"),
+        "scale": float(scale),
+    }
+    for name in names:
+        result[name] = metrics.get(name)
+    return result
+
+
 @app.local_entrypoint(name="env")
 def local_env() -> None:
     print(json.dumps(env_report.remote(), indent=2, sort_keys=True))
@@ -1538,3 +1718,212 @@ def probe_train(
     print(json.dumps({"meta": meta, "summary": summary}, indent=2, sort_keys=True))
     print(f"Wrote probe map rows: {rows_path}")
     print(f"Wrote probe map summary: {summary_path}")
+
+
+@app.local_entrypoint()
+def concept_patch_test(
+    prompts_path: str = "prompts/percussive_sustained_pairs.jsonl",
+    output_prefix: str = "percussive-sustained-patch-v1",
+    sites: str = (
+        "transformer.single_transformer_blocks.8,"
+        "transformer.transformer_blocks.4,"
+        "transformer.single_transformer_blocks.15"
+    ),
+    max_pairs: int = 6,
+    steps: int = 0,
+    alpha: float = 1.0,
+    on_target: str = "onset_strength_max",
+) -> None:
+    """Causal cross-check: patch top probe sites and measure audio-metric movement.
+
+    Tests whether the sites that *predict* onset also *cause* onset to move when
+    patched. Writes per-row and per-site movement plus a specificity summary.
+    """
+    from tangoflux_lab.probing import summarize_intervention_rows
+
+    records = _records_from_prompt_file(
+        prompts_path, default_duration=3.5, default_steps=50, default_guidance_scale=4.0
+    )
+    pair_groups = _records_by_pair(records)
+    if max_pairs > 0:
+        pair_groups = pair_groups[:max_pairs]
+    if steps > 0:
+        for group in pair_groups:
+            for record in group:
+                record["steps"] = steps
+
+    wanted = [s.strip() for s in sites.split(",") if s.strip()]
+    site_specs = [site for site in dit_layer_patch_sites() if site["site"] in wanted]
+    if not site_specs:
+        raise ValueError(f"No sites matched: {wanted}")
+    print(
+        f"Patch cross-check: {len(pair_groups)} pairs x {len(site_specs)} sites x 2 directions"
+    )
+
+    raw_rows: list[dict[str, Any]] = []
+    for pair_rows in concept_patch_pair.map(
+        pair_groups, kwargs={"sites": site_specs, "alpha": alpha}, order_outputs=True
+    ):
+        raw_rows.extend(pair_rows)
+
+    metric_names = list(PROBE_METRIC_NAMES)
+    site_rows, specificity = summarize_intervention_rows(
+        raw_rows, metric_names, on_target=on_target
+    )
+
+    out_dir = Path("results") / output_prefix
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_manifest_csv(str(out_dir / "patch-rows.csv"), raw_rows)
+    write_manifest_csv(str(out_dir / "patch-site-summary.csv"), site_rows)
+    write_json(
+        str(out_dir / "patch-summary.json"),
+        {
+            "sites": wanted,
+            "alpha": alpha,
+            "on_target": on_target,
+            "n_pairs": len(pair_groups),
+            "specificity": specificity,
+        },
+    )
+    print(json.dumps(specificity, indent=2, sort_keys=True))
+    print(f"Wrote {out_dir}/patch-rows.csv, patch-site-summary.csv, patch-summary.json")
+
+
+@app.local_entrypoint()
+def concept_steer_test(
+    prompts_path: str = "prompts/percussive_sustained_pairs.jsonl",
+    features_path: str = "outputs/percussive-sustained-probe-v1/probe-features.npz",
+    metrics_path: str = "results/percussive-sustained-v1/percussive-sustained-v1-audio-metrics.csv",
+    probe_summary_path: str = "results/percussive-sustained-probe-v1/probe-map-summary.json",
+    output_prefix: str = "percussive-sustained-steer-v1",
+    sites: str = "transformer.transformer_blocks.4,transformer.single_transformer_blocks.8",
+    scales: str = "1,2",
+    max_pairs: int = 5,
+    steps: int = 0,
+    on_target: str = "onset_strength_max",
+) -> None:
+    """Steering specificity: push sustained prompts toward percussive at top sites.
+
+    Builds per-site steering vectors (percussive - sustained) from the captured
+    features, applies them at increasing scales to the sustained side, and measures
+    on-target (onset) vs off-target metric movement relative to the population gap.
+    """
+    import csv
+
+    from tangoflux_lab.probing import load_feature_bundle, summarize_intervention_rows
+
+    metric_names = list(PROBE_METRIC_NAMES)
+
+    # cfg row to read features from (matches the probe's conditional-row choice).
+    cfg_row = 0
+    try:
+        meta = json.loads(Path(probe_summary_path).read_text())["meta"]
+        cfg_row = int(meta.get("cfg_row", 0))
+    except (OSError, KeyError, ValueError):
+        pass
+
+    bundle = load_feature_bundle(features_path)
+    features = bundle["features"]
+    labels = bundle["labels"].astype(int)
+    bundle_sites = bundle["sites"].astype(str).tolist()
+    pos = labels == 1
+    neg = labels == 0
+
+    wanted = [s.strip() for s in sites.split(",") if s.strip()]
+    site_specs = [site for site in dit_layer_patch_sites() if site["site"] in wanted]
+    vectors: list[list[float]] = []
+    for site in site_specs:
+        j = bundle_sites.index(site["site"])
+        vec = features[pos, j, cfg_row, :].mean(0) - features[neg, j, cfg_row, :].mean(0)
+        vectors.append([float(x) for x in vec])
+
+    # Population metric gap (percussive - sustained) for normalising movement.
+    sums = {"positive": {}, "negative": {}}
+    counts = {"positive": 0, "negative": 0}
+    with open(metrics_path, encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            side = row.get("side")
+            if side not in sums:
+                continue
+            counts[side] += 1
+            for name in metric_names:
+                try:
+                    sums[side][name] = sums[side].get(name, 0.0) + float(row[name])
+                except (KeyError, TypeError, ValueError):
+                    continue
+    gap = {
+        name: (sums["positive"].get(name, 0.0) / max(counts["positive"], 1))
+        - (sums["negative"].get(name, 0.0) / max(counts["negative"], 1))
+        for name in metric_names
+    }
+
+    records = _records_from_prompt_file(
+        prompts_path, default_duration=3.5, default_steps=50, default_guidance_scale=4.0
+    )
+    base_records = [r for r in records if r.get("side") == "negative"][:max_pairs]
+    if steps > 0:
+        for record in base_records:
+            record["steps"] = steps
+    scale_values = [0.0] + [float(s) for s in scales.split(",") if s.strip()]
+
+    jobs: list[tuple[Any, ...]] = []
+    for site, vector in zip(site_specs, vectors):
+        for record in base_records:
+            for scale in scale_values:
+                jobs.append((record, site, vector, scale))
+    print(
+        f"Steering test: {len(site_specs)} sites x {len(base_records)} prompts x "
+        f"{len(scale_values)} scales = {len(jobs)} generations (cfg_row={cfg_row})"
+    )
+
+    results = list(concept_steer_generate.starmap(jobs, order_outputs=True))
+    baseline = {
+        (r["site"], r["pair_id"]): r for r in results if r["status"] == "ok" and r["scale"] == 0.0
+    }
+
+    raw_rows: list[dict[str, Any]] = []
+    for r in results:
+        if r["status"] != "ok" or r["scale"] == 0.0:
+            continue
+        base = baseline.get((r["site"], r["pair_id"]))
+        if base is None:
+            continue
+        row: dict[str, Any] = {
+            "status": "ok",
+            "pair_id": r["pair_id"],
+            "site": r["site"],
+            "stack": r["stack"],
+            "block": r["block"],
+            "scale": r["scale"],
+        }
+        for name in metric_names:
+            base_val = base.get(name)
+            row[f"patched_{name}"] = r.get(name)
+            row[f"target_baseline_{name}"] = base_val
+            row[f"source_baseline_{name}"] = (
+                base_val + gap[name] if base_val is not None else None
+            )
+        raw_rows.append(row)
+
+    site_rows, specificity = summarize_intervention_rows(
+        raw_rows, metric_names, on_target=on_target
+    )
+
+    out_dir = Path("results") / output_prefix
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_manifest_csv(str(out_dir / "steer-rows.csv"), raw_rows)
+    write_manifest_csv(str(out_dir / "steer-site-summary.csv"), site_rows)
+    write_json(
+        str(out_dir / "steer-summary.json"),
+        {
+            "sites": wanted,
+            "scales": scale_values,
+            "cfg_row": cfg_row,
+            "on_target": on_target,
+            "n_prompts": len(base_records),
+            "population_gap": gap,
+            "specificity": specificity,
+        },
+    )
+    print(json.dumps(specificity, indent=2, sort_keys=True))
+    print(f"Wrote {out_dir}/steer-rows.csv, steer-site-summary.csv, steer-summary.json")

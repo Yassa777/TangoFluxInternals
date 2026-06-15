@@ -195,6 +195,71 @@ def build_probe_map(
     return rows, meta
 
 
+def _toward_source(patched: Any, target_base: Any, source_base: Any) -> float | None:
+    """Fraction of the source-target gap covered by the patched value.
+
+    0 = no movement from the target baseline, 1 = fully reached the source value,
+    negative = moved away from the source.
+    """
+    if patched is None or target_base is None or source_base is None:
+        return None
+    denom = float(source_base) - float(target_base)
+    if abs(denom) < 1e-9:
+        return None
+    return (float(patched) - float(target_base)) / denom
+
+
+def summarize_intervention_rows(
+    rows: list[dict[str, Any]],
+    metric_names: Sequence[str],
+    *,
+    on_target: str = "onset_strength_max",
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Aggregate patch/steer rows into per-site movement and a specificity summary."""
+    from collections import defaultdict
+
+    by_site_metric: dict[tuple[str, str], list[float]] = defaultdict(list)
+    for row in rows:
+        if row.get("status") != "ok":
+            continue
+        site = str(row.get("site", ""))
+        for metric in metric_names:
+            frac = _toward_source(
+                row.get(f"patched_{metric}"),
+                row.get(f"target_baseline_{metric}"),
+                row.get(f"source_baseline_{metric}"),
+            )
+            if frac is not None and np.isfinite(frac):
+                by_site_metric[(site, metric)].append(frac)
+
+    sites = sorted({site for site, _ in by_site_metric})
+    site_rows: list[dict[str, Any]] = []
+    specificity: dict[str, Any] = {}
+    for site in sites:
+        row: dict[str, Any] = {"site": site}
+        means: dict[str, float] = {}
+        for metric in metric_names:
+            vals = np.asarray(by_site_metric.get((site, metric), []), dtype=float)
+            if vals.size:
+                row[f"{metric}_toward_source_mean"] = float(vals.mean())
+                row[f"{metric}_frac_moved_toward"] = float((vals > 0).mean())
+                row[f"{metric}_n"] = int(vals.size)
+                means[metric] = float(vals.mean())
+        site_rows.append(row)
+        off = [v for m, v in means.items() if m != on_target]
+        specificity[site] = {
+            "on_target": on_target,
+            "on_target_toward_source_mean": means.get(on_target),
+            "off_target_toward_source_mean": float(np.mean(off)) if off else None,
+            "specificity_gap": (
+                float(means[on_target] - np.mean(off))
+                if on_target in means and off
+                else None
+            ),
+        }
+    return site_rows, {"on_target": on_target, "by_site": specificity}
+
+
 def summarize_probe_map(
     rows: list[dict[str, Any]],
     targets: Sequence[str] = DEFAULT_TARGETS,
