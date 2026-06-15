@@ -105,6 +105,18 @@ Key result:
   representation. The dual block (`transformer_blocks.4`) is more targeted — onset moves
   more than off-target metrics (gap +0.07).
 
+### 20-pair confirmation and per-metric specificity (`percussive-sustained-patch-v2/`)
+
+Wider run: 20 pairs x 5 sites (dual 3/4, single 8/14/15), both directions.
+
+- Onset causality holds at scale: onset moves 0.86–0.99 toward source at every site, with
+  dual blocks the most onset-specific (`transformer_blocks.3` gap +0.08).
+- Re-summarizing the same rows for other on-targets (`patch-summary-<metric>.json`):
+  spectral centroid is the most *specifically* controllable metric and peaks in the dual
+  stream (`transformer_blocks.3` gap +0.13); decay resists specific control (negative gaps
+  except `transformer_blocks.4`). The site that best *predicts* a metric is not always the
+  site where patching most *specifically* moves it.
+
 ## Percussive/Sustained Steering Specificity
 
 Directory: `percussive-sustained-steer-v1/` (5 sustained prompts, scales 1 and 2).

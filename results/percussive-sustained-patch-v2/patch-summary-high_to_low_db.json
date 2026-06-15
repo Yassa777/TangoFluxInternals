@@ -1,0 +1,38 @@
+{
+  "on_target": "high_to_low_db",
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.14": {
+        "off_target_toward_source_mean": 0.9805691446693905,
+        "on_target": "high_to_low_db",
+        "on_target_toward_source_mean": 0.9579668773949482,
+        "specificity_gap": -0.022602267274442256
+      },
+      "transformer.single_transformer_blocks.15": {
+        "off_target_toward_source_mean": 0.8790065261147344,
+        "on_target": "high_to_low_db",
+        "on_target_toward_source_mean": 0.9659804340869567,
+        "specificity_gap": 0.08697390797222226
+      },
+      "transformer.single_transformer_blocks.8": {
+        "off_target_toward_source_mean": 0.9594301665982727,
+        "on_target": "high_to_low_db",
+        "on_target_toward_source_mean": 0.9344086811003656,
+        "specificity_gap": -0.02502148549790717
+      },
+      "transformer.transformer_blocks.3": {
+        "off_target_toward_source_mean": 0.7947447463284609,
+        "on_target": "high_to_low_db",
+        "on_target_toward_source_mean": 0.8284111690964748,
+        "specificity_gap": 0.033666422768013904
+      },
+      "transformer.transformer_blocks.4": {
+        "off_target_toward_source_mean": 0.8755076591492983,
+        "on_target": "high_to_low_db",
+        "on_target_toward_source_mean": 0.8476333980844577,
+        "specificity_gap": -0.02787426106484059
+      }
+    },
+    "on_target": "high_to_low_db"
+  }
+}

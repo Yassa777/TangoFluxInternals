@@ -390,11 +390,13 @@ class SteeringApplier(AbstractContextManager["SteeringApplier"]):
         steering_vectors: dict[str, torch.Tensor],
         *,
         scale: float,
+        suffix_tokens: int | None = None,
     ):
         self.model = model
         self.spec = spec
         self.steering_vectors = steering_vectors
         self.scale = float(scale)
+        self.suffix_tokens = suffix_tokens
         self.handles: list[Any] = []
 
     def __enter__(self) -> "SteeringApplier":
@@ -418,7 +420,19 @@ class SteeringApplier(AbstractContextManager["SteeringApplier"]):
             vector = self.steering_vectors[name].to(device=current.device, dtype=current.dtype)
             while vector.ndim < current.ndim:
                 vector = vector.unsqueeze(0)
-            steered = current + self.scale * vector
+            if (
+                self.suffix_tokens is not None
+                and current.ndim >= 2
+                and current.shape[1] >= self.suffix_tokens
+            ):
+                # Add the steering vector only to the trailing audio tokens, leaving
+                # leading text tokens untouched (merged single-stream blocks).
+                steered = current.clone()
+                steered[:, -self.suffix_tokens :, ...] = (
+                    current[:, -self.suffix_tokens :, ...] + self.scale * vector
+                )
+            else:
+                steered = current + self.scale * vector
             return _replace_tensor(output, self.spec.output_index, steered)
 
         return hook

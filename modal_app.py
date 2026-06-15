@@ -1134,14 +1134,16 @@ def concept_steer_generate(
     site: dict[str, Any],
     vector: list[float],
     scale: float,
+    audio_suffix_tokens: int | None = None,
     *,
     metric_names: list[str] | None = None,
 ) -> dict[str, Any]:
     """Add ``scale * vector`` at one site during generation and measure metrics.
 
-    ``vector`` is a per-site steering direction (percussive - sustained), applied
-    via ``SteeringApplier`` and broadcast over the token axis. ``scale=0`` recovers
-    the unsteered baseline.
+    ``vector`` is a per-site steering direction (percussive - sustained). When
+    ``audio_suffix_tokens`` is set the vector is added only to the trailing audio
+    tokens (single-stream blocks); otherwise it is broadcast over all tokens.
+    ``scale=0`` recovers the unsteered baseline.
     """
     import torch
     from tangoflux_lab.audio_features import all_core_metrics
@@ -1155,7 +1157,9 @@ def concept_steer_generate(
         [site_name], regex=False, output_index=int(site["output_index"]), capture="full"
     )
     vectors = {site_name: torch.tensor(vector, dtype=torch.float32)}
-    with SteeringApplier(runner.model, spec, vectors, scale=float(scale)):
+    with SteeringApplier(
+        runner.model, spec, vectors, scale=float(scale), suffix_tokens=audio_suffix_tokens
+    ):
         audio, sample_rate = _generate_wave(runner, record)
     metrics = all_core_metrics(audio, sample_rate)
     result: dict[str, Any] = {
@@ -1797,10 +1801,11 @@ def concept_steer_test(
     probe_summary_path: str = "results/percussive-sustained-probe-v1/probe-map-summary.json",
     output_prefix: str = "percussive-sustained-steer-v1",
     sites: str = "transformer.transformer_blocks.4,transformer.single_transformer_blocks.8",
-    scales: str = "1,2",
+    scales: str = "0.5,1,2,4",
     max_pairs: int = 5,
     steps: int = 0,
     on_target: str = "onset_strength_max",
+    audio_only: bool = True,
 ) -> None:
     """Steering specificity: push sustained prompts toward percussive at top sites.
 
@@ -1826,6 +1831,7 @@ def concept_steer_test(
     features = bundle["features"]
     labels = bundle["labels"].astype(int)
     bundle_sites = bundle["sites"].astype(str).tolist()
+    audio_tokens = int(bundle["audio_tokens"]) if "audio_tokens" in bundle else 0
     pos = labels == 1
     neg = labels == 0
 
@@ -1868,12 +1874,16 @@ def concept_steer_test(
 
     jobs: list[tuple[Any, ...]] = []
     for site, vector in zip(site_specs, vectors):
+        # Single-stream blocks carry [text || audio]; restrict steering to the
+        # trailing audio tokens. Dual blocks (output_index=1) are already audio-only.
+        suffix = audio_tokens if (audio_only and site["stack"] == "single" and audio_tokens) else None
         for record in base_records:
             for scale in scale_values:
-                jobs.append((record, site, vector, scale))
+                jobs.append((record, site, vector, scale, suffix))
     print(
         f"Steering test: {len(site_specs)} sites x {len(base_records)} prompts x "
-        f"{len(scale_values)} scales = {len(jobs)} generations (cfg_row={cfg_row})"
+        f"{len(scale_values)} scales = {len(jobs)} generations "
+        f"(cfg_row={cfg_row}, audio_only={audio_only}, audio_tokens={audio_tokens})"
     )
 
     results = list(concept_steer_generate.starmap(jobs, order_outputs=True))
@@ -1919,6 +1929,8 @@ def concept_steer_test(
             "sites": wanted,
             "scales": scale_values,
             "cfg_row": cfg_row,
+            "audio_only": audio_only,
+            "audio_tokens": audio_tokens,
             "on_target": on_target,
             "n_prompts": len(base_records),
             "population_gap": gap,

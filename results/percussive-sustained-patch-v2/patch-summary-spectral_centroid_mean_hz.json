@@ -1,0 +1,38 @@
+{
+  "on_target": "spectral_centroid_mean_hz",
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.14": {
+        "off_target_toward_source_mean": 0.9776983584052144,
+        "on_target": "spectral_centroid_mean_hz",
+        "on_target_toward_source_mean": 0.9694500224516531,
+        "specificity_gap": -0.008248335953561226
+      },
+      "transformer.single_transformer_blocks.15": {
+        "off_target_toward_source_mean": 0.8785115141513353,
+        "on_target": "spectral_centroid_mean_hz",
+        "on_target_toward_source_mean": 0.967960481940553,
+        "specificity_gap": 0.08944896778921763
+      },
+      "transformer.single_transformer_blocks.8": {
+        "off_target_toward_source_mean": 0.9493885813345306,
+        "on_target": "spectral_centroid_mean_hz",
+        "on_target_toward_source_mean": 0.974575022155334,
+        "specificity_gap": 0.025186440820803346
+      },
+      "transformer.transformer_blocks.3": {
+        "off_target_toward_source_mean": 0.7747395482254111,
+        "on_target": "spectral_centroid_mean_hz",
+        "on_target_toward_source_mean": 0.9084319615086734,
+        "specificity_gap": 0.1336924132832623
+      },
+      "transformer.transformer_blocks.4": {
+        "off_target_toward_source_mean": 0.8617721785349217,
+        "on_target": "spectral_centroid_mean_hz",
+        "on_target_toward_source_mean": 0.9025753205419635,
+        "specificity_gap": 0.040803142007041826
+      }
+    },
+    "on_target": "spectral_centroid_mean_hz"
+  }
+}
