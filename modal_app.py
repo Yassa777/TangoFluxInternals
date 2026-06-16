@@ -411,11 +411,14 @@ def capture_activations(
 def capture_probe_features(
     record: dict[str, Any],
     sites: list[dict[str, Any]],
+    *,
+    time_bins: int = 1,
 ) -> dict[str, Any]:
     """Capture audio-token-pooled features at every site for one generation.
 
-    Returns one ``[batch, d_model]`` feature per site (batch keeps the CFG rows),
-    averaged over denoising steps. No WAV is written; this is feature-only.
+    Returns one ``[batch, time_bins * d_model]`` feature per site (batch keeps the
+    CFG rows), averaged over denoising steps. ``time_bins>1`` preserves coarse
+    temporal structure. No WAV is written; this is feature-only.
     """
     from tangoflux_lab.audio_features import all_core_metrics
     from tangoflux_lab.hooks import ProbeFeatureRecorder
@@ -424,7 +427,9 @@ def capture_probe_features(
     runner = _load_runner(MODEL_NAME)
     site_output_indices = {s["site"]: int(s["output_index"]) for s in sites}
     site_stacks = {s["site"]: str(s["stack"]) for s in sites}
-    with ProbeFeatureRecorder(runner.model, site_output_indices, site_stacks) as recorder:
+    with ProbeFeatureRecorder(
+        runner.model, site_output_indices, site_stacks, time_bins=time_bins
+    ) as recorder:
         audio, sample_rate = _generate_wave(runner, record)
 
     metrics = all_core_metrics(audio, sample_rate)
@@ -445,6 +450,7 @@ def capture_probe_features(
         "token_dims": recorder.token_dims,
         "calls": recorder.calls,
         "batch": batch,
+        "time_bins": int(time_bins),
         "features": features,
     }
 
@@ -1756,6 +1762,7 @@ def probe_capture(
     samples_per_prompt: int = 1,
     max_pairs: int = 0,
     steps: int = 0,
+    time_bins: int = 1,
 ) -> None:
     """Capture audio-token-pooled DiT features for every pair at all 24 sites.
 
@@ -1782,10 +1789,15 @@ def probe_capture(
 
     sites = dit_layer_patch_sites()
     site_names = [s["site"] for s in sites]
-    print(f"Capturing probe features: {len(flat)} generations x {len(sites)} sites")
+    print(
+        f"Capturing probe features: {len(flat)} generations x {len(sites)} sites "
+        f"(time_bins={time_bins})"
+    )
 
     results = list(
-        capture_probe_features.map(flat, kwargs={"sites": sites}, order_outputs=True)
+        capture_probe_features.map(
+            flat, kwargs={"sites": sites, "time_bins": time_bins}, order_outputs=True
+        )
     )
 
     first = results[0]
@@ -1831,6 +1843,7 @@ def probe_capture(
         stacks=np.array([s["stack"] for s in sites], dtype="U16"),
         blocks=np.array([s["block"] for s in sites], dtype="int64"),
         audio_tokens=np.array(int(first["audio_tokens"] or 0)),
+        time_bins=np.array(int(time_bins)),
         sources=np.array(sources, dtype="U32"),
         levels=np.array(levels, dtype="int64"),
         realized=realized,

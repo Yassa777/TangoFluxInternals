@@ -233,11 +233,13 @@ class ProbeFeatureRecorder(AbstractContextManager["ProbeFeatureRecorder"]):
         site_stacks: dict[str, str],
         *,
         audio_tokens: int | None = None,
+        time_bins: int = 1,
     ):
         self.model = model
         self.site_output_indices = site_output_indices
         self.site_stacks = site_stacks
         self.audio_tokens = audio_tokens
+        self.time_bins = max(1, int(time_bins))
         self.handles: list[Any] = []
         self.calls: dict[str, int] = {}
         self.sums: dict[str, torch.Tensor] = {}
@@ -279,7 +281,15 @@ class ProbeFeatureRecorder(AbstractContextManager["ProbeFeatureRecorder"]):
                 return
             audio = self._audio_slice(name, tensor)
             self.token_dims[name] = int(audio.shape[1])
-            pooled = audio.mean(dim=1).to(device="cpu")  # [batch, d_model]
+            # Pool over the audio-token (time) axis. With time_bins>1, split the audio
+            # tokens into K consecutive temporal bins and concatenate their means, so the
+            # feature preserves coarse temporal structure: [batch, time_bins * d_model].
+            if self.time_bins > 1 and audio.shape[1] >= self.time_bins:
+                chunks = torch.chunk(audio, self.time_bins, dim=1)
+                pooled = torch.cat([chunk.mean(dim=1) for chunk in chunks], dim=1)
+            else:
+                pooled = audio.mean(dim=1)  # [batch, d_model]
+            pooled = pooled.to(device="cpu")
             if name in self.sums:
                 self.sums[name] = self.sums[name] + pooled
             else:
