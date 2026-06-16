@@ -189,6 +189,47 @@ Implications for next experiments:
   swap (replace the latent at step k and continue) would isolate pure flow-time and give a
   clean, architecture-free point-of-no-return.
 
+## Representation-Geometry Testbed (Ground-Truth Factors)
+
+Directory: `factor-geometry-v1/` (60 prompts: brightness sweep + onset-rate sweep,
+6 levels x 5 sources each; 24 sites; grouped CV by source).
+
+Method: use *physically measurable* generative factors as ground truth to test
+representation-geometry claims a language model can't settle. Per layer we report
+grouped-CV linear R^2, out-of-sample projection monotonicity (Spearman of
+`cross_val_predict`), within-factor direction stability (split-half cosine), and the
+cross-factor cosine — each against a random-vector baseline `E|cos| = sqrt(2/(pi*d)) =
+0.025` for d=1024.
+
+Manipulation check (essential): brightness level -> realized centroid Spearman 0.56
+(range 646-5754 Hz) — a usable factor. Onset-rate level -> realized rate Spearman 0.20 —
+the text **did not** reliably control rate, so onset-rate results are treated as a failed
+manipulation, not a model claim.
+
+Findings (honest):
+
+- **Brightness is encoded as a robust *ordinal* axis at every layer**: held-out projection
+  Spearman 0.71-0.84 across all 24 sites (source-generalizing). The direction is
+  reproducible above chance everywhere (split-half cosine 0.07-0.21 vs 0.025 random),
+  peaking at dual `transformer_blocks.3` (0.21, ~8x random).
+- **Ordinal, but not linearly calibrated.** Linear R^2 is mostly <=0 (the magnitude in Hz
+  is not captured) except the early dual blocks (`transformer_blocks.3/4`, R^2 ~0.2). So
+  the model represents brightness *ordering* strongly while affine-linear *magnitude* is
+  legible only in the early dual (text-conditioned) stream. This monotonic-not-linear
+  distinction is only visible because we regress against the exact physical scale — the
+  kind of claim LM interpretability cannot make.
+- **Disentanglement is at the noise floor and underpowered.** Cross-factor cosine (0.037)
+  ~ random (0.025), and within-factor stability for onset-rate (0.05) is barely above
+  random — so no disentanglement claim can be made at N=60 in 1024-d. The *method*
+  (within- vs cross-factor cosine vs random baseline) is the right test; the data is too
+  small and onset-rate too poorly manipulated.
+
+What a properly powered version needs: many more sources/levels per factor, PCA before
+probing (reduce 1024-d), a text-manipulation that actually moves onset-rate (or a
+non-text control of it), and a third clean factor. The contribution is the *testbed +
+controls*, plus the concrete finding that brightness is represented ordinally with
+affine-linear legibility localized to the early dual stream.
+
 ## Artifact Policy
 
 Tracked:

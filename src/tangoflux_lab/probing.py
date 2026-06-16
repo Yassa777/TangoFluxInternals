@@ -281,18 +281,47 @@ def _ranks(a: np.ndarray) -> np.ndarray:
     return ranks
 
 
-def _projection_corr(
-    X: np.ndarray, y: np.ndarray, w: np.ndarray, scaler: Any
+def _cv_projection_corr(
+    X: np.ndarray, y: np.ndarray, groups: np.ndarray, *, n_splits: int = 5, alpha: float = 1.0
 ) -> tuple[float, float]:
-    """Pearson (linearity) and Spearman (monotonicity) of the factor projection."""
+    """Out-of-sample Pearson/Spearman of grouped cross-validated factor predictions.
+
+    Uses cross_val_predict so the linearity/monotonicity is held-out, not in-sample
+    (an in-sample 1024-dim ridge on a few dozen points trivially gives ~1.0).
+    """
+    from sklearn.linear_model import Ridge
+    from sklearn.model_selection import cross_val_predict
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
+
     mask = np.isfinite(y)
-    proj = scaler.transform(X[mask]) @ w
-    target = y[mask]
-    if proj.std() < 1e-12 or target.std() < 1e-12:
+    Xs, ys, gs = X[mask], y[mask], groups[mask]
+    n_groups = int(np.unique(gs).size)
+    if n_groups < 2 or ys.size < 4 or ys.std() < 1e-12:
         return float("nan"), float("nan")
-    pearson = float(np.corrcoef(proj, target)[0, 1])
-    spearman = float(np.corrcoef(_ranks(proj), _ranks(target))[0, 1])
+    pipe = make_pipeline(StandardScaler(), Ridge(alpha=alpha))
+    pred = cross_val_predict(pipe, Xs, ys, cv=_kfold(n_splits, n_groups), groups=gs)
+    if pred.std() < 1e-12:
+        return float("nan"), float("nan")
+    pearson = float(np.corrcoef(pred, ys)[0, 1])
+    spearman = float(np.corrcoef(_ranks(pred), _ranks(ys))[0, 1])
     return pearson, spearman
+
+
+def _split_half_cosine(X: np.ndarray, y: np.ndarray, groups: np.ndarray, *, alpha: float = 1.0):
+    """|cos| between factor directions fit on two source-disjoint halves (stability)."""
+    mask = np.isfinite(y)
+    Xs, ys, gs = X[mask], y[mask], groups[mask]
+    uniq = np.unique(gs)
+    if uniq.size < 2:
+        return float("nan")
+    half = uniq[: uniq.size // 2]
+    m_a = np.isin(gs, half)
+    if m_a.sum() < 2 or (~m_a).sum() < 2:
+        return float("nan")
+    w_a, _ = _unit_ridge_direction(Xs[m_a], ys[m_a], alpha=alpha)
+    w_b, _ = _unit_ridge_direction(Xs[~m_a], ys[~m_a], alpha=alpha)
+    return float(abs(np.dot(w_a, w_b)))
 
 
 def build_geometry_map(
@@ -332,15 +361,16 @@ def build_geometry_map(
         directions: dict[str, np.ndarray] = {}
         for name, y in factor_y.items():
             r2, r2_std, n_valid = metric_r2(X, y, sources, n_splits=n_splits, alpha=alpha)
-            w, scaler = _unit_ridge_direction(X, y, alpha=alpha)
-            pearson, spearman = _projection_corr(X, y, w, scaler)
+            pearson, spearman = _cv_projection_corr(X, y, sources, n_splits=n_splits, alpha=alpha)
+            w, _ = _unit_ridge_direction(X, y, alpha=alpha)
             row[f"r2_{name}"] = r2
-            row[f"lin_pearson_{name}"] = pearson
-            row[f"mono_spearman_{name}"] = spearman
+            row[f"cv_pearson_{name}"] = pearson
+            row[f"cv_spearman_{name}"] = spearman
+            row[f"stability_cos_{name}"] = _split_half_cosine(X, y, sources, alpha=alpha)
             row[f"n_{name}"] = n_valid
             directions[name] = w
         if len(factor_list) == 2:
-            row["abs_cosine"] = float(
+            row["cross_cosine"] = float(
                 abs(np.dot(directions[factor_list[0]], directions[factor_list[1]]))
             )
         rows.append(row)
@@ -360,25 +390,36 @@ def build_geometry_map(
         top = max(valid, key=lambda r: r[key])
         return {"site": top["site"], "stack": top["stack"], "block": top["block"], "value": top[key]}
 
-    summary: dict[str, Any] = {"factors": factor_list, "by_factor": {}}
+    d_model = int(features.shape[3])
+    random_cos_baseline = float(np.sqrt(2.0 / (np.pi * d_model)))
+
+    summary: dict[str, Any] = {
+        "factors": factor_list,
+        "d_model": d_model,
+        "random_abs_cosine_baseline": random_cos_baseline,
+        "by_factor": {},
+    }
     for name in factor_list:
         summary["by_factor"][name] = {
             "best_encodable": best(f"r2_{name}"),
             "r2_dual_mean": stack_mean(f"r2_{name}", "dual"),
             "r2_single_mean": stack_mean(f"r2_{name}", "single"),
-            "mono_spearman_dual_mean": stack_mean(f"mono_spearman_{name}", "dual"),
-            "mono_spearman_single_mean": stack_mean(f"mono_spearman_{name}", "single"),
+            "cv_spearman_best": best(f"cv_spearman_{name}"),
+            "stability_cos_mean": stack_mean(f"stability_cos_{name}", "dual"),
         }
     if len(factor_list) == 2:
-        cosines = [(r["site"], r["abs_cosine"]) for r in rows if np.isfinite(r.get("abs_cosine", np.nan))]
+        # Disentanglement is meaningful only relative to (a) the random-vector baseline
+        # and (b) within-factor direction stability. If cross_cosine ~ random and
+        # stability ~ random too, the directions are noise, not disentangled features.
         summary["disentanglement"] = {
-            "abs_cosine_dual_mean": stack_mean("abs_cosine", "dual"),
-            "abs_cosine_single_mean": stack_mean("abs_cosine", "single"),
-            "most_orthogonal": (
-                {"site": min(cosines, key=lambda c: c[1])[0], "abs_cosine": min(c[1] for c in cosines)}
-                if cosines
-                else None
+            "cross_cosine_mean": float(
+                np.nanmean([r.get("cross_cosine", np.nan) for r in rows])
             ),
+            "within_factor_stability_mean": {
+                name: float(np.nanmean([r.get(f"stability_cos_{name}", np.nan) for r in rows]))
+                for name in factor_list
+            },
+            "random_abs_cosine_baseline": random_cos_baseline,
         }
     return rows, summary
 
