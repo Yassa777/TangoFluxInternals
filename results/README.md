@@ -349,6 +349,37 @@ Findings:
   depth are more separate (0.35-0.40 to the spectral cluster). The representation's factor
   geometry robustly tracks the output-space statistics.
 
+## Time-Binned Pooling Test (temporal factors)
+
+Directory: `diverse-corpus-geometry-tb4/` (same 250 clips, captured with `--time-bins 4`:
+audio tokens split into 4 temporal bins -> `[batch, 4*1024]` features; PCA-30).
+
+Hypothesis: token-mean pooling discards time, so temporal factors fail; preserving coarse
+time (4 bins) should bring them back.
+
+Result -- the hypothesis is **not** supported at K=4:
+
+- The temporal factors stay at the noise floor: attack stability 0.20, decay 0.19, tail
+  0.05, AM-rate 0.16 (threshold 0.291); density 0.29 and F0 0.37 are borderline. Best linear
+  R^2 stays ~0 for attack/decay/tail. K=4 binning did not rescue them (they were also below
+  threshold at K=1).
+- The stationary geometry is unaffected: 13 stable factors, and geometry-mirrors-physics
+  still holds (Pearson r = 0.80 over 78 pairs vs 0.88 at K=1).
+
+Interpretation / leading explanations (now narrowed):
+- **K=4 is likely too coarse**: 4 bins over 3.5 s = ~875 ms each, far coarser than an attack
+  (~20 ms) or inter-onset spacing (~140 ms at 7 events/s). Finer binning (K=16-32, ~110-220 ms)
+  is the obvious next test for decay/density.
+- Combined with the earlier non-linear test (gradient boosting did not help either), the live
+  hypotheses for the temporal factors are now: **too-coarse temporal resolution** and/or
+  **noisy single-clip temporal metrics** -- not non-linearity, and not simple time-averaging.
+- It remains possible these fast temporal properties are not linearly read out from the
+  audio-token activations at all; finer bins + denoised metrics are needed to decide.
+
+Takeaway: the durable, replicated result is the stationary-factor geometry (spectral family +
+loudness/harmonicity/voicing, mirroring physics at r=0.8-0.98). The temporal factors are a
+clean open problem with two concrete remaining tests (finer K, denoised metrics).
+
 ## Artifact Policy
 
 Tracked:
