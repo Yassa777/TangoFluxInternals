@@ -380,6 +380,7 @@ def build_geometry_map(
     factor_list = list(factor_y)
 
     rows: list[dict[str, Any]] = []
+    layer_directions: list[dict[str, np.ndarray]] = []
     for j in range(n_sites):
         X = features[:, j, cfg_row, :]
         X_red = _reduce(X, pca_components)  # shared basis for descriptive directions
@@ -397,10 +398,7 @@ def build_geometry_map(
             row[f"stability_cos_{name}"] = _split_half_cosine(X_red, y, sources, alpha=alpha)
             row[f"n_{name}"] = n_valid
             directions[name] = w
-        if len(factor_list) == 2:
-            row["cross_cosine"] = float(
-                abs(np.dot(directions[factor_list[0]], directions[factor_list[1]]))
-            )
+        layer_directions.append(directions)
         rows.append(row)
 
     def stack_mean(key: str, stack: str) -> float:
@@ -440,20 +438,50 @@ def build_geometry_map(
             "cv_spearman_best": best(f"cv_spearman_{name}"),
             "stability_cos_mean": overall_mean(f"stability_cos_{name}"),
         }
-    if len(factor_list) == 2:
-        # Disentanglement is meaningful only relative to (a) the random-vector baseline
-        # and (b) within-factor direction stability. If cross_cosine ~ random and
-        # stability ~ random too, the directions are noise, not disentangled features.
-        summary["disentanglement"] = {
-            "cross_cosine_mean": float(
-                np.nanmean([r.get("cross_cosine", np.nan) for r in rows])
-            ),
-            "within_factor_stability_mean": {
-                name: float(np.nanmean([r.get(f"stability_cos_{name}", np.nan) for r in rows]))
-                for name in factor_list
-            },
-            "random_abs_cosine_baseline": random_cos_baseline,
-        }
+    # Disentanglement is meaningful only where factor directions are stable (clear the
+    # random baseline). Pick the analysis layer with the highest mean stability across
+    # factors, then compare the direction-cosine matrix to the realized-factor correlation
+    # matrix. A factor's geometry is trustworthy only if its stability > ~2x random.
+    stability_by_factor = {
+        name: overall_mean(f"stability_cos_{name}") for name in factor_list
+    }
+    stable_factors = [
+        name for name in factor_list if stability_by_factor[name] > 2.0 * random_cos_baseline
+    ]
+    mean_stab_per_layer = [
+        float(np.nanmean([rows[j].get(f"stability_cos_{f}", np.nan) for f in factor_list]))
+        for j in range(n_sites)
+    ]
+    analysis_j = int(np.nanargmax(mean_stab_per_layer)) if mean_stab_per_layer else 0
+    dirs = layer_directions[analysis_j]
+
+    def spearman_corr(a: np.ndarray, b: np.ndarray) -> float:
+        mask = np.isfinite(a) & np.isfinite(b)
+        if mask.sum() < 4 or a[mask].std() < 1e-12 or b[mask].std() < 1e-12:
+            return float("nan")
+        return float(np.corrcoef(_ranks(a[mask]), _ranks(b[mask]))[0, 1])
+
+    cosine_matrix = {
+        f1: {f2: float(abs(np.dot(dirs[f1], dirs[f2]))) for f2 in factor_list}
+        for f1 in factor_list
+    }
+    realized_corr = {
+        f1: {f2: spearman_corr(factor_y[f1], factor_y[f2]) for f2 in factor_list}
+        for f1 in factor_list
+    }
+    summary["disentanglement"] = {
+        "analysis_layer": {
+            "site": rows[analysis_j]["site"],
+            "stack": rows[analysis_j]["stack"],
+            "block": rows[analysis_j]["block"],
+        },
+        "random_abs_cosine_baseline": random_cos_baseline,
+        "stability_threshold": 2.0 * random_cos_baseline,
+        "factor_stability": stability_by_factor,
+        "stable_factors": stable_factors,
+        "direction_cosine_matrix": cosine_matrix,
+        "realized_factor_spearman_matrix": realized_corr,
+    }
     return rows, summary
 
 

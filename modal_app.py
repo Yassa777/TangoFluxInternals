@@ -46,6 +46,8 @@ GEOMETRY_METRIC_NAMES = (
     "onset_strength_max",
     "rolloff_85_mean_hz",
     "decay_time_to_minus_20db_ms",
+    "tail_energy_fraction_500ms",
+    "rms_dbfs",
 )
 
 hf_cache = modal.Volume.from_name("tangoflux-hf-cache", create_if_missing=True)
