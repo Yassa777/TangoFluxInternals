@@ -260,6 +260,129 @@ def summarize_intervention_rows(
     return site_rows, {"on_target": on_target, "by_site": specificity}
 
 
+def _unit_ridge_direction(
+    X: np.ndarray, y: np.ndarray, *, alpha: float = 1.0
+) -> tuple[np.ndarray, Any]:
+    from sklearn.linear_model import Ridge
+    from sklearn.preprocessing import StandardScaler
+
+    mask = np.isfinite(y)
+    scaler = StandardScaler().fit(X[mask])
+    ridge = Ridge(alpha=alpha).fit(scaler.transform(X[mask]), y[mask])
+    w = ridge.coef_
+    norm = float(np.linalg.norm(w))
+    return (w / norm if norm > 0 else w), scaler
+
+
+def _ranks(a: np.ndarray) -> np.ndarray:
+    order = np.argsort(a, kind="stable")
+    ranks = np.empty(len(a), dtype=float)
+    ranks[order] = np.arange(len(a), dtype=float)
+    return ranks
+
+
+def _projection_corr(
+    X: np.ndarray, y: np.ndarray, w: np.ndarray, scaler: Any
+) -> tuple[float, float]:
+    """Pearson (linearity) and Spearman (monotonicity) of the factor projection."""
+    mask = np.isfinite(y)
+    proj = scaler.transform(X[mask]) @ w
+    target = y[mask]
+    if proj.std() < 1e-12 or target.std() < 1e-12:
+        return float("nan"), float("nan")
+    pearson = float(np.corrcoef(proj, target)[0, 1])
+    spearman = float(np.corrcoef(_ranks(proj), _ranks(target))[0, 1])
+    return pearson, spearman
+
+
+def build_geometry_map(
+    bundle: dict[str, Any],
+    factors: dict[str, str],
+    *,
+    cfg_row: int = 0,
+    n_splits: int = 5,
+    alpha: float = 1.0,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Per-layer representation-geometry map against physical ground-truth factors.
+
+    For each site: linear encodability (grouped-CV R²) of each realized factor, the
+    projection's linearity/monotonicity, and the cosine between factor directions
+    (disentanglement). ``factors`` maps a factor name to its realized-metric column.
+    """
+    features = bundle["features"]
+    sites = bundle["sites"].astype(str)
+    stacks = bundle["stacks"].astype(str)
+    blocks = bundle["blocks"].astype(int)
+    sources = bundle["sources"].astype(str)
+    realized_names = bundle["realized_names"].astype(str).tolist()
+    realized = bundle["realized"]
+    n_sites = features.shape[1]
+
+    factor_y = {
+        name: realized[:, realized_names.index(metric)]
+        for name, metric in factors.items()
+        if metric in realized_names
+    }
+    factor_list = list(factor_y)
+
+    rows: list[dict[str, Any]] = []
+    for j in range(n_sites):
+        X = features[:, j, cfg_row, :]
+        row: dict[str, Any] = {"site": str(sites[j]), "stack": str(stacks[j]), "block": int(blocks[j])}
+        directions: dict[str, np.ndarray] = {}
+        for name, y in factor_y.items():
+            r2, r2_std, n_valid = metric_r2(X, y, sources, n_splits=n_splits, alpha=alpha)
+            w, scaler = _unit_ridge_direction(X, y, alpha=alpha)
+            pearson, spearman = _projection_corr(X, y, w, scaler)
+            row[f"r2_{name}"] = r2
+            row[f"lin_pearson_{name}"] = pearson
+            row[f"mono_spearman_{name}"] = spearman
+            row[f"n_{name}"] = n_valid
+            directions[name] = w
+        if len(factor_list) == 2:
+            row["abs_cosine"] = float(
+                abs(np.dot(directions[factor_list[0]], directions[factor_list[1]]))
+            )
+        rows.append(row)
+
+    def stack_mean(key: str, stack: str) -> float:
+        vals = [
+            r[key]
+            for r in rows
+            if r["stack"] == stack and r.get(key) is not None and np.isfinite(r.get(key, np.nan))
+        ]
+        return float(np.mean(vals)) if vals else float("nan")
+
+    def best(key: str) -> dict[str, Any] | None:
+        valid = [r for r in rows if r.get(key) is not None and np.isfinite(r.get(key, np.nan))]
+        if not valid:
+            return None
+        top = max(valid, key=lambda r: r[key])
+        return {"site": top["site"], "stack": top["stack"], "block": top["block"], "value": top[key]}
+
+    summary: dict[str, Any] = {"factors": factor_list, "by_factor": {}}
+    for name in factor_list:
+        summary["by_factor"][name] = {
+            "best_encodable": best(f"r2_{name}"),
+            "r2_dual_mean": stack_mean(f"r2_{name}", "dual"),
+            "r2_single_mean": stack_mean(f"r2_{name}", "single"),
+            "mono_spearman_dual_mean": stack_mean(f"mono_spearman_{name}", "dual"),
+            "mono_spearman_single_mean": stack_mean(f"mono_spearman_{name}", "single"),
+        }
+    if len(factor_list) == 2:
+        cosines = [(r["site"], r["abs_cosine"]) for r in rows if np.isfinite(r.get("abs_cosine", np.nan))]
+        summary["disentanglement"] = {
+            "abs_cosine_dual_mean": stack_mean("abs_cosine", "dual"),
+            "abs_cosine_single_mean": stack_mean("abs_cosine", "single"),
+            "most_orthogonal": (
+                {"site": min(cosines, key=lambda c: c[1])[0], "abs_cosine": min(c[1] for c in cosines)}
+                if cosines
+                else None
+            ),
+        }
+    return rows, summary
+
+
 def summarize_commitment_rows(
     rows: list[dict[str, Any]],
     attributes: Sequence[str],

@@ -38,6 +38,16 @@ HF_CACHE_DIR = "/cache/huggingface"
 OUTPUT_DIR = "/outputs"
 ACTIVATION_DIR = "/activations"
 
+# Realized acoustic factors stored alongside captured features for geometry analysis.
+GEOMETRY_METRIC_NAMES = (
+    "spectral_centroid_mean_hz",
+    "onset_rate_per_second",
+    "high_to_low_db",
+    "onset_strength_max",
+    "rolloff_85_mean_hz",
+    "decay_time_to_minus_20db_ms",
+)
+
 hf_cache = modal.Volume.from_name("tangoflux-hf-cache", create_if_missing=True)
 output_volume = modal.Volume.from_name("tangoflux-outputs", create_if_missing=True)
 activation_volume = modal.Volume.from_name("tangoflux-activations", create_if_missing=True)
@@ -394,6 +404,7 @@ def capture_probe_features(
     Returns one ``[batch, d_model]`` feature per site (batch keeps the CFG rows),
     averaged over denoising steps. No WAV is written; this is feature-only.
     """
+    from tangoflux_lab.audio_features import all_core_metrics
     from tangoflux_lab.hooks import ProbeFeatureRecorder
 
     record = normalize_generation_record(record)
@@ -401,8 +412,10 @@ def capture_probe_features(
     site_output_indices = {s["site"]: int(s["output_index"]) for s in sites}
     site_stacks = {s["site"]: str(s["stack"]) for s in sites}
     with ProbeFeatureRecorder(runner.model, site_output_indices, site_stacks) as recorder:
-        _generate_wave(runner, record)
+        audio, sample_rate = _generate_wave(runner, record)
 
+    metrics = all_core_metrics(audio, sample_rate)
+    realized = {name: metrics.get(name) for name in GEOMETRY_METRIC_NAMES}
     features = {
         name: tensor.numpy().astype("float32") for name, tensor in recorder.features().items()
     }
@@ -413,6 +426,8 @@ def capture_probe_features(
         "pair_id": str(record.get("pair_id", "")),
         "side": str(record.get("side", "")),
         "prompt": record.get("prompt"),
+        "metadata": dict(record.get("metadata", {})),
+        "realized": realized,
         "audio_tokens": recorder.audio_tokens,
         "token_dims": recorder.token_dims,
         "calls": recorder.calls,
@@ -1769,6 +1784,10 @@ def probe_capture(
     pair_ids: list[str] = []
     sides: list[str] = []
     job_ids: list[str] = []
+    sources: list[str] = []
+    levels: list[int] = []
+    realized_names = list(GEOMETRY_METRIC_NAMES)
+    realized = np.full((n_obs, len(realized_names)), np.nan, dtype="float32")
     for i, result in enumerate(results):
         for j, name in enumerate(site_names):
             features[i, j] = result["features"][name]
@@ -1776,6 +1795,14 @@ def probe_capture(
         pair_ids.append(result["pair_id"])
         sides.append(result["side"])
         job_ids.append(result["job_id"])
+        meta = result.get("metadata", {}) or {}
+        sources.append(str(meta.get("source", result["pair_id"])))
+        levels.append(int(meta.get("level", -1)))
+        rvals = result.get("realized", {}) or {}
+        for k, name in enumerate(realized_names):
+            value = rvals.get(name)
+            if value is not None:
+                realized[i, k] = float(value)
 
     out_dir = Path("outputs") / output_prefix
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -1791,6 +1818,10 @@ def probe_capture(
         stacks=np.array([s["stack"] for s in sites], dtype="U16"),
         blocks=np.array([s["block"] for s in sites], dtype="int64"),
         audio_tokens=np.array(int(first["audio_tokens"] or 0)),
+        sources=np.array(sources, dtype="U32"),
+        levels=np.array(levels, dtype="int64"),
+        realized=realized,
+        realized_names=np.array(realized_names, dtype="U48"),
     )
     print(f"Wrote {npz_path}  features shape={features.shape}  cfg_batch={batch}")
 
@@ -2143,3 +2174,36 @@ def commitment_time_test(
                 f"point_of_no_return={info['point_of_no_return_step']}"
             )
     print(f"\nWrote {out_dir}/commitment-rows.csv, commitment-window-summary.csv, commitment-summary.json")
+
+
+@app.local_entrypoint()
+def geometry_analyze(
+    features_path: str = "outputs/factor-sweeps-v1/probe-features.npz",
+    output_prefix: str = "factor-geometry-v1",
+    factors: str = "brightness:spectral_centroid_mean_hz,onset_rate:onset_rate_per_second",
+    cfg_row: int = 0,
+    n_splits: int = 5,
+) -> None:
+    """Representation-geometry map: linear encodability + disentanglement vs ground truth.
+
+    Runs locally (CPU) on captured sweep features. For each factor reports per-layer
+    linear R^2, projection linearity/monotonicity; for two factors also the cosine
+    between their activation directions (disentanglement), across the dual/single stream.
+    """
+    from tangoflux_lab.probing import build_geometry_map, load_feature_bundle
+
+    factor_map = {}
+    for item in factors.split(","):
+        if ":" in item:
+            name, metric = item.split(":", 1)
+            factor_map[name.strip()] = metric.strip()
+
+    bundle = load_feature_bundle(features_path)
+    rows, summary = build_geometry_map(bundle, factor_map, cfg_row=cfg_row, n_splits=n_splits)
+
+    out_dir = Path("results") / output_prefix
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_manifest_csv(str(out_dir / "geometry-map-rows.csv"), rows)
+    write_json(str(out_dir / "geometry-summary.json"), {"factors": factor_map, "summary": summary})
+    print(json.dumps(summary, indent=2, sort_keys=True))
+    print(f"Wrote {out_dir}/geometry-map-rows.csv, geometry-summary.json")
