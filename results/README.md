@@ -321,6 +321,34 @@ claim; loudness has silent-clip outliers; single model / single corpus. Next: de
 temporal metrics (or pick cleaner temporal factors) to test whether transient/envelope axes
 exist separately, and replicate on a second model.
 
+## Representation-Geometry v4 (18 factors, linear vs non-linear)
+
+Directory: `diverse-corpus-geometry-v2/` (same 250 clips, 18 realized factors spanning
+spectral / level / envelope / pitch / harmonicity / modulation; PCA-20; grouped CV;
+gradient-boosting non-linear estimator alongside linear ridge).
+
+Findings:
+
+- **12 of 18 factors have stable directions** (split-half cosine > 2x random = 0.357), and
+  every one of them is a *stationary* timbre property: the spectral family (brightness,
+  rolloff, tilt, bandwidth, contrast, flatness, ZCR), plus voicing, HNR, AM depth, loudness,
+  crest. The 6 unstable factors are exactly the *time-varying* ones: attack, decay, onset
+  density, tail, AM rate, and (sparse) F0.
+- **Non-linearity is not the missing ingredient.** A gradient-boosting probe does not beat
+  linear ridge for the temporal factors (non-linearity gains <= 0). So they are not
+  "non-linearly encoded" -- they are absent from the token-mean-pooled features.
+- **The cause is pooling, not the model or noise.** We mean-pool over audio tokens, which
+  discards the time axis, so only time-invariant factors survive. The cleanest evidence is
+  the modulation family splitting exactly on this line: AM *depth* (a magnitude) is stable
+  (0.60) while AM *rate* (a frequency, purely temporal) is at the noise floor (0.21).
+  Multi-seed denoising would not fix this; **time-aware pooling** (time-binned or unpooled
+  token features) is the right fix, and it also sets up the revived flow-time commitment work.
+- **Geometry-mirrors-physics replicates at scale**: across all 66 stable-factor pairs the
+  model direction-cosine correlates with the physical |Spearman| at **Pearson r = 0.88**
+  (was 0.98 on 6 pairs). The spectral family clusters (mean cosine 0.65); loudness/crest/AM
+  depth are more separate (0.35-0.40 to the spectral cluster). The representation's factor
+  geometry robustly tracks the output-space statistics.
+
 ## Artifact Policy
 
 Tracked:
