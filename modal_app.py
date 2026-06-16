@@ -2187,6 +2187,7 @@ def geometry_analyze(
     n_splits: int = 5,
     pca_components: int = 0,
     log_factors: str = "",
+    nonlinear_estimator: str = "",
 ) -> None:
     """Representation-geometry map: linear encodability + disentanglement vs ground truth.
 
@@ -2210,6 +2211,7 @@ def geometry_analyze(
         n_splits=n_splits,
         pca_components=(pca_components or None),
         log_factors=[f.strip() for f in log_factors.split(",") if f.strip()],
+        nonlinear_estimator=(nonlinear_estimator or None),
     )
 
     out_dir = Path("results") / output_prefix
@@ -2218,3 +2220,33 @@ def geometry_analyze(
     write_json(str(out_dir / "geometry-summary.json"), {"factors": factor_map, "summary": summary})
     print(json.dumps(summary, indent=2, sort_keys=True))
     print(f"Wrote {out_dir}/geometry-map-rows.csv, geometry-summary.json")
+
+
+@app.function(image=image, timeout=600, scaledown_window=60)
+def _selftest_metrics_remote() -> dict[str, Any]:
+    import numpy as np
+    import torch
+
+    from tangoflux_lab.audio_features import _EXTENDED_TIMBRE_KEYS, all_core_metrics
+
+    sr = 44100
+    t = np.linspace(0, 3.5, int(3.5 * sr), endpoint=False)
+    rng = np.random.RandomState(0)
+    signals = {
+        "tone_220_tremolo5": 0.6 * np.sin(2 * np.pi * 220 * t) * (1 + 0.5 * np.sin(2 * np.pi * 5 * t)),
+        "white_noise": 0.3 * rng.randn(t.size),
+        "click_decay": np.sin(2 * np.pi * 400 * t) * np.exp(-t * 6.0),
+    }
+    out: dict[str, Any] = {}
+    for name, y in signals.items():
+        wf = torch.tensor(y[None, :], dtype=torch.float32)
+        metrics = all_core_metrics(wf, sr)
+        out[name] = {k: metrics.get(k) for k in _EXTENDED_TIMBRE_KEYS}
+    return out
+
+
+@app.local_entrypoint()
+def selftest_metrics() -> None:
+    """CPU-only check that the extended metric library runs in the Modal image."""
+    results = _selftest_metrics_remote.remote()
+    print(json.dumps(results, indent=2, sort_keys=True))

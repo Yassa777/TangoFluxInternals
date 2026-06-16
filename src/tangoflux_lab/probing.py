@@ -73,16 +73,36 @@ def label_accuracy(
     return float(scores.mean()), float(scores.std())
 
 
-def _reg_pipeline(alpha: float, pca: int | None):
+def _make_estimator(alpha: float, estimator: str):
+    """Linear or non-linear regressor for probing. 'ridge' is the linear default."""
+    if estimator == "ridge":
+        from sklearn.linear_model import Ridge
+
+        return Ridge(alpha=alpha)
+    if estimator == "rbf":
+        from sklearn.kernel_ridge import KernelRidge
+
+        return KernelRidge(alpha=alpha, kernel="rbf", gamma=None)
+    if estimator == "gb":
+        from sklearn.ensemble import HistGradientBoostingRegressor
+
+        return HistGradientBoostingRegressor(max_depth=3, max_iter=200, random_state=0)
+    if estimator == "mlp":
+        from sklearn.neural_network import MLPRegressor
+
+        return MLPRegressor(hidden_layer_sizes=(64,), alpha=alpha, max_iter=1000, random_state=0)
+    raise ValueError(f"Unknown estimator: {estimator}")
+
+
+def _reg_pipeline(alpha: float, pca: int | None, estimator: str = "ridge"):
     from sklearn.decomposition import PCA
-    from sklearn.linear_model import Ridge
     from sklearn.pipeline import make_pipeline
     from sklearn.preprocessing import StandardScaler
 
     steps = [StandardScaler()]
     if pca:
         steps.append(PCA(n_components=pca, random_state=0))
-    steps.append(Ridge(alpha=alpha))
+    steps.append(_make_estimator(alpha, estimator))
     return make_pipeline(*steps)
 
 
@@ -94,6 +114,7 @@ def metric_r2(
     n_splits: int = 5,
     alpha: float = 1.0,
     pca: int | None = None,
+    estimator: str = "ridge",
 ) -> tuple[float, float, int]:
     from sklearn.model_selection import cross_val_score
 
@@ -103,7 +124,8 @@ def metric_r2(
     if n_groups < 2 or ts.size < 4:
         return float("nan"), float("nan"), int(mask.sum())
     scores = cross_val_score(
-        _reg_pipeline(alpha, pca), Xs, ts, cv=_kfold(n_splits, n_groups), groups=gs, scoring="r2"
+        _reg_pipeline(alpha, pca, estimator), Xs, ts, cv=_kfold(n_splits, n_groups),
+        groups=gs, scoring="r2",
     )
     return float(scores.mean()), float(scores.std()), int(mask.sum())
 
@@ -351,6 +373,7 @@ def build_geometry_map(
     alpha: float = 1.0,
     pca_components: int | None = None,
     log_factors: Iterable[str] = (),
+    nonlinear_estimator: str | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Per-layer representation-geometry map against physical ground-truth factors.
 
@@ -397,6 +420,15 @@ def build_geometry_map(
             row[f"cv_spearman_{name}"] = spearman
             row[f"stability_cos_{name}"] = _split_half_cosine(X_red, y, sources, alpha=alpha)
             row[f"n_{name}"] = n_valid
+            if nonlinear_estimator:
+                r2_nl, _, _ = metric_r2(
+                    X, y, sources, n_splits=n_splits, alpha=alpha, pca=pca_components,
+                    estimator=nonlinear_estimator,
+                )
+                row[f"r2_nl_{name}"] = r2_nl
+                row[f"nonlinearity_gain_{name}"] = (
+                    float(r2_nl - r2) if np.isfinite(r2_nl) and np.isfinite(r2) else float("nan")
+                )
             directions[name] = w
         layer_directions.append(directions)
         rows.append(row)

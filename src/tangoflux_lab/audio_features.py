@@ -191,7 +191,121 @@ def all_core_metrics(waveform: Any, sample_rate: int) -> dict[str, float | int |
         **spectral_metrics(waveform, sample_rate),
         **onset_transient_metrics(waveform, sample_rate),
         **decay_reverb_metrics(waveform, sample_rate),
+        **extended_timbre_metrics(waveform, sample_rate),
     }
+
+
+_EXTENDED_TIMBRE_KEYS = (
+    "spectral_flatness_mean",
+    "zero_crossing_rate_mean",
+    "spectral_bandwidth_mean_hz",
+    "spectral_contrast_mean_db",
+    "f0_median_hz",
+    "voiced_fraction",
+    "hnr_db",
+    "am_rate_hz",
+    "am_depth",
+    "tempo_bpm",
+    "pulse_clarity",
+    "crest_factor_db",
+)
+
+
+def extended_timbre_metrics(waveform: Any, sample_rate: int) -> dict[str, float | None]:
+    """Independent-axis timbre metrics: noisiness, pitch, harmonicity, modulation, rhythm.
+
+    Each block is guarded so one failure does not void the rest. Tuned for short
+    (~3-4 s) clips; values that cannot be estimated are returned as None.
+    """
+    import librosa
+    import numpy as np
+
+    out: dict[str, float | None] = {key: None for key in _EXTENDED_TIMBRE_KEYS}
+    mono = waveform.mean(dim=0).float().cpu().numpy()
+    if mono.size == 0 or float(np.sum(np.square(mono))) <= 1e-12:
+        return out
+
+    n_fft = min(2048, max(256, 2 ** int(np.log2(max(mono.size // 4, 256)))))
+    hop = max(128, n_fft // 4)
+
+    # --- noisiness / tonality ---
+    try:
+        flat = librosa.feature.spectral_flatness(y=mono, n_fft=n_fft, hop_length=hop)[0]
+        out["spectral_flatness_mean"] = finite_or_none(float(np.mean(flat)))
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        zcr = librosa.feature.zero_crossing_rate(mono, frame_length=n_fft, hop_length=hop)[0]
+        out["zero_crossing_rate_mean"] = finite_or_none(float(np.mean(zcr)))
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        bw = librosa.feature.spectral_bandwidth(y=mono, sr=sample_rate, n_fft=n_fft, hop_length=hop)[0]
+        out["spectral_bandwidth_mean_hz"] = finite_or_none(float(np.mean(bw)))
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        contrast = librosa.feature.spectral_contrast(y=mono, sr=sample_rate, n_fft=n_fft, hop_length=hop)
+        out["spectral_contrast_mean_db"] = finite_or_none(float(np.mean(contrast)))
+    except Exception:  # noqa: BLE001
+        pass
+
+    # --- pitch / harmonicity ---
+    try:
+        f0, voiced_flag, _ = librosa.pyin(
+            mono, fmin=50.0, fmax=2000.0, sr=sample_rate, frame_length=max(n_fft, 1024)
+        )
+        voiced = f0[np.isfinite(f0)]
+        out["voiced_fraction"] = finite_or_none(float(np.mean(voiced_flag)))
+        out["f0_median_hz"] = finite_or_none(float(np.median(voiced))) if voiced.size else None
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        harmonic = librosa.effects.harmonic(mono)
+        residual = mono - harmonic
+        h_energy = float(np.sum(np.square(harmonic)))
+        n_energy = float(np.sum(np.square(residual)))
+        out["hnr_db"] = db_ratio(h_energy, n_energy)
+    except Exception:  # noqa: BLE001
+        pass
+
+    # --- amplitude modulation (tremolo / roughness / pulsing) ---
+    try:
+        env = librosa.feature.rms(y=mono, frame_length=n_fft, hop_length=hop)[0]
+        if env.size >= 8 and float(np.mean(env)) > 1e-8:
+            env_rate = sample_rate / hop
+            centered = env - float(np.mean(env))
+            spec = np.abs(np.fft.rfft(centered))
+            freqs = np.fft.rfftfreq(centered.size, d=1.0 / env_rate)
+            band = (freqs >= 1.0) & (freqs <= 30.0)
+            if band.any() and spec[band].size:
+                peak = int(np.argmax(spec[band]))
+                out["am_rate_hz"] = finite_or_none(float(freqs[band][peak]))
+                out["am_depth"] = finite_or_none(float(spec[band][peak] / (np.mean(env) * env.size)))
+    except Exception:  # noqa: BLE001
+        pass
+
+    # --- rhythm ---
+    try:
+        onset_env = librosa.onset.onset_strength(y=mono, sr=sample_rate, hop_length=hop)
+        tempo = librosa.feature.rhythm.tempo(onset_envelope=onset_env, sr=sample_rate, hop_length=hop)
+        out["tempo_bpm"] = finite_or_none(float(np.atleast_1d(tempo)[0]))
+        if onset_env.size >= 8:
+            ac = librosa.autocorrelate(onset_env)
+            if ac.size > 1 and ac[0] > 1e-8:
+                out["pulse_clarity"] = finite_or_none(float(np.max(ac[1:]) / ac[0]))
+    except Exception:  # noqa: BLE001
+        pass
+
+    # --- crest factor ---
+    try:
+        rms = float(np.sqrt(np.mean(np.square(mono))))
+        peak = float(np.max(np.abs(mono)))
+        out["crest_factor_db"] = db_ratio(peak, rms)
+    except Exception:  # noqa: BLE001
+        pass
+
+    return out
 
 
 def decay_reverb_metrics(
