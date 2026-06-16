@@ -149,6 +149,46 @@ own. Interpretation: the linear percussive−sustained activation direction is e
 onset is only moved by full-trajectory patching. This sharpens, rather than overturns, the
 earlier steering result.
 
+## Flow-Time Commitment (Method + First Result)
+
+Directory: `percussive-sustained-commitment-v1/` (5 pairs, 2 sites, 50 steps, both directions).
+
+New primitive: `ActivationPatcher` can gate patching to a denoising-step window, so we
+patch a site's source trajectory only during prefix `[0,k)` or suffix `[k,T)` flow-steps
+and measure how much of the attribute still moves. Sweeping the window recovers *when* in
+the generation trajectory an attribute is causally malleable. This is flow-time-resolved
+causal tracing — the temporal axis most static-pass interpretability ignores.
+
+Movement-toward-source by window (fraction of source-target gap; T=50):
+
+| site / attribute | [0,12) | [0,25) | [0,50) | [12,50) | [25,50) | [38,50) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| single_8 onset | 0.76 | 0.92 | 0.95 | 0.75 | 0.52 | 0.26 |
+| single_8 centroid | 0.84 | 0.93 | 0.99 | 0.75 | 0.49 | 0.31 |
+| dual_3 onset | 0.58 | 0.82 | 0.86 | 0.74 | 0.52 | 0.26 |
+| dual_3 centroid | 0.66 | 0.86 | 0.91 | 0.74 | 0.50 | 0.32 |
+
+Findings (honest):
+
+- **Commitment is early-weighted and graded, not a sharp point of no return.** Patching only
+  the first quarter of steps `[0,12)` already secures ~76–84% of the full effect; the first
+  half `[0,25)` reaches ~92–93%. Late-only patching tapers smoothly (`[25,50)` ≈ 0.5,
+  `[38,50)` ≈ 0.3). The high-noise early phase carries most of the causal weight.
+- **The coarse-to-fine *ordering* hypothesis is NOT supported at this resolution.** Onset
+  (expected "late/fine") and spectral centroid (expected "early/global") commit on nearly
+  identical schedules at both sites. The earlier PoNR difference (onset 25 vs centroid 12)
+  was a threshold artifact (suffix `[25,50)` = 0.52 vs 0.49). This challenges, rather than
+  confirms, the image-diffusion folklore that fine detail is always committed late — at
+  least for these two acoustic attributes at these sites.
+
+Implications for next experiments:
+
+- Most of the action is inside `[0,12)`; we did not resolve *within* the early phase.
+  A finer early sweep (cuts at ~2,4,6,9,12) is needed to see any attribute ordering.
+- Activation-level windowed patching conflates layer and flow-time. A **latent-level**
+  swap (replace the latent at step k and continue) would isolate pure flow-time and give a
+  clean, architecture-free point-of-no-return.
+
 ## Artifact Policy
 
 Tracked:
