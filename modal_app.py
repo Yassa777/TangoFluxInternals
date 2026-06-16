@@ -997,7 +997,43 @@ PROBE_METRIC_NAMES = (
     "decay_time_to_minus_20db_ms",
     "high_to_low_db",
     "tail_energy_fraction_500ms",
+    "direct_to_late_db",
+    "reverb_proxy_score",
+    "late_energy_fraction_300ms",
+    "late_energy_fraction_700ms",
 )
+
+
+def _csv_values(values: str) -> list[str]:
+    return [value.strip() for value in values.split(",") if value.strip()]
+
+
+def _probe_targets_from_arg(values: str) -> list[str]:
+    from tangoflux_lab.probing import DEFAULT_TARGETS, DRY_REVERB_TARGETS
+
+    if not values or values == "default":
+        return list(DEFAULT_TARGETS)
+    if values == "dry_reverb":
+        return list(DRY_REVERB_TARGETS)
+    return _csv_values(values)
+
+
+def _metric_names_from_arg(values: str) -> list[str]:
+    if not values or values == "default":
+        return list(PROBE_METRIC_NAMES)
+    if values == "dry_reverb":
+        return list(
+            dict.fromkeys(
+                [
+                    *PROBE_METRIC_NAMES,
+                    "direct_to_late_db",
+                    "reverb_proxy_score",
+                    "late_energy_fraction_300ms",
+                    "late_energy_fraction_700ms",
+                ]
+            )
+        )
+    return _csv_values(values)
 
 
 @app.function(
@@ -1013,6 +1049,8 @@ def concept_patch_pair(
     *,
     alpha: float = 1.0,
     metric_names: list[str] | None = None,
+    positive_name: str = "positive",
+    negative_name: str = "negative",
 ) -> list[dict[str, Any]]:
     """Patch source-side activations into the target generation and measure metrics.
 
@@ -1057,8 +1095,8 @@ def concept_patch_pair(
             audio_tokens_by_side[side] = int(audio_values[0].shape[1])
 
     directions = [
-        ("sustained_to_percussive", "positive", "negative"),
-        ("percussive_to_sustained", "negative", "positive"),
+        (f"{negative_name}_to_{positive_name}", "positive", "negative"),
+        (f"{positive_name}_to_{negative_name}", "negative", "positive"),
     ]
     rows: list[dict[str, Any]] = []
     for site in sites:
@@ -1678,6 +1716,7 @@ def probe_train(
     cfg_row: str = "auto",
     exclude_pairs: str = "19",
     n_splits: int = 5,
+    targets: str = "default",
 ) -> None:
     """Fit pair-grouped logistic + ridge probes and write the decodability/R^2 map.
 
@@ -1688,18 +1727,18 @@ def probe_train(
     import csv
 
     from tangoflux_lab.probing import (
-        DEFAULT_TARGETS,
         build_probe_map,
         load_feature_bundle,
         summarize_probe_map,
     )
 
+    target_names = _probe_targets_from_arg(targets)
     bundle = load_feature_bundle(features_path)
-    lookups: dict[str, dict[tuple[str, str], float]] = {target: {} for target in DEFAULT_TARGETS}
+    lookups: dict[str, dict[tuple[str, str], float]] = {target: {} for target in target_names}
     with open(metrics_path, encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle):
             key = (str(row.get("pair_id", "")), str(row.get("side", "")))
-            for target in DEFAULT_TARGETS:
+            for target in target_names:
                 try:
                     lookups[target][key] = float(row[target])
                 except (KeyError, TypeError, ValueError):
@@ -1708,9 +1747,14 @@ def probe_train(
     exclude = [p for p in exclude_pairs.split(",") if p]
     cfg: str | int = cfg_row if cfg_row == "auto" else int(cfg_row)
     rows, meta = build_probe_map(
-        bundle, lookups, cfg_row=cfg, exclude_pairs=exclude, n_splits=n_splits
+        bundle,
+        lookups,
+        targets=target_names,
+        cfg_row=cfg,
+        exclude_pairs=exclude,
+        n_splits=n_splits,
     )
-    summary = summarize_probe_map(rows)
+    summary = summarize_probe_map(rows, targets=target_names)
 
     out_dir = Path("results") / output_prefix
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -1737,6 +1781,9 @@ def concept_patch_test(
     steps: int = 0,
     alpha: float = 1.0,
     on_target: str = "onset_strength_max",
+    metrics: str = "default",
+    positive_name: str = "positive",
+    negative_name: str = "negative",
 ) -> None:
     """Causal cross-check: patch top probe sites and measure audio-metric movement.
 
@@ -1764,13 +1811,21 @@ def concept_patch_test(
         f"Patch cross-check: {len(pair_groups)} pairs x {len(site_specs)} sites x 2 directions"
     )
 
+    metric_names = _metric_names_from_arg(metrics)
     raw_rows: list[dict[str, Any]] = []
     for pair_rows in concept_patch_pair.map(
-        pair_groups, kwargs={"sites": site_specs, "alpha": alpha}, order_outputs=True
+        pair_groups,
+        kwargs={
+            "sites": site_specs,
+            "alpha": alpha,
+            "metric_names": metric_names,
+            "positive_name": positive_name,
+            "negative_name": negative_name,
+        },
+        order_outputs=True,
     ):
         raw_rows.extend(pair_rows)
 
-    metric_names = list(PROBE_METRIC_NAMES)
     site_rows, specificity = summarize_intervention_rows(
         raw_rows, metric_names, on_target=on_target
     )
@@ -1785,6 +1840,9 @@ def concept_patch_test(
             "sites": wanted,
             "alpha": alpha,
             "on_target": on_target,
+            "metric_names": metric_names,
+            "positive_name": positive_name,
+            "negative_name": negative_name,
             "n_pairs": len(pair_groups),
             "specificity": specificity,
         },
@@ -1806,6 +1864,8 @@ def concept_steer_test(
     steps: int = 0,
     on_target: str = "onset_strength_max",
     audio_only: bool = True,
+    metrics: str = "default",
+    base_side: str = "negative",
 ) -> None:
     """Steering specificity: push sustained prompts toward percussive at top sites.
 
@@ -1817,7 +1877,7 @@ def concept_steer_test(
 
     from tangoflux_lab.probing import load_feature_bundle, summarize_intervention_rows
 
-    metric_names = list(PROBE_METRIC_NAMES)
+    metric_names = _metric_names_from_arg(metrics)
 
     # cfg row to read features from (matches the probe's conditional-row choice).
     cfg_row = 0
@@ -1866,7 +1926,9 @@ def concept_steer_test(
     records = _records_from_prompt_file(
         prompts_path, default_duration=3.5, default_steps=50, default_guidance_scale=4.0
     )
-    base_records = [r for r in records if r.get("side") == "negative"][:max_pairs]
+    base_records = [r for r in records if r.get("side") == base_side]
+    if max_pairs > 0:
+        base_records = base_records[:max_pairs]
     if steps > 0:
         for record in base_records:
             record["steps"] = steps
@@ -1933,6 +1995,8 @@ def concept_steer_test(
             "audio_tokens": audio_tokens,
             "on_target": on_target,
             "n_prompts": len(base_records),
+            "base_side": base_side,
+            "metric_names": metric_names,
             "population_gap": gap,
             "specificity": specificity,
         },

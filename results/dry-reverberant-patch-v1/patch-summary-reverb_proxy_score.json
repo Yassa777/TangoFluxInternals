@@ -1,0 +1,62 @@
+{
+  "on_target": "reverb_proxy_score",
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.3": {
+        "off_target_toward_source_mean": 1.4643233525601071,
+        "off_target_toward_source_median": 0.8760366816593607,
+        "on_target": "reverb_proxy_score",
+        "on_target_toward_source_mean": 0.929588248568337,
+        "on_target_toward_source_median": 0.9774232412036176,
+        "specificity_gap": -0.5347351039917702,
+        "specificity_gap_median": 0.1013865595442569
+      },
+      "transformer.single_transformer_blocks.6": {
+        "off_target_toward_source_mean": 1.476868099035865,
+        "off_target_toward_source_median": 0.9056073453798468,
+        "on_target": "reverb_proxy_score",
+        "on_target_toward_source_mean": 0.7731569255130966,
+        "on_target_toward_source_median": 1.0046060420928613,
+        "specificity_gap": -0.7037111735227684,
+        "specificity_gap_median": 0.09899869671301453
+      },
+      "transformer.single_transformer_blocks.7": {
+        "off_target_toward_source_mean": 1.096331783984862,
+        "off_target_toward_source_median": 0.9337559007462601,
+        "on_target": "reverb_proxy_score",
+        "on_target_toward_source_mean": 0.9630017505232006,
+        "on_target_toward_source_median": 1.0094881991791596,
+        "specificity_gap": -0.1333300334616615,
+        "specificity_gap_median": 0.07573229843289941
+      },
+      "transformer.single_transformer_blocks.8": {
+        "off_target_toward_source_mean": 1.5524646214180537,
+        "off_target_toward_source_median": 0.9516157270993,
+        "on_target": "reverb_proxy_score",
+        "on_target_toward_source_mean": 0.9359916526226375,
+        "on_target_toward_source_median": 1.0072544505673657,
+        "specificity_gap": -0.6164729687954162,
+        "specificity_gap_median": 0.055638723468065754
+      },
+      "transformer.single_transformer_blocks.9": {
+        "off_target_toward_source_mean": 1.5220597447695103,
+        "off_target_toward_source_median": 0.9637069646436902,
+        "on_target": "reverb_proxy_score",
+        "on_target_toward_source_mean": 0.9592828147071888,
+        "on_target_toward_source_median": 1.0100107912944405,
+        "specificity_gap": -0.5627769300623215,
+        "specificity_gap_median": 0.04630382665075028
+      },
+      "transformer.transformer_blocks.3": {
+        "off_target_toward_source_mean": 0.6641543195683518,
+        "off_target_toward_source_median": 0.7781321971877244,
+        "on_target": "reverb_proxy_score",
+        "on_target_toward_source_mean": 0.8563404610477632,
+        "on_target_toward_source_median": 0.8534149892969995,
+        "specificity_gap": 0.19218614147941138,
+        "specificity_gap_median": 0.07528279210927513
+      }
+    },
+    "on_target": "reverb_proxy_score"
+  }
+}

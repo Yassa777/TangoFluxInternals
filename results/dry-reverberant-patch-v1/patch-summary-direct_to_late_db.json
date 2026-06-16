@@ -1,0 +1,62 @@
+{
+  "on_target": "direct_to_late_db",
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.3": {
+        "off_target_toward_source_mean": 1.713990077249183,
+        "off_target_toward_source_median": 0.895980885542157,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": -1.0677455489442687,
+        "on_target_toward_source_median": 0.8178696101412468,
+        "specificity_gap": -2.7817356261934516,
+        "specificity_gap_median": -0.07811127540091023
+      },
+      "transformer.single_transformer_blocks.6": {
+        "off_target_toward_source_mean": 1.7221181175232008,
+        "off_target_toward_source_median": 0.9191778213995,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": -1.1888432223855907,
+        "on_target_toward_source_median": 0.8960422339356353,
+        "specificity_gap": -2.9109613399087912,
+        "specificity_gap_median": -0.023135587463864682
+      },
+      "transformer.single_transformer_blocks.7": {
+        "off_target_toward_source_mean": 1.4532935513555496,
+        "off_target_toward_source_median": 0.945410718494186,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": -1.8926923884422997,
+        "on_target_toward_source_median": 0.9162496571957528,
+        "specificity_gap": -3.345985939797849,
+        "specificity_gap_median": -0.02916106129843321
+      },
+      "transformer.single_transformer_blocks.8": {
+        "off_target_toward_source_mean": 1.8086062653897095,
+        "off_target_toward_source_median": 0.9558186721187134,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": -1.1131414991506081,
+        "on_target_toward_source_median": 0.9736308904120582,
+        "specificity_gap": -2.9217477645403176,
+        "specificity_gap_median": 0.017812218293344784
+      },
+      "transformer.single_transformer_blocks.9": {
+        "off_target_toward_source_mean": 1.792784606868019,
+        "off_target_toward_source_median": 0.9682862521612373,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": -1.2065160820808813,
+        "on_target_toward_source_median": 0.9733764911540641,
+        "specificity_gap": -2.9993006889489005,
+        "specificity_gap_median": 0.00509023899282679
+      },
+      "transformer.transformer_blocks.3": {
+        "off_target_toward_source_mean": 0.8947118152538469,
+        "off_target_toward_source_median": 0.7899714719069104,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": -0.9881195044361973,
+        "on_target_toward_source_median": 0.7587007915435114,
+        "specificity_gap": -1.8828313196900441,
+        "specificity_gap_median": -0.03127068036339897
+      }
+    },
+    "on_target": "direct_to_late_db"
+  }
+}

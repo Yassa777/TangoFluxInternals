@@ -215,6 +215,8 @@ The local probe trainer needs the `analysis` extra: `pip install -e ".[dev,analy
 ## Current Results
 
 See `results/README.md` for the committed artifact index.
+See `docs/experiment_log_and_findings.md` for the consolidated experiment log,
+results tables, and interpretation across all attempted protocols.
 
 Current strongest signals:
 

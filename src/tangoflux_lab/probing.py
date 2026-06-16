@@ -2,7 +2,7 @@
 
 Two probe families are fit independently at every DiT site:
 
-* a logistic-regression *label* probe (percussive=1 / sustained=0), scored by
+* a logistic-regression *label* probe (positive=1 / negative=0), scored by
   cross-validated accuracy -> "decodability";
 * a ridge-regression *metric* probe per audio target (onset, decay, ...), scored
   by cross-validated R^2 -> "predictability".
@@ -29,7 +29,18 @@ DEFAULT_TARGETS: tuple[str, ...] = (
     "high_to_low_db",
 )
 
-POSITIVE_SIDE = "positive"  # percussive
+DRY_REVERB_TARGETS: tuple[str, ...] = (
+    "direct_to_late_db",
+    "reverb_proxy_score",
+    "tail_energy_fraction_500ms",
+    "late_energy_fraction_300ms",
+    "late_energy_fraction_700ms",
+    "decay_time_to_minus_20db_ms",
+    "high_to_low_db",
+    "onset_strength_max",
+)
+
+POSITIVE_SIDE = "positive"
 
 # Heavy-tailed, strictly-positive targets that are better modeled in log space.
 # Linear ridge on raw milliseconds/fractions tends to give negative R^2 because a
@@ -238,22 +249,35 @@ def summarize_intervention_rows(
     for site in sites:
         row: dict[str, Any] = {"site": site}
         means: dict[str, float] = {}
+        medians: dict[str, float] = {}
         for metric in metric_names:
             vals = np.asarray(by_site_metric.get((site, metric), []), dtype=float)
             if vals.size:
                 row[f"{metric}_toward_source_mean"] = float(vals.mean())
+                row[f"{metric}_toward_source_median"] = float(np.median(vals))
                 row[f"{metric}_frac_moved_toward"] = float((vals > 0).mean())
                 row[f"{metric}_n"] = int(vals.size)
                 means[metric] = float(vals.mean())
+                medians[metric] = float(np.median(vals))
         site_rows.append(row)
         off = [v for m, v in means.items() if m != on_target]
+        off_medians = [v for m, v in medians.items() if m != on_target]
         specificity[site] = {
             "on_target": on_target,
             "on_target_toward_source_mean": means.get(on_target),
+            "on_target_toward_source_median": medians.get(on_target),
             "off_target_toward_source_mean": float(np.mean(off)) if off else None,
+            "off_target_toward_source_median": (
+                float(np.mean(off_medians)) if off_medians else None
+            ),
             "specificity_gap": (
                 float(means[on_target] - np.mean(off))
                 if on_target in means and off
+                else None
+            ),
+            "specificity_gap_median": (
+                float(medians[on_target] - np.mean(off_medians))
+                if on_target in medians and off_medians
                 else None
             ),
         }

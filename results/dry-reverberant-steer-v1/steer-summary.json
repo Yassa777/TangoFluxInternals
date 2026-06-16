@@ -1,0 +1,84 @@
+{
+  "audio_only": true,
+  "audio_tokens": 645,
+  "base_side": "negative",
+  "cfg_row": 1,
+  "metric_names": [
+    "onset_strength_max",
+    "spectral_centroid_mean_hz",
+    "decay_time_to_minus_20db_ms",
+    "high_to_low_db",
+    "tail_energy_fraction_500ms",
+    "direct_to_late_db",
+    "reverb_proxy_score",
+    "late_energy_fraction_300ms",
+    "late_energy_fraction_700ms"
+  ],
+  "n_prompts": 5,
+  "on_target": "direct_to_late_db",
+  "population_gap": {
+    "decay_time_to_minus_20db_ms": -339.8820861678005,
+    "direct_to_late_db": 4.7053475447058375,
+    "high_to_low_db": 5.0559178865142265,
+    "late_energy_fraction_300ms": -0.2797017986695987,
+    "late_energy_fraction_700ms": -0.1787004142319248,
+    "onset_strength_max": 2.3040304720401767,
+    "reverb_proxy_score": -0.22789865579365426,
+    "spectral_centroid_mean_hz": 359.53868103027344,
+    "tail_energy_fraction_500ms": -0.20830464850767383
+  },
+  "scales": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    4.0
+  ],
+  "sites": [
+    "transformer.single_transformer_blocks.6",
+    "transformer.transformer_blocks.3",
+    "transformer.single_transformer_blocks.3",
+    "transformer.single_transformer_blocks.9"
+  ],
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.3": {
+        "off_target_toward_source_mean": 0.715382982651764,
+        "off_target_toward_source_median": 0.668582069808927,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": 0.3231215414912638,
+        "on_target_toward_source_median": 0.3846606572603901,
+        "specificity_gap": -0.3922614411605002,
+        "specificity_gap_median": -0.28392141254853687
+      },
+      "transformer.single_transformer_blocks.6": {
+        "off_target_toward_source_mean": 1.3846359825582013,
+        "off_target_toward_source_median": 1.1008498334056807,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": 1.06986015837903,
+        "on_target_toward_source_median": 1.0326407830833455,
+        "specificity_gap": -0.3147758241791714,
+        "specificity_gap_median": -0.06820905032233515
+      },
+      "transformer.single_transformer_blocks.9": {
+        "off_target_toward_source_mean": 1.1767300541311343,
+        "off_target_toward_source_median": 0.8427971502368788,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": 0.5865623301344516,
+        "on_target_toward_source_median": 0.6393237941377343,
+        "specificity_gap": -0.5901677239966827,
+        "specificity_gap_median": -0.20347335609914452
+      },
+      "transformer.transformer_blocks.3": {
+        "off_target_toward_source_mean": 1.0072666294761872,
+        "off_target_toward_source_median": 0.7921962898957075,
+        "on_target": "direct_to_late_db",
+        "on_target_toward_source_mean": 0.4095329564528372,
+        "on_target_toward_source_median": 0.5690653986476932,
+        "specificity_gap": -0.59773367302335,
+        "specificity_gap_median": -0.22313089124801422
+      }
+    },
+    "on_target": "direct_to_late_db"
+  }
+}

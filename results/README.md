@@ -149,6 +149,33 @@ own. Interpretation: the linear percussive−sustained activation direction is e
 onset is only moved by full-trajectory patching. This sharpens, rather than overturns, the
 earlier steering result.
 
+## Dry/Reverberant Probe, Patch, and Steering
+
+Summary report: `dry-reverberant-probe-patch-steer-v1-summary.md`
+
+Directories:
+
+- `dry-reverberant-probe-v1/`: grouped linear probe map using dry/reverb targets.
+- `dry-reverberant-patch-v1/`: 20-pair full-trajectory patch cross-check at six
+  label/reverb/tail sites.
+- `dry-reverberant-steer-v1/`: audio-token-only dry-minus-reverberant steering
+  sweep on five reverberant prompts.
+
+Key result:
+
+- The dry/reverberant label is decodable (best 0.95 at
+  `single_transformer_blocks.6`), but all grouped audio-metric R2 scores are
+  negative. The prompt concept is readable, while realized reverb metrics are
+  unstable in this 20-pair probe map.
+- Patching moves most rows toward the source on `direct_to_late_db` by fraction
+  count and median movement, but large outliers flip the mean negative. Off-target
+  reverb/energy metrics move comparably, so the patch effect is broad rather than
+  specific.
+- Additive audio-token steering can move reverberant prompts toward dry on
+  `direct_to_late_db` (best site `single_transformer_blocks.6`, mean 1.07, median
+  1.03), but off-target movement remains high. This is steerable, not cleanly
+  specific.
+
 ## Artifact Policy
 
 Tracked:
