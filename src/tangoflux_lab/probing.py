@@ -428,13 +428,17 @@ def build_geometry_map(
         "random_abs_cosine_baseline": random_cos_baseline,
         "by_factor": {},
     }
+    def overall_mean(key: str) -> float:
+        vals = [r[key] for r in rows if r.get(key) is not None and np.isfinite(r.get(key, np.nan))]
+        return float(np.mean(vals)) if vals else float("nan")
+
     for name in factor_list:
         summary["by_factor"][name] = {
             "best_encodable": best(f"r2_{name}"),
             "r2_dual_mean": stack_mean(f"r2_{name}", "dual"),
             "r2_single_mean": stack_mean(f"r2_{name}", "single"),
             "cv_spearman_best": best(f"cv_spearman_{name}"),
-            "stability_cos_mean": stack_mean(f"stability_cos_{name}", "dual"),
+            "stability_cos_mean": overall_mean(f"stability_cos_{name}"),
         }
     if len(factor_list) == 2:
         # Disentanglement is meaningful only relative to (a) the random-vector baseline

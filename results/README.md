@@ -230,6 +230,40 @@ non-text control of it), and a third clean factor. The contribution is the *test
 controls*, plus the concrete finding that brightness is represented ordinally with
 affine-linear legibility localized to the early dual stream.
 
+## Representation-Geometry v2 (Powered: PCA + controls)
+
+Directory: `factor-geometry-v2/` (96 prompts: brightness + decay sweeps, 8 sources x 6
+levels each; PCA-20 before probing; grouped CV by source; decay log1p-transformed).
+Random |cos| baseline at PCA-20 is 0.178.
+
+Manipulation check (honest, and a problem): brightness level -> realized centroid
+Spearman 0.30; **decay level -> realized decay 0.00 (control failed entirely)**. TangoFlux
+does not reliably realize "short vs sustained" text, and the new heterogeneous brightness
+sources add baseline variance. Realized factors still vary (centroid 570-5340 Hz, decay
+12-3460 ms) and are mutually independent (0.13), so realized-factor encodability is still
+testable.
+
+Findings:
+
+- **Brightness replicates and strengthens as a reproducible *ordinal* axis.** With PCA-20
+  the direction is highly stable across source-disjoint halves (split-half cosine
+  0.62-0.78, mean 0.67, vs 0.178 random ~3.8x) and monotonically recovered out-of-sample
+  (Spearman 0.57-0.75, slightly stronger in the dual stream). But R^2 < 0 everywhere: the
+  model encodes brightness *ordering*, not a calibrated linear magnitude. This is the same
+  monotonic-not-linear result as v1, now with proper power and dimensionality control.
+- **Decay is not recoverable** (stability 0.22 ~ random, Spearman ~0) -- a consequence of
+  the failed manipulation and a noisy metric, not a model fact.
+- **Disentanglement cannot be claimed**: cross-factor cosine (0.206) ~ random (0.178), and
+  because decay's own direction is at the noise floor the cosine is uninformative. A clean
+  disentanglement test needs two factors that each have stable directions.
+
+Methodological conclusion (the actionable lesson): designed text "sweeps" do not give
+clean single-factor control in TangoFlux (brightness weakly, decay not at all). The fix is
+to **decouple ground truth from prompt control** -- generate a large, diverse prompt corpus
+and bin/regress activations by the *realized measured* factor, rather than trying to make
+prompts sweep a factor. Brightness already shows that realized variation is robustly
+encoded even when the manipulation is weak, which validates the realized-binning approach.
+
 ## Artifact Policy
 
 Tracked:
