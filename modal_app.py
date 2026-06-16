@@ -2183,6 +2183,8 @@ def geometry_analyze(
     factors: str = "brightness:spectral_centroid_mean_hz,onset_rate:onset_rate_per_second",
     cfg_row: int = 0,
     n_splits: int = 5,
+    pca_components: int = 0,
+    log_factors: str = "",
 ) -> None:
     """Representation-geometry map: linear encodability + disentanglement vs ground truth.
 
@@ -2199,7 +2201,14 @@ def geometry_analyze(
             factor_map[name.strip()] = metric.strip()
 
     bundle = load_feature_bundle(features_path)
-    rows, summary = build_geometry_map(bundle, factor_map, cfg_row=cfg_row, n_splits=n_splits)
+    rows, summary = build_geometry_map(
+        bundle,
+        factor_map,
+        cfg_row=cfg_row,
+        n_splits=n_splits,
+        pca_components=(pca_components or None),
+        log_factors=[f.strip() for f in log_factors.split(",") if f.strip()],
+    )
 
     out_dir = Path("results") / output_prefix
     out_dir.mkdir(parents=True, exist_ok=True)

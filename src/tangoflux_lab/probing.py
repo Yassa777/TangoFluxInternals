@@ -73,6 +73,19 @@ def label_accuracy(
     return float(scores.mean()), float(scores.std())
 
 
+def _reg_pipeline(alpha: float, pca: int | None):
+    from sklearn.decomposition import PCA
+    from sklearn.linear_model import Ridge
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
+
+    steps = [StandardScaler()]
+    if pca:
+        steps.append(PCA(n_components=pca, random_state=0))
+    steps.append(Ridge(alpha=alpha))
+    return make_pipeline(*steps)
+
+
 def metric_r2(
     X: np.ndarray,
     t: np.ndarray,
@@ -80,20 +93,17 @@ def metric_r2(
     *,
     n_splits: int = 5,
     alpha: float = 1.0,
+    pca: int | None = None,
 ) -> tuple[float, float, int]:
-    from sklearn.linear_model import Ridge
     from sklearn.model_selection import cross_val_score
-    from sklearn.pipeline import make_pipeline
-    from sklearn.preprocessing import StandardScaler
 
     mask = np.isfinite(t)
     Xs, ts, gs = X[mask], t[mask], groups[mask]
     n_groups = int(np.unique(gs).size)
     if n_groups < 2 or ts.size < 4:
         return float("nan"), float("nan"), int(mask.sum())
-    pipe = make_pipeline(StandardScaler(), Ridge(alpha=alpha))
     scores = cross_val_score(
-        pipe, Xs, ts, cv=_kfold(n_splits, n_groups), groups=gs, scoring="r2"
+        _reg_pipeline(alpha, pca), Xs, ts, cv=_kfold(n_splits, n_groups), groups=gs, scoring="r2"
     )
     return float(scores.mean()), float(scores.std()), int(mask.sum())
 
@@ -282,25 +292,22 @@ def _ranks(a: np.ndarray) -> np.ndarray:
 
 
 def _cv_projection_corr(
-    X: np.ndarray, y: np.ndarray, groups: np.ndarray, *, n_splits: int = 5, alpha: float = 1.0
+    X: np.ndarray, y: np.ndarray, groups: np.ndarray, *, n_splits: int = 5, alpha: float = 1.0,
+    pca: int | None = None,
 ) -> tuple[float, float]:
     """Out-of-sample Pearson/Spearman of grouped cross-validated factor predictions.
 
     Uses cross_val_predict so the linearity/monotonicity is held-out, not in-sample
     (an in-sample 1024-dim ridge on a few dozen points trivially gives ~1.0).
     """
-    from sklearn.linear_model import Ridge
     from sklearn.model_selection import cross_val_predict
-    from sklearn.pipeline import make_pipeline
-    from sklearn.preprocessing import StandardScaler
 
     mask = np.isfinite(y)
     Xs, ys, gs = X[mask], y[mask], groups[mask]
     n_groups = int(np.unique(gs).size)
     if n_groups < 2 or ys.size < 4 or ys.std() < 1e-12:
         return float("nan"), float("nan")
-    pipe = make_pipeline(StandardScaler(), Ridge(alpha=alpha))
-    pred = cross_val_predict(pipe, Xs, ys, cv=_kfold(n_splits, n_groups), groups=gs)
+    pred = cross_val_predict(_reg_pipeline(alpha, pca), Xs, ys, cv=_kfold(n_splits, n_groups), groups=gs)
     if pred.std() < 1e-12:
         return float("nan"), float("nan")
     pearson = float(np.corrcoef(pred, ys)[0, 1])
@@ -324,6 +331,17 @@ def _split_half_cosine(X: np.ndarray, y: np.ndarray, groups: np.ndarray, *, alph
     return float(abs(np.dot(w_a, w_b)))
 
 
+def _reduce(X: np.ndarray, pca: int | None) -> np.ndarray:
+    """Standardize then PCA-reduce (full-data fit) for descriptive direction work."""
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
+
+    Xs = StandardScaler().fit_transform(X)
+    if pca and pca < min(Xs.shape):
+        Xs = PCA(n_components=pca, random_state=0).fit_transform(Xs)
+    return Xs
+
+
 def build_geometry_map(
     bundle: dict[str, Any],
     factors: dict[str, str],
@@ -331,6 +349,8 @@ def build_geometry_map(
     cfg_row: int = 0,
     n_splits: int = 5,
     alpha: float = 1.0,
+    pca_components: int | None = None,
+    log_factors: Iterable[str] = (),
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Per-layer representation-geometry map against physical ground-truth factors.
 
@@ -347,26 +367,34 @@ def build_geometry_map(
     realized = bundle["realized"]
     n_sites = features.shape[1]
 
-    factor_y = {
-        name: realized[:, realized_names.index(metric)]
-        for name, metric in factors.items()
-        if metric in realized_names
-    }
+    log_set = {str(name) for name in log_factors}
+    factor_y: dict[str, np.ndarray] = {}
+    for name, metric in factors.items():
+        if metric not in realized_names:
+            continue
+        y = realized[:, realized_names.index(metric)].astype(float)
+        if name in log_set:
+            with np.errstate(invalid="ignore"):
+                y = np.where(np.isfinite(y) & (y > -1.0), np.log1p(y), np.nan)
+        factor_y[name] = y
     factor_list = list(factor_y)
 
     rows: list[dict[str, Any]] = []
     for j in range(n_sites):
         X = features[:, j, cfg_row, :]
+        X_red = _reduce(X, pca_components)  # shared basis for descriptive directions
         row: dict[str, Any] = {"site": str(sites[j]), "stack": str(stacks[j]), "block": int(blocks[j])}
         directions: dict[str, np.ndarray] = {}
         for name, y in factor_y.items():
-            r2, r2_std, n_valid = metric_r2(X, y, sources, n_splits=n_splits, alpha=alpha)
-            pearson, spearman = _cv_projection_corr(X, y, sources, n_splits=n_splits, alpha=alpha)
-            w, _ = _unit_ridge_direction(X, y, alpha=alpha)
+            r2, r2_std, n_valid = metric_r2(X, y, sources, n_splits=n_splits, alpha=alpha, pca=pca_components)
+            pearson, spearman = _cv_projection_corr(
+                X, y, sources, n_splits=n_splits, alpha=alpha, pca=pca_components
+            )
+            w, _ = _unit_ridge_direction(X_red, y, alpha=alpha)
             row[f"r2_{name}"] = r2
             row[f"cv_pearson_{name}"] = pearson
             row[f"cv_spearman_{name}"] = spearman
-            row[f"stability_cos_{name}"] = _split_half_cosine(X, y, sources, alpha=alpha)
+            row[f"stability_cos_{name}"] = _split_half_cosine(X_red, y, sources, alpha=alpha)
             row[f"n_{name}"] = n_valid
             directions[name] = w
         if len(factor_list) == 2:
@@ -391,7 +419,8 @@ def build_geometry_map(
         return {"site": top["site"], "stack": top["stack"], "block": top["block"], "value": top[key]}
 
     d_model = int(features.shape[3])
-    random_cos_baseline = float(np.sqrt(2.0 / (np.pi * d_model)))
+    eff_dim = int(pca_components) if pca_components else d_model
+    random_cos_baseline = float(np.sqrt(2.0 / (np.pi * eff_dim)))
 
     summary: dict[str, Any] = {
         "factors": factor_list,
