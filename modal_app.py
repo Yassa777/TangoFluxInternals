@@ -39,15 +39,26 @@ OUTPUT_DIR = "/outputs"
 ACTIVATION_DIR = "/activations"
 
 # Realized acoustic factors stored alongside captured features for geometry analysis.
+# Spans spectral / level / envelope / pitch / harmonicity / modulation families.
 GEOMETRY_METRIC_NAMES = (
     "spectral_centroid_mean_hz",
-    "onset_rate_per_second",
-    "high_to_low_db",
-    "onset_strength_max",
     "rolloff_85_mean_hz",
+    "high_to_low_db",
+    "spectral_bandwidth_mean_hz",
+    "spectral_contrast_mean_db",
+    "spectral_flatness_mean",
+    "zero_crossing_rate_mean",
+    "onset_strength_max",
+    "onset_rate_per_second",
     "decay_time_to_minus_20db_ms",
     "tail_energy_fraction_500ms",
+    "f0_median_hz",
+    "voiced_fraction",
+    "hnr_db",
+    "am_rate_hz",
+    "am_depth",
     "rms_dbfs",
+    "crest_factor_db",
 )
 
 hf_cache = modal.Volume.from_name("tangoflux-hf-cache", create_if_missing=True)
