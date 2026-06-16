@@ -264,6 +264,60 @@ and bin/regress activations by the *realized measured* factor, rather than tryin
 prompts sweep a factor. Brightness already shows that realized variation is robustly
 encoded even when the manipulation is weak, which validates the realized-binning approach.
 
+## Representation-Geometry v3 (Realized-Corpus, 8 factors)
+
+Directory: `diverse-corpus-geometry-v1/` (250 diverse prompts, 40 source groups; 8 realized
+factors measured per clip; PCA-20; grouped CV by source; decay log1p). This uses the
+realized-binning approach (measure factors on a diverse corpus) instead of designed text
+sweeps. Random |cos| baseline 0.178; stability threshold 2x = 0.357.
+
+Per-factor (direction stability / best linear R^2 / best out-of-sample Spearman):
+
+| factor (metric) | stability | best R^2 | best CV Spearman |
+| --- | ---: | ---: | ---: |
+| brightness (centroid) | 0.85 | +0.59 | 0.82 |
+| rolloff_85 | 0.76 | +0.42 | 0.74 |
+| tilt (high/low dB) | 0.73 | +0.49 | 0.76 |
+| loudness (rms dBFS) | 0.69 | +0.15 | 0.56 |
+| density (onset rate) | 0.34 | +0.19 | 0.49 |
+| attack (onset strength) | 0.30 | +0.03 | 0.40 |
+| decay (log) | 0.26 | +0.03 | 0.29 |
+| tail energy | 0.13 | -0.08 | 0.08 |
+
+Findings:
+
+- **Correction of the v1/v2 claim**: with 250 diverse samples brightness is *linearly*
+  encodable (R^2 **+0.59**, dual block 3), not merely ordinal. The earlier negative R^2 was
+  a small-N / source-confound artifact, not a property of the model. Science self-correcting.
+- **Only 4 factors have trustworthy directions** (stability > 0.357): the three spectral
+  metrics + loudness. The temporal/transient/envelope factors (attack, decay, density, tail)
+  are not robustly linearly recoverable here — either the model does not linearly encode them
+  or the metrics are too noisy on diverse audio (not yet separable).
+- **The model's factor geometry mirrors the physical correlation structure.** Among the
+  stable factors, direction-cosine vs realized-Spearman:
+
+  ```
+  direction cosine (model)      realized |corr| (physical)
+            bri  rol  til  lou            bri  rol  til  lou
+  bright   1.00 0.92 0.97 0.29   bright  1.00 0.95 0.89 0.24
+  rolloff  0.92 1.00 0.87 0.48   rolloff 0.95 1.00 0.79 0.30
+  tilt     0.97 0.87 1.00 0.35   tilt    0.89 0.79 1.00 0.20
+  loudness 0.29 0.48 0.35 1.00   loudness0.24 0.30 0.20 1.00
+  ```
+
+  The three physically-collinear spectral factors (|r| 0.79-0.95) are encoded along a single
+  shared direction (cosine 0.87-0.97) — the model has one "brightness" latent, not three
+  independent encodings. Loudness, physically near-independent of spectrum (|r| 0.2-0.3, and
+  negative in sign), occupies a distinct axis (cosine 0.29-0.48). So the linearly-accessible
+  representation is low-dimensional: a spectral axis + a loudness axis, with internal geometry
+  that tracks the output-space statistics. Spectral structure is most legible in the early
+  dual stream (best R^2 at `transformer_blocks.3`).
+
+Limitations: cosine is sign-blind; temporal factors may need denoised metrics before any
+claim; loudness has silent-clip outliers; single model / single corpus. Next: denoise the
+temporal metrics (or pick cleaner temporal factors) to test whether transient/envelope axes
+exist separately, and replicate on a second model.
+
 ## Artifact Policy
 
 Tracked:
