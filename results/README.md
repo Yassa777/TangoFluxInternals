@@ -312,6 +312,9 @@ Findings:
   representation is low-dimensional: a spectral axis + a loudness axis, with internal geometry
   that tracks the output-space statistics. Spectral structure is most legible in the early
   dual stream (best R^2 at `transformer_blocks.3`).
+- **Quantitatively, the internal geometry mirrors physics**: across the 6 off-diagonal factor
+  pairs, the model direction-cosine correlates with the physical |Spearman| at **Pearson
+  r = 0.98**. The representation's pairwise factor structure is nearly a copy of the output's.
 
 Limitations: cosine is sign-blind; temporal factors may need denoised metrics before any
 claim; loudness has silent-clip outliers; single model / single corpus. Next: denoise the
