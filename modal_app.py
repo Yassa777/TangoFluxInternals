@@ -1175,6 +1175,131 @@ def concept_steer_generate(
     return result
 
 
+@app.function(
+    image=image,
+    gpu=GPU_TYPE,
+    volumes=COMMON_VOLUMES,
+    timeout=60 * 60,
+    scaledown_window=600,
+)
+def commitment_patch_pair(
+    pair_records: list[dict[str, Any]],
+    sites: list[dict[str, Any]],
+    windows: list[list[int]],
+    *,
+    alpha: float = 1.0,
+    metric_names: list[str] | None = None,
+) -> list[dict[str, Any]]:
+    """Flow-time-resolved patching: patch a site only during a denoising-step window.
+
+    Captures source/target activations once, then for each (site, direction, window)
+    injects the source trajectory only within ``[start, end)`` flow-steps and measures
+    metrics. Sweeping the window recovers, per attribute, *when* in the trajectory the
+    attribute is still causally malleable -- its commitment time / point of no return.
+    """
+    from tangoflux_lab.audio_features import all_core_metrics
+    from tangoflux_lab.hooks import ActivationPatcher, HookSpec, MultiSiteActivationRecorder
+
+    names = list(metric_names) if metric_names else list(PROBE_METRIC_NAMES)
+    runner = _load_runner(MODEL_NAME)
+    records = [normalize_generation_record(record) for record in pair_records]
+    by_side = {str(record["side"]): record for record in records}
+    if set(by_side) != {"positive", "negative"}:
+        raise ValueError(f"Expected positive/negative records, got sides: {sorted(by_side)}")
+
+    site_output_indices = {str(site["site"]): int(site["output_index"]) for site in sites}
+    needs_audio_suffix = any(str(site.get("stack")) == "single" for site in sites)
+    audio_token_site = "transformer.transformer_blocks.0"
+    if needs_audio_suffix and audio_token_site not in site_output_indices:
+        site_output_indices[audio_token_site] = 1
+    site_meta = {str(site["site"]): site for site in sites}
+
+    activations_by_side: dict[str, dict[str, list[Any]]] = {}
+    audio_tokens_by_side: dict[str, int] = {}
+    baseline_by_side: dict[str, dict[str, Any]] = {}
+    for side in ("positive", "negative"):
+        record = by_side[side]
+        with MultiSiteActivationRecorder(
+            runner.model, site_output_indices, capture="full"
+        ) as recorder:
+            audio, sample_rate = _generate_wave(runner, record)
+        activations_by_side[side] = recorder.activations
+        metrics = all_core_metrics(audio, sample_rate)
+        baseline_by_side[side] = {name: metrics.get(name) for name in names}
+        if needs_audio_suffix:
+            audio_values = recorder.activations.get(audio_token_site, [])
+            if not audio_values:
+                raise ValueError(f"Could not infer audio-token count from {audio_token_site}")
+            audio_tokens_by_side[side] = int(audio_values[0].shape[1])
+
+    directions = [
+        ("sustained_to_percussive", "positive", "negative"),
+        ("percussive_to_sustained", "negative", "positive"),
+    ]
+    rows: list[dict[str, Any]] = []
+    for site in sites:
+        site_name = str(site["site"])
+        output_index = int(site["output_index"])
+        for direction, source_side, target_side in directions:
+            target_record = by_side[target_side]
+            source_values = activations_by_side[source_side].get(site_name, [])
+            suffix_tokens = (
+                min(audio_tokens_by_side[source_side], audio_tokens_by_side[target_side])
+                if site_meta[site_name]["stack"] == "single"
+                else None
+            )
+            for window in windows:
+                start, end = int(window[0]), int(window[1])
+                try:
+                    spec = HookSpec(
+                        patterns=(site_name,),
+                        regex=False,
+                        output_index=output_index,
+                        max_calls=None,
+                        capture="full",
+                    )
+                    with ActivationPatcher(
+                        runner.model,
+                        spec,
+                        {site_name: source_values},
+                        alpha=alpha,
+                        suffix_tokens=suffix_tokens,
+                        step_window=(start, end),
+                    ):
+                        audio, sample_rate = _generate_wave(runner, target_record)
+                    patched = all_core_metrics(audio, sample_rate)
+                    row: dict[str, Any] = {
+                        "status": "ok",
+                        "error": "",
+                        "pair_id": target_record["pair_id"],
+                        "site": site_name,
+                        "stack": site_meta[site_name]["stack"],
+                        "block": site_meta[site_name]["block"],
+                        "direction": direction,
+                        "window_start": start,
+                        "window_end": end,
+                        "alpha": alpha,
+                    }
+                    for name in names:
+                        row[f"patched_{name}"] = patched.get(name)
+                        row[f"target_baseline_{name}"] = baseline_by_side[target_side].get(name)
+                        row[f"source_baseline_{name}"] = baseline_by_side[source_side].get(name)
+                    rows.append(row)
+                except Exception as exc:  # noqa: BLE001
+                    rows.append(
+                        {
+                            "status": "error",
+                            "error": repr(exc),
+                            "pair_id": target_record["pair_id"],
+                            "site": site_name,
+                            "direction": direction,
+                            "window_start": start,
+                            "window_end": end,
+                        }
+                    )
+    return rows
+
+
 @app.local_entrypoint(name="env")
 def local_env() -> None:
     print(json.dumps(env_report.remote(), indent=2, sort_keys=True))
@@ -1939,3 +2064,82 @@ def concept_steer_test(
     )
     print(json.dumps(specificity, indent=2, sort_keys=True))
     print(f"Wrote {out_dir}/steer-rows.csv, steer-site-summary.csv, steer-summary.json")
+
+
+@app.local_entrypoint()
+def commitment_time_test(
+    prompts_path: str = "prompts/percussive_sustained_pairs.jsonl",
+    output_prefix: str = "percussive-sustained-commitment-v1",
+    sites: str = "transformer.single_transformer_blocks.8,transformer.transformer_blocks.3",
+    attributes: str = "onset_strength_max,spectral_centroid_mean_hz",
+    max_pairs: int = 5,
+    steps: int = 50,
+    alpha: float = 1.0,
+) -> None:
+    """Flow-time commitment experiment: when in the trajectory is each attribute fixed?
+
+    Patches top sites only within prefix ``[0,k)`` and suffix ``[k,T)`` denoising-step
+    windows, then recovers per-attribute sufficiency-commit and point-of-no-return steps.
+    Onset (transient) is expected to commit late; spectral centroid (brightness) early.
+    """
+    from tangoflux_lab.probing import summarize_commitment_rows
+
+    records = _records_from_prompt_file(
+        prompts_path, default_duration=3.5, default_steps=steps, default_guidance_scale=4.0
+    )
+    pair_groups = _records_by_pair(records)
+    if max_pairs > 0:
+        pair_groups = pair_groups[:max_pairs]
+    for group in pair_groups:
+        for record in group:
+            record["steps"] = steps
+
+    wanted = [s.strip() for s in sites.split(",") if s.strip()]
+    site_specs = [site for site in dit_layer_patch_sites() if site["site"] in wanted]
+    if not site_specs:
+        raise ValueError(f"No sites matched: {wanted}")
+    attribute_names = [a.strip() for a in attributes.split(",") if a.strip()]
+
+    # Prefix [0,k) sufficiency windows + suffix [k,T) point-of-no-return windows.
+    cuts = sorted({round(f * steps) for f in (0.25, 0.5, 0.75)})
+    windows: list[list[int]] = [[0, k] for k in cuts] + [[0, steps]]
+    windows += [[k, steps] for k in cuts]
+    windows = [list(w) for w in sorted({tuple(w) for w in windows})]
+    print(
+        f"Commitment test: {len(pair_groups)} pairs x {len(site_specs)} sites x "
+        f"{len(windows)} windows x 2 directions (steps={steps})"
+    )
+
+    raw_rows: list[dict[str, Any]] = []
+    for pair_rows in commitment_patch_pair.map(
+        pair_groups, kwargs={"sites": site_specs, "windows": windows, "alpha": alpha},
+        order_outputs=True,
+    ):
+        raw_rows.extend(pair_rows)
+
+    window_rows, summary = summarize_commitment_rows(raw_rows, attribute_names, steps)
+
+    out_dir = Path("results") / output_prefix
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_manifest_csv(str(out_dir / "commitment-rows.csv"), raw_rows)
+    write_manifest_csv(str(out_dir / "commitment-window-summary.csv"), window_rows)
+    write_json(
+        str(out_dir / "commitment-summary.json"),
+        {
+            "sites": wanted,
+            "attributes": attribute_names,
+            "steps": steps,
+            "windows": windows,
+            "n_pairs": len(pair_groups),
+            "summary": summary,
+        },
+    )
+    for site, per_attr in summary.items():
+        print(f"\n{site}")
+        for attribute, info in per_attr.items():
+            print(
+                f"  {attribute}: full={info['full_movement']}, "
+                f"commit_step={info['sufficiency_commit_step']}, "
+                f"point_of_no_return={info['point_of_no_return_step']}"
+            )
+    print(f"\nWrote {out_dir}/commitment-rows.csv, commitment-window-summary.csv, commitment-summary.json")

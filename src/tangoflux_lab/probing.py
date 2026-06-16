@@ -260,6 +260,94 @@ def summarize_intervention_rows(
     return site_rows, {"on_target": on_target, "by_site": specificity}
 
 
+def summarize_commitment_rows(
+    rows: list[dict[str, Any]],
+    attributes: Sequence[str],
+    num_steps: int,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Aggregate windowed-patch rows into per-attribute commitment curves.
+
+    For each site and attribute, builds the prefix sufficiency curve (patching
+    steps ``[0, k)``) and the suffix curve (patching steps ``[k, T)``), then
+    estimates a sufficiency commit step (smallest prefix k reaching half of full
+    movement) and a point-of-no-return (largest suffix start still reaching half).
+    """
+    from collections import defaultdict
+
+    acc: dict[tuple[str, tuple[int, int]], dict[str, list[float]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    windows_by_site: dict[str, set[tuple[int, int]]] = defaultdict(set)
+    for row in rows:
+        if row.get("status") != "ok":
+            continue
+        site = str(row["site"])
+        window = (int(row["window_start"]), int(row["window_end"]))
+        windows_by_site[site].add(window)
+        for attribute in attributes:
+            frac = _toward_source(
+                row.get(f"patched_{attribute}"),
+                row.get(f"target_baseline_{attribute}"),
+                row.get(f"source_baseline_{attribute}"),
+            )
+            if frac is not None and np.isfinite(frac):
+                acc[(site, window)][attribute].append(frac)
+
+    movement: dict[tuple[str, str, tuple[int, int]], float] = {}
+    window_rows: list[dict[str, Any]] = []
+    for (site, window), per_attr in acc.items():
+        out: dict[str, Any] = {"site": site, "window_start": window[0], "window_end": window[1]}
+        for attribute in attributes:
+            vals = per_attr.get(attribute, [])
+            if vals:
+                mean = float(np.mean(vals))
+                out[f"{attribute}_toward_source_mean"] = mean
+                out[f"{attribute}_n"] = len(vals)
+                movement[(site, attribute, window)] = mean
+        window_rows.append(out)
+    window_rows.sort(key=lambda r: (r["site"], r["window_start"], r["window_end"]))
+
+    def crosses(value: float, threshold: float, full: float) -> bool:
+        return value >= threshold if full > 0 else value <= threshold
+
+    summary: dict[str, Any] = {}
+    full_window = (0, num_steps)
+    for site in sorted(windows_by_site):
+        wins = sorted(windows_by_site[site])
+        site_summary: dict[str, Any] = {}
+        for attribute in attributes:
+            full = movement.get((site, attribute, full_window))
+            prefix = sorted(
+                (end, movement[(site, attribute, (0, end))])
+                for start, end in wins
+                if start == 0 and (site, attribute, (0, end)) in movement
+            )
+            suffix = sorted(
+                (start, movement[(site, attribute, (start, num_steps))])
+                for start, end in wins
+                if end == num_steps and (site, attribute, (start, num_steps)) in movement
+            )
+            commit_step = None
+            point_of_no_return = None
+            if full is not None and abs(full) > 1e-9:
+                threshold = 0.5 * full
+                for end, value in prefix:
+                    if crosses(value, threshold, full):
+                        commit_step = end
+                        break
+                survivors = [start for start, value in suffix if crosses(value, threshold, full)]
+                point_of_no_return = max(survivors) if survivors else None
+            site_summary[attribute] = {
+                "full_movement": full,
+                "prefix_curve": prefix,
+                "suffix_curve": suffix,
+                "sufficiency_commit_step": commit_step,
+                "point_of_no_return_step": point_of_no_return,
+            }
+        summary[site] = site_summary
+    return window_rows, summary
+
+
 def summarize_probe_map(
     rows: list[dict[str, Any]],
     targets: Sequence[str] = DEFAULT_TARGETS,

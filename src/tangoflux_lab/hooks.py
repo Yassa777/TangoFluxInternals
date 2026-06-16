@@ -304,12 +304,14 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
         *,
         alpha: float = 1.0,
         suffix_tokens: int | None = None,
+        step_window: tuple[int, int] | None = None,
     ):
         self.model = model
         self.spec = spec
         self.source_activations = source_activations
         self.alpha = float(alpha)
         self.suffix_tokens = suffix_tokens
+        self.step_window = step_window
         self.handles: list[Any] = []
         self.calls: dict[str, int] = {}
 
@@ -334,6 +336,12 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
             self.calls[name] = call_index + 1
             if self.spec.max_calls is not None and call_index >= self.spec.max_calls:
                 return output
+            # Flow-time gate: each forward call is one denoising step (CFG is batched),
+            # so call_index == step index. Outside the window we pass through unpatched.
+            if self.step_window is not None:
+                start, end = self.step_window
+                if not (start <= call_index < end):
+                    return output
             source_values = self.source_activations.get(name, [])
             if call_index >= len(source_values):
                 return output
