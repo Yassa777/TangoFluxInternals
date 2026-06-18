@@ -1,0 +1,15 @@
+site,window_start,window_end,onset_strength_max_toward_source_mean,onset_strength_max_n,spectral_centroid_mean_hz_toward_source_mean,spectral_centroid_mean_hz_n
+transformer.single_transformer_blocks.8,0,12,0.7633342357766973,10,0.8385137740096708,10
+transformer.single_transformer_blocks.8,0,25,0.9169228914616093,10,0.9326015948418682,10
+transformer.single_transformer_blocks.8,0,38,0.9482307795630256,10,0.9668391910109326,10
+transformer.single_transformer_blocks.8,0,50,0.9535432891893724,10,0.9889038054132355,10
+transformer.single_transformer_blocks.8,12,50,0.7519886067607028,10,0.7468172420950993,10
+transformer.single_transformer_blocks.8,25,50,0.5157648286599633,10,0.4874330822006071,10
+transformer.single_transformer_blocks.8,38,50,0.2628617028251823,10,0.31224303159631556,10
+transformer.transformer_blocks.3,0,12,0.5819819580761163,10,0.6643855846375997,10
+transformer.transformer_blocks.3,0,25,0.8164520308532556,10,0.855528040235917,10
+transformer.transformer_blocks.3,0,38,0.8507184613873677,10,0.8918820758001157,10
+transformer.transformer_blocks.3,0,50,0.8621952056799078,10,0.9127096531079282,10
+transformer.transformer_blocks.3,12,50,0.7447918175252279,10,0.7427469337161037,10
+transformer.transformer_blocks.3,25,50,0.5158566587331592,10,0.4981451411968359,10
+transformer.transformer_blocks.3,38,50,0.2648937893894908,10,0.3174008012322316,10

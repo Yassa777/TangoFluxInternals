@@ -1,0 +1,58 @@
+{
+  "factors": {
+    "brightness": "spectral_centroid_mean_hz",
+    "decay": "decay_time_to_minus_20db_ms"
+  },
+  "summary": {
+    "by_factor": {
+      "brightness": {
+        "best_encodable": {
+          "block": 2,
+          "site": "transformer.transformer_blocks.2",
+          "stack": "dual",
+          "value": -0.5898151629409025
+        },
+        "cv_spearman_best": {
+          "block": 1,
+          "site": "transformer.transformer_blocks.1",
+          "stack": "dual",
+          "value": 0.7475990233315246
+        },
+        "r2_dual_mean": -0.718936327844173,
+        "r2_single_mean": -1.2661898057088494,
+        "stability_cos_mean": 0.6700841014583906
+      },
+      "decay": {
+        "best_encodable": {
+          "block": 8,
+          "site": "transformer.single_transformer_blocks.8",
+          "stack": "single",
+          "value": -0.2808682124856384
+        },
+        "cv_spearman_best": {
+          "block": 0,
+          "site": "transformer.single_transformer_blocks.0",
+          "stack": "single",
+          "value": 0.02555615843733044
+        },
+        "r2_dual_mean": -0.5787648356339048,
+        "r2_single_mean": -0.41856756948800555,
+        "stability_cos_mean": 0.21793948179886988
+      }
+    },
+    "d_model": 1024,
+    "disentanglement": {
+      "cross_cosine_mean": 0.20577419797579447,
+      "random_abs_cosine_baseline": 0.1784124116152771,
+      "within_factor_stability_mean": {
+        "brightness": 0.6700841014583906,
+        "decay": 0.21793948179886988
+      }
+    },
+    "factors": [
+      "brightness",
+      "decay"
+    ],
+    "random_abs_cosine_baseline": 0.1784124116152771
+  }
+}

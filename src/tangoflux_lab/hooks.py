@@ -233,11 +233,13 @@ class ProbeFeatureRecorder(AbstractContextManager["ProbeFeatureRecorder"]):
         site_stacks: dict[str, str],
         *,
         audio_tokens: int | None = None,
+        time_bins: int = 1,
     ):
         self.model = model
         self.site_output_indices = site_output_indices
         self.site_stacks = site_stacks
         self.audio_tokens = audio_tokens
+        self.time_bins = max(1, int(time_bins))
         self.handles: list[Any] = []
         self.calls: dict[str, int] = {}
         self.sums: dict[str, torch.Tensor] = {}
@@ -279,7 +281,15 @@ class ProbeFeatureRecorder(AbstractContextManager["ProbeFeatureRecorder"]):
                 return
             audio = self._audio_slice(name, tensor)
             self.token_dims[name] = int(audio.shape[1])
-            pooled = audio.mean(dim=1).to(device="cpu")  # [batch, d_model]
+            # Pool over the audio-token (time) axis. With time_bins>1, split the audio
+            # tokens into K consecutive temporal bins and concatenate their means, so the
+            # feature preserves coarse temporal structure: [batch, time_bins * d_model].
+            if self.time_bins > 1 and audio.shape[1] >= self.time_bins:
+                chunks = torch.chunk(audio, self.time_bins, dim=1)
+                pooled = torch.cat([chunk.mean(dim=1) for chunk in chunks], dim=1)
+            else:
+                pooled = audio.mean(dim=1)  # [batch, d_model]
+            pooled = pooled.to(device="cpu")
             if name in self.sums:
                 self.sums[name] = self.sums[name] + pooled
             else:
@@ -304,12 +314,14 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
         *,
         alpha: float = 1.0,
         suffix_tokens: int | None = None,
+        step_window: tuple[int, int] | None = None,
     ):
         self.model = model
         self.spec = spec
         self.source_activations = source_activations
         self.alpha = float(alpha)
         self.suffix_tokens = suffix_tokens
+        self.step_window = step_window
         self.handles: list[Any] = []
         self.calls: dict[str, int] = {}
 
@@ -334,6 +346,12 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
             self.calls[name] = call_index + 1
             if self.spec.max_calls is not None and call_index >= self.spec.max_calls:
                 return output
+            # Flow-time gate: each forward call is one denoising step (CFG is batched),
+            # so call_index == step index. Outside the window we pass through unpatched.
+            if self.step_window is not None:
+                start, end = self.step_window
+                if not (start <= call_index < end):
+                    return output
             source_values = self.source_activations.get(name, [])
             if call_index >= len(source_values):
                 return output
