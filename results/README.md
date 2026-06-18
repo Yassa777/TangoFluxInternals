@@ -376,9 +376,17 @@ Interpretation / leading explanations (now narrowed):
 - It remains possible these fast temporal properties are not linearly read out from the
   audio-token activations at all; finer bins + denoised metrics are needed to decide.
 
+Follow-up at K=8 (`diverse-corpus-geometry-tb8/`, ~440 ms bins) revises the interpretation:
+temporal factors are **resolution-limited, not absent**. Stability rises monotonically from
+K=4 to K=8 for every temporal factor (attack 0.20->0.25, decay 0.19->0.25, density 0.29->0.31,
+AM-rate 0.16->0.22), and **F0 crosses into stable (0.37->0.54, R^2 0.16->0.35)**. So temporal
+structure is linearly present but needs fine temporal resolution; token-mean pooling discards
+it. Finer than K=8 is blocked by the Modal 2 MB return limit (fix: volume-write capture).
+
 Takeaway: the durable, replicated result is the stationary-factor geometry (spectral family +
-loudness/harmonicity/voicing, mirroring physics at r=0.8-0.98). The temporal factors are a
-clean open problem with two concrete remaining tests (finer K, denoised metrics).
+loudness/harmonicity/voicing, mirroring physics at r=0.8-0.98). The temporal factors are
+resolution-limited; finer binning (K>=16, via volume-write capture) is the concrete next test.
+See `docs/representation_geometry.md` for the consolidated writeup.
 
 ## Artifact Policy
 

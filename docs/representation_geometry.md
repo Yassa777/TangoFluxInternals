@@ -54,18 +54,38 @@ sits in the early **dual** (text-conditioned) stream (best brightness R^2 at
   linear ridge for any factor (non-linearity gains <= 0); the linearly-accessible structure is
   genuinely linear.
 
-## The temporal boundary (open problem)
+## The temporal boundary: resolution-limited, not absent
 
-The factors that are NOT recoverable are exactly the *time-varying* ones: attack salience,
-decay time, onset density, tail energy, and amplitude-modulation **rate**. The split is sharp
-— amplitude-modulation *depth* (a magnitude) is stable while *rate* (a frequency) is at the
-noise floor. We have ruled out two explanations:
+The factors that are not recoverable from token-mean pooling are exactly the *time-varying*
+ones: attack salience, decay time, onset density, tail energy, amplitude-modulation **rate**,
+and pitch (F0). The split is sharp — amplitude-modulation *depth* (a magnitude) is stable
+while *rate* (a frequency) is at the noise floor.
 
-- not non-linearity (gradient boosting does not help), and
-- not simple time-averaging at coarse resolution (K=4 temporal-binned pooling does not help).
+A time-binned pooling sweep (split the audio tokens into K temporal bins) shows these factors
+are **resolution-limited, not absent** — their direction stability rises monotonically as the
+temporal resolution increases:
 
-Remaining hypotheses: temporal resolution still too coarse, and/or noisy single-clip temporal
-metrics. (Finer-binning result recorded below.)
+| factor | K=4 (~875 ms bins) | K=8 (~440 ms bins) |
+| --- | ---: | ---: |
+| attack | 0.20 | 0.25 |
+| decay | 0.19 | 0.25 |
+| density | 0.29 | 0.31 |
+| tail | 0.05 | 0.09 |
+| AM rate | 0.16 | 0.22 |
+| F0 | 0.37 | **0.54** (R^2 0.16 -> 0.35) |
+
+(stability vs random threshold 0.291). Every temporal factor improves with finer bins; F0
+crosses cleanly into "stable, linearly encodable", and the envelope-scale factors (decay,
+density, AM rate) trend toward the threshold. The fastest event (attack, ~20 ms) responds
+least at these still-coarse resolutions. We have also ruled out non-linearity (a
+gradient-boosting probe does not help any temporal factor).
+
+Conclusion: temporal structure *is* linearly present in the activations but requires fine
+temporal resolution to read out; token-mean pooling discards it and coarse binning only
+partially recovers it. Going finer than K=8 is currently blocked by the Modal return-size
+limit (K=16 features exceed the 2 MB blob threshold); the fix is to write features to the
+volume instead of returning them, enabling K=16-64 (or unpooled, per-token probing) to test
+whether decay/density/AM-rate fully recover.
 
 ## Limitations
 
@@ -78,6 +98,7 @@ geometry-mirrors-physics correlation on a second audio model.
 
 - `results/diverse-corpus-geometry-v1/` — 6-factor panel (r=0.98).
 - `results/diverse-corpus-geometry-v2/` — 18-factor panel (r=0.88), linear vs non-linear.
-- `results/diverse-corpus-geometry-tb4/` — K=4 time-binned (temporal negative).
+- `results/diverse-corpus-geometry-tb4/`, `-tb8/` — K=4 and K=8 time-binned
+  (temporal factors resolution-limited; stability rises with K, F0 recovers).
 - `results/factor-geometry-v1/`, `factor-geometry-v2/` — earlier designed-sweep attempts
   (superseded; document why designed sweeps fail).
