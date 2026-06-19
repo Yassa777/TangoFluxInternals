@@ -1,0 +1,334 @@
+{
+  "best_by_localization_gap": {
+    "bleed_ratio_outside_over_inside": 0.5730034304867495,
+    "gap_mean_delta_hz": 41.7385498046875,
+    "inside": {
+      "mean": 97.7491455078125,
+      "median": 74.55908203125,
+      "n": 10
+    },
+    "outside": {
+      "mean": 56.010595703125,
+      "median": 48.66790771484375,
+      "n": 10
+    },
+    "scale": 4.0,
+    "token_window_label": "second_half"
+  },
+  "by_segment_window_all_scales": [
+    {
+      "delta": {
+        "mean": -10.3751220703125,
+        "median": 0.3602294921875,
+        "n": 15
+      },
+      "inside": true,
+      "segment_label": "q1",
+      "token_window_label": "first_half"
+    },
+    {
+      "delta": {
+        "mean": 13.580940755208333,
+        "median": 13.42327880859375,
+        "n": 15
+      },
+      "inside": true,
+      "segment_label": "q2",
+      "token_window_label": "first_half"
+    },
+    {
+      "delta": {
+        "mean": 1.7311767578125,
+        "median": 43.69384765625,
+        "n": 15
+      },
+      "inside": false,
+      "segment_label": "q3",
+      "token_window_label": "first_half"
+    },
+    {
+      "delta": {
+        "mean": 13.006840006510417,
+        "median": 29.005859375,
+        "n": 15
+      },
+      "inside": false,
+      "segment_label": "q4",
+      "token_window_label": "first_half"
+    },
+    {
+      "delta": {
+        "mean": 43.3173095703125,
+        "median": 30.96533203125,
+        "n": 15
+      },
+      "inside": false,
+      "segment_label": "q1",
+      "token_window_label": "middle_half"
+    },
+    {
+      "delta": {
+        "mean": 50.06983642578125,
+        "median": 39.12109375,
+        "n": 15
+      },
+      "inside": true,
+      "segment_label": "q2",
+      "token_window_label": "middle_half"
+    },
+    {
+      "delta": {
+        "mean": 63.7173583984375,
+        "median": 51.227783203125,
+        "n": 15
+      },
+      "inside": true,
+      "segment_label": "q3",
+      "token_window_label": "middle_half"
+    },
+    {
+      "delta": {
+        "mean": 67.31227620442708,
+        "median": 47.67138671875,
+        "n": 15
+      },
+      "inside": false,
+      "segment_label": "q4",
+      "token_window_label": "middle_half"
+    },
+    {
+      "delta": {
+        "mean": 30.32685546875,
+        "median": 27.12451171875,
+        "n": 15
+      },
+      "inside": false,
+      "segment_label": "q1",
+      "token_window_label": "second_half"
+    },
+    {
+      "delta": {
+        "mean": 37.55738932291667,
+        "median": 28.0263671875,
+        "n": 15
+      },
+      "inside": false,
+      "segment_label": "q2",
+      "token_window_label": "second_half"
+    },
+    {
+      "delta": {
+        "mean": 59.23407796223958,
+        "median": 43.06884765625,
+        "n": 15
+      },
+      "inside": true,
+      "segment_label": "q3",
+      "token_window_label": "second_half"
+    },
+    {
+      "delta": {
+        "mean": 52.13783365885417,
+        "median": 40.5390625,
+        "n": 15
+      },
+      "inside": true,
+      "segment_label": "q4",
+      "token_window_label": "second_half"
+    }
+  ],
+  "by_window_all_scales": [
+    {
+      "bleed_ratio_outside_over_inside": 4.597270841847938,
+      "inside": {
+        "mean": 1.6029093424479166,
+        "median": 10.075469970703125,
+        "n": 30
+      },
+      "localization_gap_mean_delta_hz": -5.766099039713541,
+      "outside": {
+        "mean": 7.369008382161458,
+        "median": 38.785186767578125,
+        "n": 30
+      },
+      "token_window_label": "first_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 0.9722498735085515,
+      "inside": {
+        "mean": 56.89359741210937,
+        "median": 49.322509765625,
+        "n": 30
+      },
+      "localization_gap_mean_delta_hz": 1.5788045247395814,
+      "outside": {
+        "mean": 55.31479288736979,
+        "median": 36.552093505859375,
+        "n": 30
+      },
+      "token_window_label": "middle_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 0.6095275173386666,
+      "inside": {
+        "mean": 55.68595581054687,
+        "median": 41.3665771484375,
+        "n": 30
+      },
+      "localization_gap_mean_delta_hz": 21.743833414713542,
+      "outside": {
+        "mean": 33.94212239583333,
+        "median": 27.595703125,
+        "n": 30
+      },
+      "token_window_label": "second_half"
+    }
+  ],
+  "by_window_scale": [
+    {
+      "bleed_ratio_outside_over_inside": -22.199588680255243,
+      "inside": {
+        "mean": -0.433294677734375,
+        "median": 2.098419189453125,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": -10.05225830078125,
+      "outside": {
+        "mean": 9.618963623046875,
+        "median": 30.222564697265625,
+        "n": 10
+      },
+      "scale": 1.0,
+      "token_window_label": "first_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 18.77061766910439,
+      "inside": {
+        "mean": 0.301287841796875,
+        "median": 3.5439453125,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": -5.3540710449218745,
+      "outside": {
+        "mean": 5.65535888671875,
+        "median": 40.0218505859375,
+        "n": 10
+      },
+      "scale": 2.0,
+      "token_window_label": "first_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 1.3829324636499525,
+      "inside": {
+        "mean": 4.94073486328125,
+        "median": 22.38946533203125,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": -1.8919677734375,
+      "outside": {
+        "mean": 6.83270263671875,
+        "median": 50.26544189453125,
+        "n": 10
+      },
+      "scale": 4.0,
+      "token_window_label": "first_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 0.8831488639708878,
+      "inside": {
+        "mean": 29.81458740234375,
+        "median": 35.994140625,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": 3.4838684082031257,
+      "outside": {
+        "mean": 26.330718994140625,
+        "median": 25.54034423828125,
+        "n": 10
+      },
+      "scale": 1.0,
+      "token_window_label": "middle_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 1.0061565164037607,
+      "inside": {
+        "mean": 51.24996337890625,
+        "median": 58.27777099609375,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": -0.315521240234375,
+      "outside": {
+        "mean": 51.565484619140626,
+        "median": 40.67828369140625,
+        "n": 10
+      },
+      "scale": 2.0,
+      "token_window_label": "middle_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 0.9825024305774304,
+      "inside": {
+        "mean": 89.61624145507812,
+        "median": 69.8056640625,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": 1.5680664062499972,
+      "outside": {
+        "mean": 88.04817504882813,
+        "median": 86.93222045898438,
+        "n": 10
+      },
+      "scale": 4.0,
+      "token_window_label": "middle_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 0.7013632651181564,
+      "inside": {
+        "mean": 22.531158447265625,
+        "median": 18.7100830078125,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": 6.728631591796875,
+      "outside": {
+        "mean": 15.80252685546875,
+        "median": 26.396728515625,
+        "n": 10
+      },
+      "scale": 1.0,
+      "token_window_label": "second_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 0.6416162450176383,
+      "inside": {
+        "mean": 46.7775634765625,
+        "median": 41.803955078125,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": 16.76431884765625,
+      "outside": {
+        "mean": 30.01324462890625,
+        "median": 36.6484375,
+        "n": 10
+      },
+      "scale": 2.0,
+      "token_window_label": "second_half"
+    },
+    {
+      "bleed_ratio_outside_over_inside": 0.5730034304867495,
+      "inside": {
+        "mean": 97.7491455078125,
+        "median": 74.55908203125,
+        "n": 10
+      },
+      "localization_gap_mean_delta_hz": 41.7385498046875,
+      "outside": {
+        "mean": 56.010595703125,
+        "median": 48.66790771484375,
+        "n": 10
+      },
+      "scale": 4.0,
+      "token_window_label": "second_half"
+    }
+  ],
+  "source_rows": "results/time-localized-brightness-steer-v1/time-localized-rows.csv"
+}

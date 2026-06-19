@@ -1,0 +1,3 @@
+status,pair_id,job_id,axis,factor_metric,site,stack,block,scale,audio_suffix_tokens,spectral_centroid_mean_hz,rms_dbfs,high_to_low_db,crest_factor_db,spectral_flatness_mean,onset_strength_max
+ok,corpus-000,corpus-000-single-sample-000-seed-30000,loudness,rms_dbfs,transformer.transformer_blocks.1,dual,1,0.0,,1020.1132202148438,-22.059261108374276,-44.11633307778763,9.617951183837521,6.720481178490445e-05,1.7491744756698608
+ok,corpus-000,corpus-000-single-sample-000-seed-30000,loudness,rms_dbfs,transformer.transformer_blocks.1,dual,1,0.5,,1024.4488525390625,-22.002719198955734,-44.138598817909624,9.596163626057203,6.81499732309021e-05,1.7550373077392578

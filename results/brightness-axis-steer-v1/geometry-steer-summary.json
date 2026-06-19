@@ -1,0 +1,160 @@
+{
+  "alpha": 1.0,
+  "audio_only": true,
+  "audio_suffix_tokens": null,
+  "audio_tokens": 645,
+  "cfg_row": 0,
+  "direction_meta": {
+    "alpha": 1.0,
+    "block": 3,
+    "cfg_row": 0,
+    "factors": {
+      "brightness": "spectral_centroid_mean_hz"
+    },
+    "geometry_summary": {
+      "by_factor": {
+        "brightness": {
+          "best_encodable": {
+            "block": 0,
+            "site": "transformer.transformer_blocks.0",
+            "stack": "dual",
+            "value": 0.46608106256637294
+          },
+          "cv_spearman_best": {
+            "block": 0,
+            "site": "transformer.transformer_blocks.0",
+            "stack": "dual",
+            "value": 0.7942848365573848
+          },
+          "r2_dual_mean": 0.2724749114305172,
+          "r2_single_mean": -0.0838161189521018,
+          "stability_cos_mean": 0.14925518414626518
+        }
+      },
+      "d_model": 1024,
+      "disentanglement": {
+        "analysis_layer": {
+          "block": 4,
+          "site": "transformer.single_transformer_blocks.4",
+          "stack": "single"
+        },
+        "direction_cosine_matrix": {
+          "brightness": {
+            "brightness": 1.000000238418579
+          }
+        },
+        "factor_stability": {
+          "brightness": 0.14925518414626518
+        },
+        "random_abs_cosine_baseline": 0.024933892525089544,
+        "realized_factor_spearman_matrix": {
+          "brightness": {
+            "brightness": 0.9999999999999998
+          }
+        },
+        "stability_threshold": 0.04986778505017909,
+        "stable_factors": [
+          "brightness"
+        ]
+      },
+      "factors": [
+        "brightness"
+      ],
+      "random_abs_cosine_baseline": 0.024933892525089544
+    },
+    "n_splits": 5,
+    "site": "transformer.transformer_blocks.3",
+    "stack": "dual"
+  },
+  "directions": {
+    "brightness": {
+      "metric": "spectral_centroid_mean_hz",
+      "n_valid": 250,
+      "norm": 35367.55061224142,
+      "target_mean": 2462.739996459961,
+      "target_std": 1296.8587448786475
+    }
+  },
+  "factors": {
+    "brightness": "spectral_centroid_mean_hz"
+  },
+  "features_path": "outputs/diverse-corpus-probe-v1/probe-features.npz",
+  "metric_names": [
+    "spectral_centroid_mean_hz",
+    "rms_dbfs",
+    "high_to_low_db",
+    "crest_factor_db",
+    "spectral_flatness_mean",
+    "onset_strength_max"
+  ],
+  "n_prompts": 6,
+  "n_splits": 5,
+  "output_prefix": "brightness-axis-steer-v1",
+  "population_gaps": {
+    "crest_factor_db": 3.554269790649414,
+    "high_to_low_db": 27.00093698501587,
+    "onset_strength_max": 4.86550959944725,
+    "rms_dbfs": 12.89921522140503,
+    "spectral_centroid_mean_hz": 2227.8034057617188,
+    "spectral_flatness_mean": 0.0004710177381639369
+  },
+  "prompts_path": "prompts/diverse_corpus_v1.jsonl",
+  "scales": [
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    4.0
+  ],
+  "site": "transformer.transformer_blocks.3",
+  "site_spec": {
+    "block": 3,
+    "output_index": 1,
+    "site": "transformer.transformer_blocks.3",
+    "stack": "dual"
+  },
+  "steering_summary": {
+    "axis_targets": {
+      "brightness": "spectral_centroid_mean_hz"
+    },
+    "by_axis": {
+      "brightness": {
+        "curve": [
+          {
+            "scale": 0.5,
+            "target_abs_gap_fraction_mean": 0.0049413250526413035,
+            "target_delta_mean": 8.889729817708334
+          },
+          {
+            "scale": 1.0,
+            "target_abs_gap_fraction_mean": 0.010627282621994123,
+            "target_delta_mean": 20.555216471354168
+          },
+          {
+            "scale": 2.0,
+            "target_abs_gap_fraction_mean": 0.02411529729232684,
+            "target_delta_mean": 30.492574055989582
+          },
+          {
+            "scale": 4.0,
+            "target_abs_gap_fraction_mean": 0.046459231652812495,
+            "target_delta_mean": 62.953450520833336
+          }
+        ],
+        "max_scale": 4.0,
+        "max_scale_by_off_target_metric": {
+          "crest_factor_db": 0.1275678682033328,
+          "high_to_low_db": 0.04190161563980429,
+          "onset_strength_max": 0.09095189414021998,
+          "rms_dbfs": 0.09670056612239415,
+          "spectral_flatness_mean": 0.07902852168381563
+        },
+        "max_scale_off_target_abs_gap_fraction_mean": 0.08723009315791337,
+        "max_scale_specificity_ratio": 0.5326055489669942,
+        "max_scale_target_abs_gap_fraction_mean": 0.046459231652812495,
+        "max_scale_target_delta_mean": 62.953450520833336,
+        "target_metric": "spectral_centroid_mean_hz"
+      }
+    }
+  }
+}

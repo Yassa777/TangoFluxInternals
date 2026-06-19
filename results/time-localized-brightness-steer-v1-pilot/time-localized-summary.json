@@ -1,0 +1,83 @@
+{
+  "audio_tokens": 645,
+  "metric_name": "spectral_centroid_mean_hz",
+  "n_prompts": 3,
+  "output_segments": [
+    {
+      "end_fraction": 0.25,
+      "label": "q1",
+      "start_fraction": 0.0
+    },
+    {
+      "end_fraction": 0.5,
+      "label": "q2",
+      "start_fraction": 0.25
+    },
+    {
+      "end_fraction": 0.75,
+      "label": "q3",
+      "start_fraction": 0.5
+    },
+    {
+      "end_fraction": 1.0,
+      "label": "q4",
+      "start_fraction": 0.75
+    }
+  ],
+  "scales": [
+    0.0,
+    1.0,
+    2.0,
+    4.0
+  ],
+  "sites": [
+    "transformer.transformer_blocks.3"
+  ],
+  "summary": {
+    "inside": {
+      "mean_delta_hz": 251.34739402488427,
+      "median_delta_hz": 103.727294921875,
+      "n": 54
+    },
+    "localization_gap_mean_delta_hz": 8.606580946180571,
+    "ok_rows": 144,
+    "outside": {
+      "mean_delta_hz": 242.7408130787037,
+      "median_delta_hz": 100.717529296875,
+      "n": 54
+    },
+    "rows": 144,
+    "segment_rows": 144
+  },
+  "token_windows": [
+    {
+      "end": 322,
+      "end_fraction": 0.5,
+      "label": "first_half",
+      "start": 0,
+      "start_fraction": 0.0
+    },
+    {
+      "end": 484,
+      "end_fraction": 0.75,
+      "label": "middle_half",
+      "start": 161,
+      "start_fraction": 0.25
+    },
+    {
+      "end": 645,
+      "end_fraction": 1.0,
+      "label": "second_half",
+      "start": 322,
+      "start_fraction": 0.5
+    }
+  ],
+  "vector": {
+    "audio_tokens": 645,
+    "cfg_row": 0,
+    "features_path": "outputs/factor-sweeps-v1/probe-features.npz",
+    "metric_name": "spectral_centroid_mean_hz",
+    "source": "feature_bundle",
+    "time_bins": 1
+  }
+}

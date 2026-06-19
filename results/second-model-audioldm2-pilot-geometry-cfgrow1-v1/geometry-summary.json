@@ -1,0 +1,156 @@
+{
+  "factors": {
+    "brightness": "spectral_centroid_mean_hz",
+    "decay": "decay_time_to_minus_20db_ms",
+    "loudness": "rms_dbfs",
+    "onset_rate": "onset_rate_per_second"
+  },
+  "summary": {
+    "by_factor": {
+      "brightness": {
+        "best_encodable": {
+          "block": 1,
+          "site": "down_blocks.1.attentions.1",
+          "stack": "down",
+          "value": 0.1579388377082881
+        },
+        "cv_spearman_best": {
+          "block": 0,
+          "site": "down_blocks.0.resnets.0",
+          "stack": "down",
+          "value": 0.5034965034965035
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "stability_cos_mean": 0.4021422788500786
+      },
+      "decay": {
+        "best_encodable": {
+          "block": 1,
+          "site": "down_blocks.1.attentions.0",
+          "stack": "down",
+          "value": -4.633621828199746
+        },
+        "cv_spearman_best": {
+          "block": 0,
+          "site": "down_blocks.0.resnets.1",
+          "stack": "down",
+          "value": -0.6573426573426573
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "stability_cos_mean": 0.4964075870811939
+      },
+      "loudness": {
+        "best_encodable": {
+          "block": 1,
+          "site": "down_blocks.1.attentions.1",
+          "stack": "down",
+          "value": 0.20366261678349973
+        },
+        "cv_spearman_best": {
+          "block": 0,
+          "site": "down_blocks.0.resnets.0",
+          "stack": "down",
+          "value": 0.6503496503496504
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "stability_cos_mean": 0.5320933759212494
+      },
+      "onset_rate": {
+        "best_encodable": {
+          "block": 1,
+          "site": "down_blocks.1.attentions.1",
+          "stack": "down",
+          "value": 0.1423481885505773
+        },
+        "cv_spearman_best": {
+          "block": 1,
+          "site": "down_blocks.1.attentions.0",
+          "stack": "down",
+          "value": 0.4125874125874127
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "stability_cos_mean": 0.2016814947128296
+      }
+    },
+    "d_model": 256,
+    "disentanglement": {
+      "analysis_layer": {
+        "block": 1,
+        "site": "down_blocks.1.attentions.1",
+        "stack": "down"
+      },
+      "direction_cosine_matrix": {
+        "brightness": {
+          "brightness": 1.0,
+          "decay": 0.7892575263977051,
+          "loudness": 0.5261421203613281,
+          "onset_rate": 0.6817396879196167
+        },
+        "decay": {
+          "brightness": 0.7892575263977051,
+          "decay": 1.0,
+          "loudness": 0.3495566248893738,
+          "onset_rate": 0.6532524228096008
+        },
+        "loudness": {
+          "brightness": 0.5261421203613281,
+          "decay": 0.3495566248893738,
+          "loudness": 1.0000001192092896,
+          "onset_rate": 0.6256909966468811
+        },
+        "onset_rate": {
+          "brightness": 0.6817396879196167,
+          "decay": 0.6532524228096008,
+          "loudness": 0.6256909966468811,
+          "onset_rate": 1.0
+        }
+      },
+      "factor_stability": {
+        "brightness": 0.4021422788500786,
+        "decay": 0.4964075870811939,
+        "loudness": 0.5320933759212494,
+        "onset_rate": 0.2016814947128296
+      },
+      "random_abs_cosine_baseline": 0.3989422804014327,
+      "realized_factor_spearman_matrix": {
+        "brightness": {
+          "brightness": 1.0,
+          "decay": 0.3846153846153847,
+          "loudness": -0.43356643356643365,
+          "onset_rate": -0.46153846153846156
+        },
+        "decay": {
+          "brightness": 0.3846153846153847,
+          "decay": 1.0,
+          "loudness": -0.4825174825174825,
+          "onset_rate": -0.35664335664335667
+        },
+        "loudness": {
+          "brightness": -0.43356643356643365,
+          "decay": -0.4825174825174825,
+          "loudness": 1.0,
+          "onset_rate": 0.6433566433566434
+        },
+        "onset_rate": {
+          "brightness": -0.46153846153846156,
+          "decay": -0.35664335664335667,
+          "loudness": 0.6433566433566434,
+          "onset_rate": 1.0
+        }
+      },
+      "stability_threshold": 0.7978845608028654,
+      "stable_factors": []
+    },
+    "factors": [
+      "brightness",
+      "onset_rate",
+      "decay",
+      "loudness"
+    ],
+    "random_abs_cosine_baseline": 0.3989422804014327
+  }
+}

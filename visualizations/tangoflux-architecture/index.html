@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TangoFlux Architecture</title>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="scene"></canvas>
+      <div id="labels"></div>
+
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">TangoFlux Internals</p>
+          <h1>Architecture Map</h1>
+        </div>
+        <div class="top-controls">
+          <nav class="mode-tabs" aria-label="Evidence mode">
+            <button class="mode-button active" data-mode="model">Model</button>
+            <button class="mode-button" data-mode="brightness">Brightness</button>
+            <button class="mode-button" data-mode="percussive">Percussive</button>
+            <button class="mode-button" data-mode="dry">Dry/Reverb</button>
+          </nav>
+          <label class="label-toggle" title="Show or hide scene text labels">
+            <input id="label-toggle" type="checkbox" checked />
+            <span class="toggle-track" aria-hidden="true"><span></span></span>
+            <span>Labels</span>
+          </label>
+          <label class="label-toggle" title="Show or hide the details panel">
+            <input id="panel-toggle" type="checkbox" checked />
+            <span class="toggle-track" aria-hidden="true"><span></span></span>
+            <span>Details</span>
+          </label>
+        </div>
+      </header>
+
+      <aside class="info-panel">
+        <section class="panel-section">
+          <p class="eyebrow" id="panel-eyebrow">Selected View</p>
+          <h2 id="panel-title">TangoFlux DiT Flow</h2>
+          <p id="panel-copy"></p>
+        </section>
+        <section class="panel-section">
+          <h3>Selected Site</h3>
+          <div id="site-card" class="site-card"></div>
+        </section>
+        <section class="panel-section">
+          <h3>Evidence</h3>
+          <div id="evidence-table"></div>
+        </section>
+      </aside>
+
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch prompt"></i>Text stream</span>
+        <span><i class="swatch audio"></i>Audio stream</span>
+        <span><i class="swatch single"></i>Merged stream</span>
+        <span><i class="swatch hot"></i>Evidence site</span>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
