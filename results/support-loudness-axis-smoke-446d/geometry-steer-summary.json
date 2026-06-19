@@ -1,0 +1,96 @@
+{
+  "alpha": 1.0,
+  "audio_only": true,
+  "audio_suffix_tokens": null,
+  "audio_tokens": 645,
+  "cfg_row": 0,
+  "direction_meta": {
+    "alpha": 1.0,
+    "block": 1,
+    "cfg_row": 0,
+    "factors": {
+      "loudness": "rms_dbfs"
+    },
+    "geometry_summary": {
+      "error": "ValueError('All-NaN slice encountered')",
+      "reason": "geometry_map_failed_for_explicit_site",
+      "status": "skipped"
+    },
+    "n_splits": 2,
+    "site": "transformer.transformer_blocks.1",
+    "stack": "dual"
+  },
+  "directions": {
+    "loudness": {
+      "metric": "rms_dbfs",
+      "n_valid": 2,
+      "norm": 1631.207287855188,
+      "target_mean": -16.13983678817749,
+      "target_std": 4.546209812164307
+    }
+  },
+  "factors": {
+    "loudness": "rms_dbfs"
+  },
+  "features_path": "/Users/dim/Desktop/DAV Lab Documents/TangoFlux/outputs/brightness-axis-prep-smoke/probe-features.npz",
+  "metric_names": [
+    "spectral_centroid_mean_hz",
+    "rms_dbfs",
+    "high_to_low_db",
+    "crest_factor_db",
+    "spectral_flatness_mean",
+    "onset_strength_max"
+  ],
+  "n_prompts": 1,
+  "n_splits": 2,
+  "output_prefix": "support-loudness-axis-smoke-446d",
+  "population_gaps": {
+    "crest_factor_db": 1.6020278930664062,
+    "high_to_low_db": 3.8495254516601562,
+    "onset_strength_max": 0.5136956572532654,
+    "rms_dbfs": 4.546209812164307,
+    "spectral_centroid_mean_hz": 82.39297485351562,
+    "spectral_flatness_mean": 2.685083200049121e-05
+  },
+  "prompts_path": "prompts/diverse_corpus_v1.jsonl",
+  "scales": [
+    0.0,
+    0.5
+  ],
+  "site": "transformer.transformer_blocks.1",
+  "site_spec": {
+    "block": 1,
+    "output_index": 1,
+    "site": "transformer.transformer_blocks.1",
+    "stack": "dual"
+  },
+  "steering_summary": {
+    "axis_targets": {
+      "loudness": "rms_dbfs"
+    },
+    "by_axis": {
+      "loudness": {
+        "curve": [
+          {
+            "scale": 0.5,
+            "target_abs_gap_fraction_mean": 0.012437153531113366,
+            "target_delta_mean": 0.056541909418541536
+          }
+        ],
+        "max_scale": 0.5,
+        "max_scale_by_off_target_metric": {
+          "crest_factor_db": 0.013599986538695421,
+          "high_to_low_db": 0.005784022057158345,
+          "onset_strength_max": 0.011413045811493872,
+          "spectral_centroid_mean_hz": 0.052621383460506925,
+          "spectral_flatness_mean": 0.035200452856744426
+        },
+        "max_scale_off_target_abs_gap_fraction_mean": 0.023723778144919796,
+        "max_scale_specificity_ratio": 0.5242484335816745,
+        "max_scale_target_abs_gap_fraction_mean": 0.012437153531113366,
+        "max_scale_target_delta_mean": 0.056541909418541536,
+        "target_metric": "rms_dbfs"
+      }
+    }
+  }
+}

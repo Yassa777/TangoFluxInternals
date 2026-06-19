@@ -1,0 +1,128 @@
+{
+  "alpha": 1.0,
+  "audio_only": true,
+  "audio_suffix_tokens": null,
+  "audio_tokens": 645,
+  "cfg_row": 0,
+  "direction_meta": {
+    "alpha": 1.0,
+    "block": 3,
+    "cfg_row": 0,
+    "factors": {
+      "brightness": "spectral_centroid_mean_hz",
+      "loudness": "rms_dbfs"
+    },
+    "geometry_summary": {
+      "error": "ValueError('All-NaN slice encountered')",
+      "reason": "geometry_map_failed_for_explicit_site",
+      "status": "skipped"
+    },
+    "n_splits": 2,
+    "site": "transformer.transformer_blocks.3",
+    "stack": "dual"
+  },
+  "directions": {
+    "brightness": {
+      "metric": "spectral_centroid_mean_hz",
+      "n_valid": 2,
+      "norm": 11382.0734520848,
+      "target_mean": 1005.8130798339844,
+      "target_std": 82.39297485351562
+    },
+    "loudness": {
+      "metric": "rms_dbfs",
+      "n_valid": 2,
+      "norm": 628.0303823431664,
+      "target_mean": -16.13983678817749,
+      "target_std": 4.546209812164307
+    }
+  },
+  "factors": {
+    "brightness": "spectral_centroid_mean_hz",
+    "loudness": "rms_dbfs"
+  },
+  "features_path": "outputs/brightness-axis-prep-smoke/probe-features.npz",
+  "metric_names": [
+    "spectral_centroid_mean_hz",
+    "rms_dbfs",
+    "high_to_low_db",
+    "crest_factor_db",
+    "spectral_flatness_mean",
+    "onset_strength_max"
+  ],
+  "n_prompts": 1,
+  "n_splits": 2,
+  "output_prefix": "brightness-axis-steer-smoke",
+  "population_gaps": {
+    "crest_factor_db": 1.6020278930664062,
+    "high_to_low_db": 3.8495254516601562,
+    "onset_strength_max": 0.5136956572532654,
+    "rms_dbfs": 4.546209812164307,
+    "spectral_centroid_mean_hz": 82.39297485351562,
+    "spectral_flatness_mean": 2.685083200049121e-05
+  },
+  "prompts_path": "prompts/diverse_corpus_v1.jsonl",
+  "scales": [
+    0.0,
+    0.5
+  ],
+  "site": "transformer.transformer_blocks.3",
+  "site_spec": {
+    "block": 3,
+    "output_index": 1,
+    "site": "transformer.transformer_blocks.3",
+    "stack": "dual"
+  },
+  "steering_summary": {
+    "axis_targets": {
+      "brightness": "spectral_centroid_mean_hz",
+      "loudness": "rms_dbfs"
+    },
+    "by_axis": {
+      "brightness": {
+        "curve": [
+          {
+            "scale": 0.5,
+            "target_abs_gap_fraction_mean": 0.05137761204035923,
+            "target_delta_mean": -4.233154296875
+          }
+        ],
+        "max_scale": 0.5,
+        "max_scale_by_off_target_metric": {
+          "crest_factor_db": 0.018318422472684573,
+          "high_to_low_db": 0.12957702814914085,
+          "onset_strength_max": 0.04670899401894764,
+          "rms_dbfs": 0.0385456007671673,
+          "spectral_flatness_mean": 0.012810030701015438
+        },
+        "max_scale_off_target_abs_gap_fraction_mean": 0.049192015221791154,
+        "max_scale_specificity_ratio": 1.044429910194041,
+        "max_scale_target_abs_gap_fraction_mean": 0.05137761204035923,
+        "max_scale_target_delta_mean": -4.233154296875,
+        "target_metric": "spectral_centroid_mean_hz"
+      },
+      "loudness": {
+        "curve": [
+          {
+            "scale": 0.5,
+            "target_abs_gap_fraction_mean": 0.05860834584723223,
+            "target_delta_mean": -0.26644583696540636
+          }
+        ],
+        "max_scale": 0.5,
+        "max_scale_by_off_target_metric": {
+          "crest_factor_db": 0.02219383890007015,
+          "high_to_low_db": 0.17757937962632456,
+          "onset_strength_max": 0.024179709813314167,
+          "spectral_centroid_mean_hz": 0.007046309558335213,
+          "spectral_flatness_mean": 0.005936428391857928
+        },
+        "max_scale_off_target_abs_gap_fraction_mean": 0.0473871332579804,
+        "max_scale_specificity_ratio": 1.2367987218843224,
+        "max_scale_target_abs_gap_fraction_mean": 0.05860834584723223,
+        "max_scale_target_delta_mean": -0.26644583696540636,
+        "target_metric": "rms_dbfs"
+      }
+    }
+  }
+}
