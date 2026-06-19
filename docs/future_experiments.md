@@ -4,6 +4,21 @@ Planned follow-ups to the representation-geometry work (`docs/representation_geo
 Each entry: what we're after, how it could fail, the nuances that matter, and the steps to
 finish. Kept deliberately lightweight.
 
+Results update: these four follow-ups were run as the 2026-06-19 fast-completion batch.
+The detailed writeup is in `docs/future_experiment_results_2026_06_19.md`.
+
+High-level status:
+
+- K=16/32/64 temporal maps completed for the six temporal factors; F0 is robustly
+  recovered, density recovers at K=16/K=32, attack and AM rate are partial, decay/tail remain
+  weak.
+- Spectral/loudness steering completed; centroid moves monotonically under brightness
+  steering but not specifically, while loudness steering is modestly target-selective.
+- AudioLDM2 second-model path is pilot-complete only; the full diverse-corpus replication
+  remains a long-running follow-up.
+- Time-localized brightness steering completed; the intended window moves, but the effect
+  bleeds substantially outside the target window.
+
 ---
 
 ## 1. Push temporal resolution: K = 16-64

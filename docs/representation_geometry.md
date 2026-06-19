@@ -80,19 +80,44 @@ density, AM rate) trend toward the threshold. The fastest event (attack, ~20 ms)
 least at these still-coarse resolutions. We have also ruled out non-linearity (a
 gradient-boosting probe does not help any temporal factor).
 
-Conclusion: temporal structure *is* linearly present in the activations but requires fine
-temporal resolution to read out; token-mean pooling discards it and coarse binning only
-partially recovers it. Going finer than K=8 is currently blocked by the Modal return-size
-limit (K=16 features exceed the 2 MB blob threshold); the fix is to write features to the
-volume instead of returning them, enabling K=16-64 (or unpooled, per-token probing) to test
-whether decay/density/AM-rate fully recover.
+The K>=16 Modal return-size blocker has now been cleared by writing high-K feature payloads
+through the `tangoflux-activations` volume before assembling the local NPZ. A focused
+six-factor temporal map was run at K=16, 32, and 64:
+
+| factor | K=16 stability | K=16 status | K=32 stability | K=32 status | K=64 stability | K=64 status |
+| --- | ---: | --- | ---: | --- | ---: | --- |
+| attack | 0.242 | partial | 0.264 | partial | 0.158 | partial |
+| density | 0.279 | recovered | 0.237 | recovered | 0.174 | partial |
+| decay | 0.108 | weak | 0.075 | weak | 0.047 | weak |
+| tail | 0.117 | weak | 0.070 | weak | 0.056 | weak |
+| AM rate | 0.184 | weak | 0.172 | partial | 0.155 | partial |
+| F0 | 0.445 | recovered | 0.426 | recovered | 0.276 | recovered |
+
+Conclusion: temporal structure *is* linearly present in the activations but the K>8 result is
+more mixed than a simple monotonic-recovery story. F0 is robust across high K. Density is a
+real recovery at K=16/K=32 but does not clear the K=64 stability threshold under the current
+PCA/CV setting. Attack and AM rate show positive held-out rank order but remain only partial;
+decay and tail stay weak. The next step is not just "increase K" but use a more local temporal
+readout or average seeds to reduce noisy realized attack/decay estimates.
+
+## Causal and Cross-Model Follow-Ups
+
+The first causal steering and generality follow-ups are now mixed rather than decisive.
+Brightness steering moves spectral centroid monotonically, but off-target movement is larger
+than target movement at the max scale. Loudness steering is modestly more target-selective.
+Token-window brightness steering changes the target window, but the edit bleeds outside the
+window. The AudioLDM2 second-model path is implemented and pilot-tested, but the 12-record
+pilot has no stable factors and should not be treated as a full replication.
+
+See `docs/future_experiment_results_2026_06_19.md` for the command-level result tables and
+artifact paths.
 
 ## Limitations
 
 Single model, single corpus; cosine is sign-blind; loudness has silent-clip outliers; the
-temporal factors are unresolved. Natural extensions: causal confirmation (steer along the
-spectral axis, confirm it moves centroid without moving loudness), and replication of the
-geometry-mirrors-physics correlation on a second audio model.
+temporal factors are only partly resolved. The current causal steering results show movement
+but limited specificity, and the second-model work is still pilot-only rather than a
+cross-model geometry-mirroring result.
 
 ## Artifacts
 
@@ -100,5 +125,11 @@ geometry-mirrors-physics correlation on a second audio model.
 - `results/diverse-corpus-geometry-v2/` — 18-factor panel (r=0.88), linear vs non-linear.
 - `results/diverse-corpus-geometry-tb4/`, `-tb8/` — K=4 and K=8 time-binned
   (temporal factors resolution-limited; stability rises with K, F0 recovers).
+- `results/diverse-corpus-geometry-tb16-temporal/`, `-tb32-temporal/`,
+  `-tb64-temporal/` — high-K six-factor temporal maps.
+- `results/brightness-axis-steer-v1/`, `results/loudness-axis-steer-exp2-tb1-v1/` —
+  spectral/loudness additive steering specificity tests.
+- `results/time-localized-brightness-steer-v1/` — token-window brightness steering.
+- `results/second-model-audioldm2-pilot-geometry-v1/` — AudioLDM2 pilot geometry map.
 - `results/factor-geometry-v1/`, `factor-geometry-v2/` — earlier designed-sweep attempts
   (superseded; document why designed sweeps fail).

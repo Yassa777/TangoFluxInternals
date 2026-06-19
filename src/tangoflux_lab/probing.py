@@ -14,7 +14,7 @@ seed/source fingerprint instead of generalising the concept.
 
 from __future__ import annotations
 
-from typing import Any, Iterable, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
 
@@ -127,19 +127,49 @@ def metric_r2(
     pca: int | None = None,
     estimator: str = "ridge",
 ) -> tuple[float, float, int]:
-    from sklearn.model_selection import cross_val_score
-
-    mask = np.isfinite(t)
-    Xs, ts, gs = X[mask], t[mask], groups[mask]
-    n_groups = int(np.unique(gs).size)
-    if n_groups < 2 or ts.size < 4:
-        return float("nan"), float("nan"), int(mask.sum())
-    scores = cross_val_score(
-        _reg_pipeline(alpha, pca, estimator), Xs, ts, cv=_kfold(n_splits, n_groups),
-        groups=gs, scoring="r2",
+    r2, r2_std, _, _, n_valid = _cv_regression_summary(
+        X, t, groups, n_splits=n_splits, alpha=alpha, pca=pca, estimator=estimator
     )
-    return float(scores.mean()), float(scores.std()), int(mask.sum())
+    return r2, r2_std, n_valid
 
+
+def _cv_regression_summary(
+    X: np.ndarray,
+    y: np.ndarray,
+    groups: np.ndarray,
+    *,
+    n_splits: int = 5,
+    alpha: float = 1.0,
+    pca: int | None = None,
+    estimator: str = "ridge",
+) -> tuple[float, float, float, float, int]:
+    """Grouped-CV R2 plus held-out prediction correlations from one fit loop."""
+    from sklearn.metrics import r2_score
+
+    mask = np.isfinite(y)
+    Xs, ys, gs = X[mask], y[mask], groups[mask]
+    n_groups = int(np.unique(gs).size)
+    if n_groups < 2 or ys.size < 4:
+        return float("nan"), float("nan"), float("nan"), float("nan"), int(mask.sum())
+
+    pred = np.full(ys.shape, np.nan, dtype=float)
+    scores: list[float] = []
+    for train_idx, test_idx in _kfold(n_splits, n_groups).split(Xs, ys, groups=gs):
+        model = _reg_pipeline(alpha, pca, estimator)
+        model.fit(Xs[train_idx], ys[train_idx])
+        fold_pred = np.asarray(model.predict(Xs[test_idx]), dtype=float)
+        pred[test_idx] = fold_pred
+        if test_idx.size >= 2:
+            scores.append(float(r2_score(ys[test_idx], fold_pred)))
+
+    valid_scores = np.asarray([score for score in scores if np.isfinite(score)], dtype=float)
+    r2 = float(valid_scores.mean()) if valid_scores.size else float("nan")
+    r2_std = float(valid_scores.std()) if valid_scores.size else float("nan")
+    if pred.std() < 1e-12:
+        return r2, r2_std, float("nan"), float("nan"), int(mask.sum())
+    pearson = float(np.corrcoef(pred, ys)[0, 1])
+    spearman = float(np.corrcoef(_ranks(pred), _ranks(ys))[0, 1])
+    return r2, r2_std, pearson, spearman, int(mask.sum())
 
 def target_array(
     metrics_lookup: dict[tuple[str, str], float],
@@ -330,6 +360,242 @@ def _unit_ridge_direction(
     return (w / norm if norm > 0 else w), scaler
 
 
+def _unit_raw_ridge_direction(
+    X: np.ndarray, y: np.ndarray, *, alpha: float = 1.0
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Fit a ridge factor direction and return it in raw activation coordinates."""
+    from sklearn.linear_model import Ridge
+    from sklearn.preprocessing import StandardScaler
+
+    mask = np.isfinite(y) & np.isfinite(X).all(axis=1)
+    if mask.sum() < 2:
+        return np.zeros(X.shape[1], dtype="float32"), {
+            "n_valid": int(mask.sum()),
+            "norm": 0.0,
+            "target_mean": float("nan"),
+            "target_std": float("nan"),
+        }
+    scaler = StandardScaler().fit(X[mask])
+    ridge = Ridge(alpha=alpha).fit(scaler.transform(X[mask]), y[mask])
+    scale = np.where(scaler.scale_ == 0.0, 1.0, scaler.scale_)
+    # Ridge coefficients are in standardized-feature coordinates. Divide by
+    # feature scale so adding the vector to raw activations follows the fitted
+    # increasing-factor gradient.
+    w = np.asarray(ridge.coef_, dtype="float64") / scale
+    norm = float(np.linalg.norm(w))
+    direction = (w / norm if norm > 0 else w).astype("float32")
+    return direction, {
+        "n_valid": int(mask.sum()),
+        "norm": norm,
+        "target_mean": float(np.mean(y[mask])),
+        "target_std": float(np.std(y[mask])),
+    }
+
+
+def factor_population_gaps(
+    bundle: dict[str, Any],
+    metrics: Sequence[str],
+    *,
+    lower_quantile: float = 25.0,
+    upper_quantile: float = 75.0,
+) -> dict[str, float]:
+    """Robust realized-metric gaps used to normalize steering movement."""
+    realized_names = bundle["realized_names"].astype(str).tolist()
+    realized = bundle["realized"]
+    gaps: dict[str, float] = {}
+    for metric in metrics:
+        if metric not in realized_names:
+            continue
+        y = realized[:, realized_names.index(metric)].astype(float)
+        vals = y[np.isfinite(y)]
+        if vals.size < 2:
+            continue
+        lo = float(np.percentile(vals, lower_quantile))
+        hi = float(np.percentile(vals, upper_quantile))
+        gap = hi - lo
+        if abs(gap) < 1e-12:
+            gap = float(np.std(vals))
+        gaps[metric] = gap
+    return gaps
+
+
+def build_factor_steering_directions(
+    bundle: dict[str, Any],
+    factors: Mapping[str, str],
+    *,
+    site: str | None = None,
+    cfg_row: int = 0,
+    alpha: float = 1.0,
+    n_splits: int = 5,
+    log_factors: Iterable[str] = (),
+) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
+    """Build raw activation steering directions from realized factor geometry.
+
+    The site defaults to the best encodable layer for the first factor, using the
+    same grouped geometry analysis as ``build_geometry_map``.
+    """
+    if not factors:
+        raise ValueError("At least one factor is required")
+
+    factor_map = dict(factors)
+    sites = bundle["sites"].astype(str).tolist()
+    selected_site = site
+    rows: list[dict[str, Any]]
+    try:
+        rows, geometry_summary = build_geometry_map(
+            bundle,
+            factor_map,
+            cfg_row=cfg_row,
+            n_splits=n_splits,
+            alpha=alpha,
+            log_factors=log_factors,
+        )
+    except ValueError as exc:
+        if not selected_site or selected_site == "auto":
+            raise
+        rows = []
+        geometry_summary = {
+            "status": "skipped",
+            "reason": "geometry_map_failed_for_explicit_site",
+            "error": repr(exc),
+        }
+    if not selected_site or selected_site == "auto":
+        primary = next(iter(factor_map))
+        by_factor = geometry_summary.get("by_factor", {}).get(primary, {})
+        best = by_factor.get("best_encodable") or by_factor.get("cv_spearman_best")
+        if not best:
+            raise ValueError(f"Could not auto-select a site for factor {primary!r}")
+        selected_site = str(best["site"])
+    if selected_site not in sites:
+        raise ValueError(f"Site {selected_site!r} not found in feature bundle")
+
+    site_index = sites.index(selected_site)
+    X = bundle["features"][:, site_index, cfg_row, :]
+    realized_names = bundle["realized_names"].astype(str).tolist()
+    log_set = {str(name) for name in log_factors}
+    directions: dict[str, Any] = {}
+    for factor, metric in factor_map.items():
+        if metric not in realized_names:
+            raise ValueError(f"Metric {metric!r} for factor {factor!r} not found in bundle")
+        y = bundle["realized"][:, realized_names.index(metric)].astype(float)
+        if factor in log_set:
+            with np.errstate(invalid="ignore"):
+                y = np.where(np.isfinite(y) & (y > -1.0), np.log1p(y), np.nan)
+        vector, meta = _unit_raw_ridge_direction(X, y, alpha=alpha)
+        directions[factor] = {"metric": metric, "vector": vector, **meta}
+
+    site_row = next((r for r in rows if r["site"] == selected_site), {})
+    if not site_row:
+        site_row = {
+            "site": selected_site,
+            "stack": str(bundle["stacks"][site_index]),
+            "block": int(bundle["blocks"][site_index]),
+        }
+    meta = {
+        "site": selected_site,
+        "stack": site_row.get("stack"),
+        "block": site_row.get("block"),
+        "cfg_row": int(cfg_row),
+        "alpha": float(alpha),
+        "n_splits": int(n_splits),
+        "factors": factor_map,
+        "geometry_summary": geometry_summary,
+    }
+    return directions, rows, meta
+
+
+def summarize_factor_steering_rows(
+    rows: list[dict[str, Any]],
+    metric_names: Sequence[str],
+    axis_targets: Mapping[str, str],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Summarize scale-wise movement for factor steering rows."""
+    from collections import defaultdict
+
+    by_key: dict[tuple[str, str, float], dict[str, list[float]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    by_key_delta: dict[tuple[str, str, float], dict[str, list[float]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for row in rows:
+        if row.get("status") != "ok":
+            continue
+        key = (str(row.get("axis", "")), str(row.get("site", "")), float(row.get("scale", 0.0)))
+        for metric in metric_names:
+            patched = row.get(f"patched_{metric}")
+            base = row.get(f"target_baseline_{metric}")
+            frac = _toward_source(patched, base, row.get(f"source_baseline_{metric}"))
+            if frac is not None and np.isfinite(frac):
+                by_key[key][metric].append(float(frac))
+            if patched is not None and base is not None:
+                delta = float(patched) - float(base)
+                if np.isfinite(delta):
+                    by_key_delta[key][metric].append(delta)
+
+    scale_rows: list[dict[str, Any]] = []
+    for axis, site, scale in sorted(by_key_delta, key=lambda item: (item[0], item[1], item[2])):
+        out: dict[str, Any] = {"axis": axis, "site": site, "scale": scale}
+        for metric in metric_names:
+            deltas = np.asarray(by_key_delta[(axis, site, scale)].get(metric, []), dtype=float)
+            fracs = np.asarray(by_key[(axis, site, scale)].get(metric, []), dtype=float)
+            if deltas.size:
+                out[f"{metric}_delta_mean"] = float(deltas.mean())
+                out[f"{metric}_delta_median"] = float(np.median(deltas))
+                out[f"{metric}_abs_delta_mean"] = float(np.mean(np.abs(deltas)))
+                out[f"{metric}_n"] = int(deltas.size)
+            if fracs.size:
+                out[f"{metric}_gap_fraction_mean"] = float(fracs.mean())
+                out[f"{metric}_abs_gap_fraction_mean"] = float(np.mean(np.abs(fracs)))
+        scale_rows.append(out)
+
+    summary: dict[str, Any] = {"axis_targets": dict(axis_targets), "by_axis": {}}
+    axes = sorted({row["axis"] for row in scale_rows})
+    for axis in axes:
+        target = axis_targets.get(axis)
+        axis_rows = [row for row in scale_rows if row["axis"] == axis]
+        if not target:
+            continue
+        curve = [
+            {
+                "scale": row["scale"],
+                "target_delta_mean": row.get(f"{target}_delta_mean"),
+                "target_abs_gap_fraction_mean": row.get(f"{target}_abs_gap_fraction_mean"),
+            }
+            for row in axis_rows
+        ]
+        max_row = max(axis_rows, key=lambda row: float(row["scale"]))
+        off_metrics = [metric for metric in metric_names if metric != target]
+        off_abs = [
+            max_row.get(f"{metric}_abs_gap_fraction_mean")
+            for metric in off_metrics
+            if max_row.get(f"{metric}_abs_gap_fraction_mean") is not None
+        ]
+        target_abs = max_row.get(f"{target}_abs_gap_fraction_mean")
+        contrast: dict[str, Any] = {}
+        for metric in off_metrics:
+            value = max_row.get(f"{metric}_abs_gap_fraction_mean")
+            if value is not None:
+                contrast[metric] = value
+        summary["by_axis"][axis] = {
+            "target_metric": target,
+            "curve": curve,
+            "max_scale": max_row["scale"],
+            "max_scale_target_delta_mean": max_row.get(f"{target}_delta_mean"),
+            "max_scale_target_abs_gap_fraction_mean": target_abs,
+            "max_scale_off_target_abs_gap_fraction_mean": (
+                float(np.mean(off_abs)) if off_abs else None
+            ),
+            "max_scale_specificity_ratio": (
+                float(target_abs / np.mean(off_abs))
+                if target_abs is not None and off_abs and abs(float(np.mean(off_abs))) > 1e-12
+                else None
+            ),
+            "max_scale_by_off_target_metric": contrast,
+        }
+    return scale_rows, summary
+
+
 def _ranks(a: np.ndarray) -> np.ndarray:
     order = np.argsort(a, kind="stable")
     ranks = np.empty(len(a), dtype=float)
@@ -434,9 +700,13 @@ def build_geometry_map(
         row: dict[str, Any] = {"site": str(sites[j]), "stack": str(stacks[j]), "block": int(blocks[j])}
         directions: dict[str, np.ndarray] = {}
         for name, y in factor_y.items():
-            r2, r2_std, n_valid = metric_r2(X, y, sources, n_splits=n_splits, alpha=alpha, pca=pca_components)
-            pearson, spearman = _cv_projection_corr(
-                X, y, sources, n_splits=n_splits, alpha=alpha, pca=pca_components
+            r2, r2_std, pearson, spearman, n_valid = _cv_regression_summary(
+                X,
+                y,
+                sources,
+                n_splits=n_splits,
+                alpha=alpha,
+                pca=pca_components,
             )
             w, _ = _unit_ridge_direction(X_red, y, alpha=alpha)
             row[f"r2_{name}"] = r2

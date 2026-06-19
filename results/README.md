@@ -4,6 +4,34 @@ This directory contains compact, tracked experiment artifacts. Raw generated aud
 kept out of git; local WAV downloads live under `outputs/*-download-subset/`, and full runs live in
 the Modal `tangoflux-outputs` volume.
 
+## 2026-06-19 Future Experiment Batch
+
+Writeup: `docs/future_experiment_results_2026_06_19.md`
+
+New result directories:
+
+- `diverse-corpus-geometry-tb16-temporal/`: K=16 temporal six-factor map.
+- `diverse-corpus-geometry-tb32-temporal/`: K=32 temporal six-factor map.
+- `diverse-corpus-geometry-tb64-temporal/`: K=64 temporal six-factor map.
+- `brightness-axis-steer-v1/`: brightness-axis additive steering specificity run.
+- `loudness-axis-steer-exp2-tb1-v1/`: loudness-axis additive steering cross-check.
+- `second-model-audioldm2-pilot-geometry-v1/`: AudioLDM2 row-0 pilot geometry map.
+- `second-model-audioldm2-pilot-geometry-cfgrow1-v1/`: AudioLDM2 row-1 sensitivity audit.
+- `time-localized-brightness-steer-v1/`: full token-window brightness steering run.
+- `time-localized-brightness-steer-v1-pilot/`: smaller pilot for token-window steering.
+
+Headline results:
+
+- F0 is the only high-K temporal factor recovered at K=16/K=32/K=64. Density recovers at
+  K=16/K=32 but drops to partial at K=64; attack and AM rate are partial; decay and tail
+  stay weak.
+- Brightness steering moves spectral centroid monotonically but with more off-target than
+  target-normalized movement. Loudness steering is modestly target-selective.
+- AudioLDM2 is pilot-complete, not a full second-model replication: no pilot factor clears
+  stability.
+- Time-localized steering shows target-window movement but substantial bleed outside the
+  steered token window.
+
 ## Bright/Dark
 
 Top-level files:
