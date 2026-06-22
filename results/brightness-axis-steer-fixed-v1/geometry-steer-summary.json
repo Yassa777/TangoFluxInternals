@@ -1,0 +1,248 @@
+{
+  "alpha": 1.0,
+  "audio_only": true,
+  "audio_suffix_tokens": null,
+  "audio_tokens": 645,
+  "cfg_row": 0,
+  "direction_meta": {
+    "alpha": 1.0,
+    "block": 2,
+    "cfg_row": 0,
+    "factors": {
+      "brightness": "spectral_centroid_mean_hz",
+      "loudness": "rms_dbfs"
+    },
+    "geometry_summary": {
+      "by_factor": {
+        "brightness": {
+          "best_encodable": {
+            "block": 2,
+            "site": "transformer.transformer_blocks.2",
+            "stack": "dual",
+            "value": 0.2901553058550864
+          },
+          "cv_spearman_best": {
+            "block": 2,
+            "site": "transformer.transformer_blocks.2",
+            "stack": "dual",
+            "value": 0.7831356021696346
+          },
+          "r2_dual_mean": 0.13649972677333258,
+          "r2_single_mean": -0.13356243719753708,
+          "stability_cos_mean": 0.14925398274014393
+        },
+        "loudness": {
+          "best_encodable": {
+            "block": 0,
+            "site": "transformer.transformer_blocks.0",
+            "stack": "dual",
+            "value": -1.0820225853505654
+          },
+          "cv_spearman_best": {
+            "block": 0,
+            "site": "transformer.transformer_blocks.0",
+            "stack": "dual",
+            "value": 0.5136093697499159
+          },
+          "r2_dual_mean": -2.9378420109078474,
+          "r2_single_mean": -6.50772920553383,
+          "stability_cos_mean": 0.08529335710530479
+        }
+      },
+      "d_model": 1024,
+      "disentanglement": {
+        "analysis_layer": {
+          "block": 0,
+          "site": "transformer.transformer_blocks.0",
+          "stack": "dual"
+        },
+        "direction_cosine_matrix": {
+          "brightness": {
+            "brightness": 0.9999999403953552,
+            "loudness": 0.22059716284275055
+          },
+          "loudness": {
+            "brightness": 0.22059716284275055,
+            "loudness": 1.0
+          }
+        },
+        "factor_stability": {
+          "brightness": 0.14925398274014393,
+          "loudness": 0.08529335710530479
+        },
+        "random_abs_cosine_baseline": 0.024933892525089544,
+        "realized_factor_spearman_matrix": {
+          "brightness": {
+            "brightness": 0.9999999999999998,
+            "loudness": -0.23818326693227085
+          },
+          "loudness": {
+            "brightness": -0.23818326693227085,
+            "loudness": 0.9999999999999998
+          }
+        },
+        "stability_threshold": 0.04986778505017909,
+        "stable_factors": [
+          "brightness",
+          "loudness"
+        ]
+      },
+      "factors": [
+        "brightness",
+        "loudness"
+      ],
+      "random_abs_cosine_baseline": 0.024933892525089544
+    },
+    "n_splits": 5,
+    "site": "transformer.transformer_blocks.2",
+    "stack": "dual"
+  },
+  "directions": {
+    "brightness": {
+      "metric": "spectral_centroid_mean_hz",
+      "n_valid": 250,
+      "norm": 71880.09108633068,
+      "target_mean": 2462.73998828125,
+      "target_std": 1296.8587417063293
+    },
+    "loudness": {
+      "metric": "rms_dbfs",
+      "n_valid": 250,
+      "norm": 1365.1343990526275,
+      "target_mean": -22.07663151550293,
+      "target_std": 13.899890452384433
+    }
+  },
+  "factors": {
+    "brightness": "spectral_centroid_mean_hz",
+    "loudness": "rms_dbfs"
+  },
+  "features_path": "outputs/diverse-corpus-v2/probe-features.npz",
+  "metric_names": [
+    "spectral_centroid_mean_hz",
+    "rms_dbfs",
+    "high_to_low_db",
+    "crest_factor_db",
+    "spectral_flatness_mean",
+    "onset_strength_max"
+  ],
+  "n_prompts": 6,
+  "n_splits": 5,
+  "output_prefix": "brightness-axis-steer-fixed-v1",
+  "population_gaps": {
+    "crest_factor_db": 3.554269790649414,
+    "high_to_low_db": 27.000937342643738,
+    "onset_strength_max": 4.865509420633316,
+    "rms_dbfs": 12.89921522140503,
+    "spectral_centroid_mean_hz": 2227.803253173828,
+    "spectral_flatness_mean": 0.0004710177381639369
+  },
+  "prompts_path": "prompts/diverse_corpus_v1.jsonl",
+  "scales": [
+    0.0,
+    5.0,
+    10.0,
+    20.0,
+    40.0,
+    80.0
+  ],
+  "site": "transformer.transformer_blocks.2",
+  "site_spec": {
+    "block": 2,
+    "output_index": 1,
+    "site": "transformer.transformer_blocks.2",
+    "stack": "dual"
+  },
+  "steering_summary": {
+    "axis_targets": {
+      "brightness": "spectral_centroid_mean_hz",
+      "loudness": "rms_dbfs"
+    },
+    "by_axis": {
+      "brightness": {
+        "curve": [
+          {
+            "scale": 5.0,
+            "target_abs_gap_fraction_mean": 0.08747183375806239,
+            "target_delta_mean": 49.7301025390625
+          },
+          {
+            "scale": 10.0,
+            "target_abs_gap_fraction_mean": 0.12758701610041676,
+            "target_delta_mean": 88.878173828125
+          },
+          {
+            "scale": 20.0,
+            "target_abs_gap_fraction_mean": 0.19735191333049693,
+            "target_delta_mean": -221.76019287109375
+          },
+          {
+            "scale": 40.0,
+            "target_abs_gap_fraction_mean": 0.41340244832773676,
+            "target_delta_mean": -854.8255513509115
+          },
+          {
+            "scale": 80.0,
+            "target_abs_gap_fraction_mean": 0.8132258636156293,
+            "target_delta_mean": -1518.0040995279949
+          }
+        ],
+        "max_scale": 80.0,
+        "max_scale_by_off_target_metric": {
+          "crest_factor_db": 0.7722636901746102,
+          "high_to_low_db": 0.7224083631895861,
+          "onset_strength_max": 0.206605649048723,
+          "rms_dbfs": 0.9764203184752902,
+          "spectral_flatness_mean": 0.6980921132053116
+        },
+        "max_scale_off_target_abs_gap_fraction_mean": 0.6751580268187042,
+        "max_scale_specificity_ratio": 1.2044970678160944,
+        "max_scale_target_abs_gap_fraction_mean": 0.8132258636156293,
+        "max_scale_target_delta_mean": -1518.0040995279949,
+        "target_metric": "spectral_centroid_mean_hz"
+      },
+      "loudness": {
+        "curve": [
+          {
+            "scale": 5.0,
+            "target_abs_gap_fraction_mean": 0.08821908872384032,
+            "target_delta_mean": 0.8042889430407332
+          },
+          {
+            "scale": 10.0,
+            "target_abs_gap_fraction_mean": 0.09060004555874292,
+            "target_delta_mean": 0.2933678704292939
+          },
+          {
+            "scale": 20.0,
+            "target_abs_gap_fraction_mean": 0.1963788485517862,
+            "target_delta_mean": -0.5036716135667006
+          },
+          {
+            "scale": 40.0,
+            "target_abs_gap_fraction_mean": 0.4074318207590449,
+            "target_delta_mean": -5.054029936172745
+          },
+          {
+            "scale": 80.0,
+            "target_abs_gap_fraction_mean": 0.5061260792105166,
+            "target_delta_mean": -2.4017652170762123
+          }
+        ],
+        "max_scale": 80.0,
+        "max_scale_by_off_target_metric": {
+          "crest_factor_db": 0.860776401660161,
+          "high_to_low_db": 0.5501050445938972,
+          "onset_strength_max": 0.280612452311706,
+          "spectral_centroid_mean_hz": 0.4169067775193676,
+          "spectral_flatness_mean": 0.5326430271055773
+        },
+        "max_scale_off_target_abs_gap_fraction_mean": 0.5282087406381418,
+        "max_scale_specificity_ratio": 0.9581933055463137,
+        "max_scale_target_abs_gap_fraction_mean": 0.5061260792105166,
+        "max_scale_target_delta_mean": -2.4017652170762123,
+        "target_metric": "rms_dbfs"
+      }
+    }
+  }
+}

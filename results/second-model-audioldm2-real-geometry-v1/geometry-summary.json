@@ -1,0 +1,466 @@
+{
+  "summary": {
+    "factors": [
+      "brightness",
+      "rolloff",
+      "tilt",
+      "bandwidth",
+      "flatness",
+      "zcr",
+      "hnr",
+      "voiced",
+      "loudness",
+      "crest"
+    ],
+    "d_model": 256,
+    "random_abs_cosine_baseline": 0.1456731240789439,
+    "by_factor": {
+      "brightness": {
+        "best_encodable": {
+          "site": "down_blocks.0.resnets.1",
+          "stack": "down",
+          "block": 0,
+          "value": 0.5746143706794766
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.0.resnets.1",
+          "stack": "down",
+          "block": 0,
+          "value": 0.8304266291608065
+        },
+        "stability_cos_mean": 0.6259755231440067
+      },
+      "rolloff": {
+        "best_encodable": {
+          "site": "down_blocks.1.attentions.0",
+          "stack": "down",
+          "block": 1,
+          "value": 0.5868302947229436
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.1.attentions.1",
+          "stack": "down",
+          "block": 1,
+          "value": 0.8148148148148149
+        },
+        "stability_cos_mean": 0.6456384025514126
+      },
+      "tilt": {
+        "best_encodable": {
+          "site": "down_blocks.1.attentions.2",
+          "stack": "down",
+          "block": 1,
+          "value": 0.5207274997799806
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.1.attentions.1",
+          "stack": "down",
+          "block": 1,
+          "value": 0.7336146272855134
+        },
+        "stability_cos_mean": 0.5846510380506516
+      },
+      "bandwidth": {
+        "best_encodable": {
+          "site": "down_blocks.0.resnets.0",
+          "stack": "down",
+          "block": 0,
+          "value": 0.2562730467938164
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.0.resnets.0",
+          "stack": "down",
+          "block": 0,
+          "value": 0.6155649320206282
+        },
+        "stability_cos_mean": 0.5302359163761139
+      },
+      "flatness": {
+        "best_encodable": {
+          "site": "down_blocks.0.resnets.1",
+          "stack": "down",
+          "block": 0,
+          "value": -1.1378378107751226
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.0.resnets.1",
+          "stack": "down",
+          "block": 0,
+          "value": 0.7105250820440695
+        },
+        "stability_cos_mean": 0.555295966565609
+      },
+      "zcr": {
+        "best_encodable": {
+          "site": "down_blocks.1.attentions.4",
+          "stack": "down",
+          "block": 1,
+          "value": 0.3959385077657072
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.1.attentions.4",
+          "stack": "down",
+          "block": 1,
+          "value": 0.7285044538209094
+        },
+        "stability_cos_mean": 0.5336090475320816
+      },
+      "hnr": {
+        "best_encodable": {
+          "site": "down_blocks.1.attentions.3",
+          "stack": "down",
+          "block": 1,
+          "value": 0.29140768427242936
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.1.attentions.1",
+          "stack": "down",
+          "block": 1,
+          "value": 0.6712611345522739
+        },
+        "stability_cos_mean": 0.3888196051120758
+      },
+      "voiced": {
+        "best_encodable": {
+          "site": "down_blocks.1.attentions.3",
+          "stack": "down",
+          "block": 1,
+          "value": -0.011003219447137069
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.1.attentions.3",
+          "stack": "down",
+          "block": 1,
+          "value": 0.39113924050632914
+        },
+        "stability_cos_mean": 0.23945003561675549
+      },
+      "loudness": {
+        "best_encodable": {
+          "site": "down_blocks.1.attentions.3",
+          "stack": "down",
+          "block": 1,
+          "value": 0.7710364263994227
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.1.attentions.3",
+          "stack": "down",
+          "block": 1,
+          "value": 0.9080637599624942
+        },
+        "stability_cos_mean": 0.6674457564949989
+      },
+      "crest": {
+        "best_encodable": {
+          "site": "down_blocks.1.attentions.0",
+          "stack": "down",
+          "block": 1,
+          "value": 0.42572913404267004
+        },
+        "r2_dual_mean": NaN,
+        "r2_single_mean": NaN,
+        "cv_spearman_best": {
+          "site": "down_blocks.1.attentions.0",
+          "stack": "down",
+          "block": 1,
+          "value": 0.7164088138771684
+        },
+        "stability_cos_mean": 0.5369247570633888
+      }
+    },
+    "disentanglement": {
+      "analysis_layer": {
+        "site": "down_blocks.1.attentions.3",
+        "stack": "down",
+        "block": 1
+      },
+      "random_abs_cosine_baseline": 0.1456731240789439,
+      "stability_threshold": 0.2913462481578878,
+      "factor_stability": {
+        "brightness": 0.6259755231440067,
+        "rolloff": 0.6456384025514126,
+        "tilt": 0.5846510380506516,
+        "bandwidth": 0.5302359163761139,
+        "flatness": 0.555295966565609,
+        "zcr": 0.5336090475320816,
+        "hnr": 0.3888196051120758,
+        "voiced": 0.23945003561675549,
+        "loudness": 0.6674457564949989,
+        "crest": 0.5369247570633888
+      },
+      "stable_factors": [
+        "brightness",
+        "rolloff",
+        "tilt",
+        "bandwidth",
+        "flatness",
+        "zcr",
+        "hnr",
+        "loudness",
+        "crest"
+      ],
+      "direction_cosine_matrix": {
+        "brightness": {
+          "brightness": 1.0000001192092896,
+          "rolloff": 0.9681811332702637,
+          "tilt": 0.9456340074539185,
+          "bandwidth": 0.752089262008667,
+          "flatness": 0.5914416909217834,
+          "zcr": 0.9591240882873535,
+          "hnr": 0.4541313350200653,
+          "voiced": 0.2815844416618347,
+          "loudness": 0.09709661453962326,
+          "crest": 0.05041986703872681
+        },
+        "rolloff": {
+          "brightness": 0.9681811332702637,
+          "rolloff": 0.9999998807907104,
+          "tilt": 0.9370711445808411,
+          "bandwidth": 0.8799567818641663,
+          "flatness": 0.6273320913314819,
+          "zcr": 0.8989856839179993,
+          "hnr": 0.4110107719898224,
+          "voiced": 0.3496345281600952,
+          "loudness": 0.015870649367570877,
+          "crest": 0.04961331933736801
+        },
+        "tilt": {
+          "brightness": 0.9456340074539185,
+          "rolloff": 0.9370711445808411,
+          "tilt": 1.0,
+          "bandwidth": 0.776081919670105,
+          "flatness": 0.5410481095314026,
+          "zcr": 0.8917896747589111,
+          "hnr": 0.42174801230430603,
+          "voiced": 0.23908868432044983,
+          "loudness": 0.017126724123954773,
+          "crest": 0.023522937670350075
+        },
+        "bandwidth": {
+          "brightness": 0.752089262008667,
+          "rolloff": 0.8799567818641663,
+          "tilt": 0.776081919670105,
+          "bandwidth": 0.9999999403953552,
+          "flatness": 0.5567409992218018,
+          "zcr": 0.6300323009490967,
+          "hnr": 0.27492761611938477,
+          "voiced": 0.3232511579990387,
+          "loudness": 0.08582120388746262,
+          "crest": 0.18192636966705322
+        },
+        "flatness": {
+          "brightness": 0.5914416909217834,
+          "rolloff": 0.6273320913314819,
+          "tilt": 0.5410481095314026,
+          "bandwidth": 0.5567409992218018,
+          "flatness": 1.0,
+          "zcr": 0.5773887634277344,
+          "hnr": 0.2413244992494583,
+          "voiced": 0.5053857564926147,
+          "loudness": 0.029301565140485764,
+          "crest": 0.192787766456604
+        },
+        "zcr": {
+          "brightness": 0.9591240882873535,
+          "rolloff": 0.8989856839179993,
+          "tilt": 0.8917896747589111,
+          "bandwidth": 0.6300323009490967,
+          "flatness": 0.5773887634277344,
+          "zcr": 1.0,
+          "hnr": 0.4074947237968445,
+          "voiced": 0.30630961060523987,
+          "loudness": 0.11336728185415268,
+          "crest": 0.08023124188184738
+        },
+        "hnr": {
+          "brightness": 0.4541313350200653,
+          "rolloff": 0.4110107719898224,
+          "tilt": 0.42174801230430603,
+          "bandwidth": 0.27492761611938477,
+          "flatness": 0.2413244992494583,
+          "zcr": 0.4074947237968445,
+          "hnr": 1.0,
+          "voiced": 0.47653308510780334,
+          "loudness": 0.22123171389102936,
+          "crest": 0.49682730436325073
+        },
+        "voiced": {
+          "brightness": 0.2815844416618347,
+          "rolloff": 0.3496345281600952,
+          "tilt": 0.23908868432044983,
+          "bandwidth": 0.3232511579990387,
+          "flatness": 0.5053857564926147,
+          "zcr": 0.30630961060523987,
+          "hnr": 0.47653308510780334,
+          "voiced": 1.0,
+          "loudness": 0.134240984916687,
+          "crest": 0.043488673865795135
+        },
+        "loudness": {
+          "brightness": 0.09709661453962326,
+          "rolloff": 0.015870649367570877,
+          "tilt": 0.017126724123954773,
+          "bandwidth": 0.08582120388746262,
+          "flatness": 0.029301565140485764,
+          "zcr": 0.11336728185415268,
+          "hnr": 0.22123171389102936,
+          "voiced": 0.134240984916687,
+          "loudness": 0.9999999403953552,
+          "crest": 0.7823965549468994
+        },
+        "crest": {
+          "brightness": 0.05041986703872681,
+          "rolloff": 0.04961331933736801,
+          "tilt": 0.023522937670350075,
+          "bandwidth": 0.18192636966705322,
+          "flatness": 0.192787766456604,
+          "zcr": 0.08023124188184738,
+          "hnr": 0.49682730436325073,
+          "voiced": 0.043488673865795135,
+          "loudness": 0.7823965549468994,
+          "crest": 0.9999999403953552
+        }
+      },
+      "realized_factor_spearman_matrix": {
+        "brightness": {
+          "brightness": 1.0,
+          "rolloff": 0.9581340834505391,
+          "tilt": 0.922526957337084,
+          "bandwidth": 0.716502578527895,
+          "flatness": 0.8083216127519925,
+          "zcr": 0.93216127519925,
+          "hnr": -0.4766760431317394,
+          "voiced": -0.1979840600093765,
+          "loudness": -0.08778715424285047,
+          "crest": 0.06962025316455696
+        },
+        "rolloff": {
+          "brightness": 0.9581340834505391,
+          "rolloff": 1.0,
+          "tilt": 0.8863572433192686,
+          "bandwidth": 0.8415142991092358,
+          "flatness": 0.8060009376465074,
+          "zcr": 0.8413267698077825,
+          "hnr": -0.40173464603844355,
+          "voiced": -0.1768635724331927,
+          "loudness": -0.032442569151429915,
+          "crest": -0.015025785278949839
+        },
+        "tilt": {
+          "brightness": 0.922526957337084,
+          "rolloff": 0.8863572433192686,
+          "tilt": 1.0,
+          "bandwidth": 0.6397562119081106,
+          "flatness": 0.8128691983122363,
+          "zcr": 0.8621190811064229,
+          "hnr": -0.5042662916080639,
+          "voiced": -0.1995311767463666,
+          "loudness": -0.05267229254571027,
+          "crest": 0.1179324894514768
+        },
+        "bandwidth": {
+          "brightness": 0.716502578527895,
+          "rolloff": 0.8415142991092358,
+          "tilt": 0.6397562119081106,
+          "bandwidth": 1.0,
+          "flatness": 0.7019924988279419,
+          "zcr": 0.5258321612751993,
+          "hnr": -0.25133614627285517,
+          "voiced": -0.11765119549929677,
+          "loudness": 0.07308954524144398,
+          "crest": -0.16643225503984999
+        },
+        "flatness": {
+          "brightness": 0.8083216127519925,
+          "rolloff": 0.8060009376465074,
+          "tilt": 0.8128691983122363,
+          "bandwidth": 0.7019924988279419,
+          "flatness": 1.0,
+          "zcr": 0.7250586029067042,
+          "hnr": -0.5402719174871073,
+          "voiced": -0.4481247069854665,
+          "loudness": 0.014416315049226441,
+          "crest": -0.034903891233005156
+        },
+        "zcr": {
+          "brightness": 0.93216127519925,
+          "rolloff": 0.8413267698077825,
+          "tilt": 0.8621190811064229,
+          "bandwidth": 0.5258321612751993,
+          "flatness": 0.7250586029067042,
+          "zcr": 1.0,
+          "hnr": -0.4809188935771214,
+          "voiced": -0.2957571495546179,
+          "loudness": -0.04737458977965307,
+          "crest": 0.0994608532583216
+        },
+        "hnr": {
+          "brightness": -0.4766760431317394,
+          "rolloff": -0.40173464603844355,
+          "tilt": -0.5042662916080639,
+          "bandwidth": -0.25133614627285517,
+          "flatness": -0.5402719174871073,
+          "zcr": -0.4809188935771214,
+          "hnr": 1.0,
+          "voiced": 0.4782231598687296,
+          "loudness": 0.15916549460853258,
+          "crest": -0.44294421003281764
+        },
+        "voiced": {
+          "brightness": -0.1979840600093765,
+          "rolloff": -0.1768635724331927,
+          "tilt": -0.1995311767463666,
+          "bandwidth": -0.11765119549929677,
+          "flatness": -0.4481247069854665,
+          "zcr": -0.2957571495546179,
+          "hnr": 0.4782231598687296,
+          "voiced": 1.0,
+          "loudness": -0.04549929676511955,
+          "crest": -0.0852555086732302
+        },
+        "loudness": {
+          "brightness": -0.08778715424285047,
+          "rolloff": -0.032442569151429915,
+          "tilt": -0.05267229254571027,
+          "bandwidth": 0.07308954524144398,
+          "flatness": 0.014416315049226441,
+          "zcr": -0.04737458977965307,
+          "hnr": 0.15916549460853258,
+          "voiced": -0.04549929676511955,
+          "loudness": 1.0,
+          "crest": -0.761908110642288
+        },
+        "crest": {
+          "brightness": 0.06962025316455696,
+          "rolloff": -0.015025785278949839,
+          "tilt": 0.1179324894514768,
+          "bandwidth": -0.16643225503984999,
+          "flatness": -0.034903891233005156,
+          "zcr": 0.0994608532583216,
+          "hnr": -0.44294421003281764,
+          "voiced": -0.0852555086732302,
+          "loudness": -0.761908110642288,
+          "crest": 1.0
+        }
+      }
+    }
+  }
+}
