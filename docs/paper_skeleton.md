@@ -111,11 +111,25 @@ measurable outputs.
 
 ---
 
+## Gap status (updated 2026-06-22)
+
+- **[GAP-2] Bootstrap CIs -- DONE.** Clip-bootstrap (B=400) 95% CIs: TangoFlux r=0.88
+  [0.81, 0.93]; AudioLDM2 r=0.95 [0.88, 0.97]. Both far from zero -> mirroring is robust.
+  Artifact: `results/geometry-mirrors-physics-bootstrap.json`.
+- **[GAP-1] Patching causal confirmation -- PARTIAL.** Full-block patching at the
+  brightness site moves spectral centroid **0.90 toward source, undistorted** (the clean
+  positive vs additive steering, which saturated/degenerated). This establishes brightness is
+  *causally controllable*. But full-block patching is **global** -- it also drags loudness
+  (0.95) and other factors -- so factor-*specific* control is not yet shown. A directional-
+  patch attempt (inject only the brightness-axis component) returned results indistinguishable
+  from full patching (<=0.0002 Hz), which the local logic cannot produce -- suspected stale
+  remote `src` image; **unverified, needs a clean rerun**. Artifacts:
+  `results/brightness-patch-causal-v1/`, `results/brightness-directional-patch-v1/`.
+  Open question: can any single-site intervention be factor-specific, or does downstream
+  global attention re-entangle factors? (The latter would itself be a result.)
+
 ## Remaining work before a full-conference submission
 
-- **[GAP-1] Patching causal confirmation** -- bin clips by realized brightness, patch
-  high->low (and reverse) at a stable site, measure centroid moves while loudness does not.
-  Turns the causal section from a negative into a result. (1 GPU run.)
-- **[GAP-2] Bootstrap CIs** -- resample factor-pairs/clips to put CIs on the mirroring r and
-  on per-factor stability/R^2. (local, no GPU.)
+- Verify directional patching (rerun on a clean image; confirm centroid moves while loudness
+  stays) -- closes the specificity half of the causal story.
 - Optional: third model; multi-seed temporal denoising; tighter related-work.

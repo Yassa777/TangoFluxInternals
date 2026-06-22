@@ -1,0 +1,20 @@
+{
+  "alpha": 1.0,
+  "factor_metric": "spectral_centroid_mean_hz",
+  "n_pairs": 8,
+  "site": "transformer.transformer_blocks.3",
+  "specificity": {
+    "by_site": {
+      "transformer.transformer_blocks.3": {
+        "off_target_toward_source_mean": 0.8940166076173142,
+        "off_target_toward_source_median": 0.9361082942947568,
+        "on_target": "spectral_centroid_mean_hz",
+        "on_target_toward_source_mean": 0.9001876574860108,
+        "on_target_toward_source_median": 0.903103937616123,
+        "specificity_gap": 0.006171049868696654,
+        "specificity_gap_median": -0.033004356678633884
+      }
+    },
+    "on_target": "spectral_centroid_mean_hz"
+  }
+}
