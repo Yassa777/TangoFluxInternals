@@ -315,6 +315,7 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
         alpha: float = 1.0,
         suffix_tokens: int | None = None,
         step_window: tuple[int, int] | None = None,
+        direction: dict[str, Any] | None = None,
     ):
         self.model = model
         self.spec = spec
@@ -322,6 +323,7 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
         self.alpha = float(alpha)
         self.suffix_tokens = suffix_tokens
         self.step_window = step_window
+        self.direction = direction or {}
         self.handles: list[Any] = []
         self.calls: dict[str, int] = {}
 
@@ -357,6 +359,12 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
                 return output
             current = _get_tensor(output, self.spec.output_index)
             source = source_values[call_index].to(device=current.device, dtype=current.dtype)
+            if name in self.direction:
+                # Directional patching: inject only the source's component along the
+                # factor direction, leaving orthogonal content (e.g. loudness) intact.
+                d = self.direction[name].to(device=current.device, dtype=current.dtype)
+                patched = _directional_patch(current, source, d, self.alpha, self.suffix_tokens)
+                return _replace_tensor(output, self.spec.output_index, patched)
             if source.shape == current.shape:
                 patched = current.lerp(source, self.alpha)
                 return _replace_tensor(output, self.spec.output_index, patched)
@@ -369,6 +377,33 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
             return _replace_tensor(output, self.spec.output_index, patched)
 
         return hook
+
+
+def _directional_patch(
+    current: torch.Tensor,
+    source: torch.Tensor,
+    direction: torch.Tensor,
+    alpha: float,
+    suffix_tokens: int | None,
+) -> torch.Tensor:
+    """Replace only the source's component along ``direction`` (unit vector).
+
+    Leaves the orthogonal complement of ``current`` untouched, so a brightness-axis
+    patch should move spectral centroid without dragging loudness. Operates on the
+    trailing ``suffix_tokens`` audio tokens when set (merged single-stream blocks).
+    """
+    d = direction / direction.norm().clamp_min(1e-8)
+    patched = current.clone()
+    cur = patched[:, -suffix_tokens:, :] if suffix_tokens else patched
+    src = source[:, -suffix_tokens:, :] if suffix_tokens else source
+    if src.shape[1] != cur.shape[1]:  # token-count mismatch: align trailing tokens
+        n = min(src.shape[1], cur.shape[1])
+        src = src[:, -n:, :]
+        cur = cur[:, -n:, :]
+    proj_cur = (cur * d).sum(dim=-1, keepdim=True)
+    proj_src = (src * d).sum(dim=-1, keepdim=True)
+    cur.add_(alpha * (proj_src - proj_cur) * d)
+    return patched
 
 
 def _patch_suffix(

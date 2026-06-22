@@ -1408,6 +1408,7 @@ def concept_patch_pair(
     metric_names: list[str] | None = None,
     positive_name: str = "positive",
     negative_name: str = "negative",
+    directions: dict[str, list[float]] | None = None,
 ) -> list[dict[str, Any]]:
     """Patch source-side activations into the target generation and measure metrics.
 
@@ -1475,12 +1476,20 @@ def concept_patch_pair(
                     max_calls=None,
                     capture="full",
                 )
+                direction_map = None
+                if directions and site_name in directions:
+                    import torch
+
+                    direction_map = {
+                        site_name: torch.tensor(directions[site_name], dtype=torch.float32)
+                    }
                 with ActivationPatcher(
                     runner.model,
                     spec,
                     {site_name: source_values},
                     alpha=alpha,
                     suffix_tokens=suffix_tokens,
+                    direction=direction_map,
                 ):
                     audio, sample_rate = _generate_wave(runner, target_record)
                 patched = all_core_metrics(audio, sample_rate)
@@ -3561,3 +3570,81 @@ def selftest_metrics() -> None:
     """CPU-only check that the extended metric library runs in the Modal image."""
     results = _selftest_metrics_remote.remote()
     print(json.dumps(results, indent=2, sort_keys=True))
+
+
+@app.local_entrypoint()
+def brightness_directional_patch_test(
+    prompts_path: str = "prompts/brightness_contrast_pairs.jsonl",
+    features_path: str = "outputs/diverse-corpus-v2/probe-features.npz",
+    output_prefix: str = "brightness-directional-patch-v1",
+    site: str = "transformer.transformer_blocks.3",
+    factor_metric: str = "spectral_centroid_mean_hz",
+    cfg_row: int = 0,
+    max_pairs: int = 8,
+    alpha: float = 1.0,
+    metrics: str = (
+        "spectral_centroid_mean_hz,rms_dbfs,high_to_low_db,crest_factor_db,"
+        "spectral_flatness_mean,onset_strength_max"
+    ),
+) -> None:
+    """Directional patching: inject only the brightness-axis component, source->target.
+
+    Tests whether brightness can be moved causally *and specifically* (centroid moves,
+    loudness does not) -- the clean control that full-block patching and additive
+    steering both failed to give.
+    """
+    from tangoflux_lab.probing import (
+        build_factor_steering_directions,
+        load_feature_bundle,
+        summarize_intervention_rows,
+    )
+
+    bundle = load_feature_bundle(features_path)
+    directions, _, meta = build_factor_steering_directions(
+        bundle, {"brightness": factor_metric}, site=site, cfg_row=cfg_row, alpha=alpha
+    )
+    selected_site = str(meta["site"])
+    vector = [float(x) for x in directions["brightness"]["vector"]]
+    site_specs = [s for s in dit_layer_patch_sites() if s["site"] == selected_site]
+    if not site_specs:
+        raise ValueError(f"Site {selected_site!r} not a known DiT patch site")
+
+    metric_names = _metric_names_from_arg(metrics)
+    records = _records_from_prompt_file(
+        prompts_path, default_duration=3.5, default_steps=50, default_guidance_scale=4.0
+    )
+    pair_groups = _records_by_pair(records)
+    if max_pairs > 0:
+        pair_groups = pair_groups[:max_pairs]
+    print(
+        f"Directional brightness patch: {len(pair_groups)} pairs at {selected_site} "
+        f"(alpha={alpha})"
+    )
+
+    raw_rows: list[dict[str, Any]] = []
+    for pair_rows in concept_patch_pair.map(
+        pair_groups,
+        kwargs={
+            "sites": site_specs,
+            "alpha": alpha,
+            "metric_names": metric_names,
+            "directions": {selected_site: vector},
+        },
+        order_outputs=True,
+    ):
+        raw_rows.extend(pair_rows)
+
+    site_rows, specificity = summarize_intervention_rows(
+        raw_rows, metric_names, on_target=factor_metric
+    )
+    out_dir = Path("results") / output_prefix
+    out_dir.mkdir(parents=True, exist_ok=True)
+    write_manifest_csv(str(out_dir / "patch-rows.csv"), raw_rows)
+    write_manifest_csv(str(out_dir / "patch-site-summary.csv"), site_rows)
+    write_json(
+        str(out_dir / "patch-summary.json"),
+        {"site": selected_site, "factor_metric": factor_metric, "alpha": alpha,
+         "n_pairs": len(pair_groups), "specificity": specificity},
+    )
+    print(json.dumps(specificity, indent=2, sort_keys=True))
+    print(f"Wrote {out_dir}/patch-rows.csv, patch-site-summary.csv, patch-summary.json")
