@@ -1,0 +1,42 @@
+{
+  "alpha": 1.0,
+  "metric_names": [
+    "spectral_centroid_mean_hz",
+    "rms_dbfs",
+    "high_to_low_db",
+    "crest_factor_db",
+    "onset_strength_max",
+    "spectral_flatness_mean"
+  ],
+  "n_pairs": 8,
+  "negative_name": "negative",
+  "on_target": "spectral_centroid_mean_hz",
+  "positive_name": "positive",
+  "sites": [
+    "transformer.transformer_blocks.3",
+    "transformer.single_transformer_blocks.3"
+  ],
+  "specificity": {
+    "by_site": {
+      "transformer.single_transformer_blocks.3": {
+        "off_target_toward_source_mean": 0.9720916519200717,
+        "off_target_toward_source_median": 0.9622044167195771,
+        "on_target": "spectral_centroid_mean_hz",
+        "on_target_toward_source_mean": 0.9119875141604851,
+        "on_target_toward_source_median": 0.9002005704901079,
+        "specificity_gap": -0.06010413775958667,
+        "specificity_gap_median": -0.062003846229469195
+      },
+      "transformer.transformer_blocks.3": {
+        "off_target_toward_source_mean": 0.8940166091748079,
+        "off_target_toward_source_median": 0.9361083051081305,
+        "on_target": "spectral_centroid_mean_hz",
+        "on_target_toward_source_mean": 0.9001876905019597,
+        "on_target_toward_source_median": 0.9031039351058022,
+        "specificity_gap": 0.006171081327151828,
+        "specificity_gap_median": -0.033004370002328254
+      }
+    },
+    "on_target": "spectral_centroid_mean_hz"
+  }
+}
