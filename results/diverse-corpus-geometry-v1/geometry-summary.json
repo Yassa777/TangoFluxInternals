@@ -1,0 +1,353 @@
+{
+  "factors": {
+    "attack": "onset_strength_max",
+    "brightness": "spectral_centroid_mean_hz",
+    "decay": "decay_time_to_minus_20db_ms",
+    "density": "onset_rate_per_second",
+    "loudness": "rms_dbfs",
+    "rolloff": "rolloff_85_mean_hz",
+    "tail": "tail_energy_fraction_500ms",
+    "tilt": "high_to_low_db"
+  },
+  "summary": {
+    "by_factor": {
+      "attack": {
+        "best_encodable": {
+          "block": 3,
+          "site": "transformer.single_transformer_blocks.3",
+          "stack": "single",
+          "value": 0.03332290418076807
+        },
+        "cv_spearman_best": {
+          "block": 3,
+          "site": "transformer.single_transformer_blocks.3",
+          "stack": "single",
+          "value": 0.39628858061728983
+        },
+        "r2_dual_mean": -0.03690816367218069,
+        "r2_single_mean": -0.0018680926090636,
+        "stability_cos_mean": 0.30440009757876396
+      },
+      "brightness": {
+        "best_encodable": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.5912024223503729
+        },
+        "cv_spearman_best": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.8211529784476551
+        },
+        "r2_dual_mean": 0.5409784260941887,
+        "r2_single_mean": 0.43550335942854274,
+        "stability_cos_mean": 0.8545037060976028
+      },
+      "decay": {
+        "best_encodable": {
+          "block": 8,
+          "site": "transformer.single_transformer_blocks.8",
+          "stack": "single",
+          "value": 0.028239032524270867
+        },
+        "cv_spearman_best": {
+          "block": 8,
+          "site": "transformer.single_transformer_blocks.8",
+          "stack": "single",
+          "value": 0.29082206115297843
+        },
+        "r2_dual_mean": -0.1226591281515661,
+        "r2_single_mean": -0.04302457030228128,
+        "stability_cos_mean": 0.25773402210325
+      },
+      "density": {
+        "best_encodable": {
+          "block": 3,
+          "site": "transformer.single_transformer_blocks.3",
+          "stack": "single",
+          "value": 0.19223996857888562
+        },
+        "cv_spearman_best": {
+          "block": 3,
+          "site": "transformer.single_transformer_blocks.3",
+          "stack": "single",
+          "value": 0.4943460855373686
+        },
+        "r2_dual_mean": 0.11960416085016627,
+        "r2_single_mean": 0.15374111195927742,
+        "stability_cos_mean": 0.3358397390693426
+      },
+      "loudness": {
+        "best_encodable": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.1485402124605505
+        },
+        "cv_spearman_best": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.5604719435510968
+        },
+        "r2_dual_mean": 0.12612292614783582,
+        "r2_single_mean": 0.06819271301721325,
+        "stability_cos_mean": 0.6850557165841261
+      },
+      "rolloff": {
+        "best_encodable": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.42447753967270774
+        },
+        "cv_spearman_best": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.7361125138002207
+        },
+        "r2_dual_mean": 0.35642864145186737,
+        "r2_single_mean": 0.2793163389402016,
+        "stability_cos_mean": 0.7634026035666466
+      },
+      "tail": {
+        "best_encodable": {
+          "block": 4,
+          "site": "transformer.transformer_blocks.4",
+          "stack": "dual",
+          "value": -0.08115562235906457
+        },
+        "cv_spearman_best": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.08120923534776556
+        },
+        "r2_dual_mean": -0.14049089456395922,
+        "r2_single_mean": -0.13181842767355198,
+        "stability_cos_mean": 0.13377531039683768
+      },
+      "tilt": {
+        "best_encodable": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.48576864189138086
+        },
+        "cv_spearman_best": {
+          "block": 1,
+          "site": "transformer.transformer_blocks.1",
+          "stack": "dual",
+          "value": 0.7625889694235107
+        },
+        "r2_dual_mean": 0.441949950902185,
+        "r2_single_mean": 0.34671523154487227,
+        "stability_cos_mean": 0.7281972467899323
+      }
+    },
+    "d_model": 1024,
+    "disentanglement": {
+      "analysis_layer": {
+        "block": 3,
+        "site": "transformer.single_transformer_blocks.3",
+        "stack": "single"
+      },
+      "direction_cosine_matrix": {
+        "attack": {
+          "attack": 1.0000001192092896,
+          "brightness": 0.24535447359085083,
+          "decay": 0.437574177980423,
+          "density": 0.8331657648086548,
+          "loudness": 0.3819994330406189,
+          "rolloff": 0.5299875736236572,
+          "tail": 0.4724825620651245,
+          "tilt": 0.2265896499156952
+        },
+        "brightness": {
+          "attack": 0.24535447359085083,
+          "brightness": 1.0,
+          "decay": 0.32093140482902527,
+          "density": 0.009788350202143192,
+          "loudness": 0.29349932074546814,
+          "rolloff": 0.9207469820976257,
+          "tail": 0.2659645080566406,
+          "tilt": 0.9707623720169067
+        },
+        "decay": {
+          "attack": 0.437574177980423,
+          "brightness": 0.32093140482902527,
+          "decay": 0.9999998807907104,
+          "density": 0.35113805532455444,
+          "loudness": 0.28192460536956787,
+          "rolloff": 0.15646205842494965,
+          "tail": 0.4032381474971771,
+          "tilt": 0.20273078978061676
+        },
+        "density": {
+          "attack": 0.8331657648086548,
+          "brightness": 0.009788350202143192,
+          "decay": 0.35113805532455444,
+          "density": 1.0000001192092896,
+          "loudness": 0.33233702182769775,
+          "rolloff": 0.2640823721885681,
+          "tail": 0.6077659130096436,
+          "tilt": 0.030870255082845688
+        },
+        "loudness": {
+          "attack": 0.3819994330406189,
+          "brightness": 0.29349932074546814,
+          "decay": 0.28192460536956787,
+          "density": 0.33233702182769775,
+          "loudness": 1.0,
+          "rolloff": 0.47902151942253113,
+          "tail": 0.3029921054840088,
+          "tilt": 0.34917402267456055
+        },
+        "rolloff": {
+          "attack": 0.5299875736236572,
+          "brightness": 0.9207469820976257,
+          "decay": 0.15646205842494965,
+          "density": 0.2640823721885681,
+          "loudness": 0.47902151942253113,
+          "rolloff": 0.9999999403953552,
+          "tail": 0.013337526470422745,
+          "tilt": 0.8703910112380981
+        },
+        "tail": {
+          "attack": 0.4724825620651245,
+          "brightness": 0.2659645080566406,
+          "decay": 0.4032381474971771,
+          "density": 0.6077659130096436,
+          "loudness": 0.3029921054840088,
+          "rolloff": 0.013337526470422745,
+          "tail": 1.0,
+          "tilt": 0.23794902861118317
+        },
+        "tilt": {
+          "attack": 0.2265896499156952,
+          "brightness": 0.9707623720169067,
+          "decay": 0.20273078978061676,
+          "density": 0.030870255082845688,
+          "loudness": 0.34917402267456055,
+          "rolloff": 0.8703910112380981,
+          "tail": 0.23794902861118317,
+          "tilt": 1.0
+        }
+      },
+      "factor_stability": {
+        "attack": 0.30440009757876396,
+        "brightness": 0.8545037060976028,
+        "decay": 0.25773402210325,
+        "density": 0.3358397390693426,
+        "loudness": 0.6850557165841261,
+        "rolloff": 0.7634026035666466,
+        "tail": 0.13377531039683768,
+        "tilt": 0.7281972467899323
+      },
+      "random_abs_cosine_baseline": 0.1784124116152771,
+      "realized_factor_spearman_matrix": {
+        "attack": {
+          "attack": 0.9999999999999998,
+          "brightness": 0.17797724763596218,
+          "decay": -0.3635482167714683,
+          "density": -0.8274453031248499,
+          "loudness": -0.03241357461719387,
+          "rolloff": 0.19130302884846156,
+          "tail": -0.10732472519560313,
+          "tilt": 0.2407184754956079
+        },
+        "brightness": {
+          "attack": 0.17797724763596218,
+          "brightness": 0.9999999999999998,
+          "decay": 0.05008937743003888,
+          "density": -0.07469188307012913,
+          "loudness": -0.23818326693227085,
+          "rolloff": 0.9539730235683771,
+          "tail": 0.022095329525272402,
+          "tilt": 0.8869117265876254
+        },
+        "decay": {
+          "attack": -0.3635482167714683,
+          "brightness": 0.05008937743003888,
+          "decay": 0.9999999999999998,
+          "density": 0.30204963279412467,
+          "loudness": 0.149101521624346,
+          "rolloff": 0.002909614553832861,
+          "tail": 0.3380578889262228,
+          "tilt": 0.07440695051120819
+        },
+        "density": {
+          "attack": -0.8274453031248499,
+          "brightness": -0.07469188307012913,
+          "decay": 0.30204963279412467,
+          "density": 0.9999999999999998,
+          "loudness": 0.08921960351365621,
+          "rolloff": -0.1359723515576249,
+          "tail": 0.1967989247827965,
+          "tilt": -0.09455191283060528
+        },
+        "loudness": {
+          "attack": -0.03241357461719387,
+          "brightness": -0.23818326693227085,
+          "decay": 0.149101521624346,
+          "density": 0.08921960351365621,
+          "loudness": 0.9999999999999998,
+          "rolloff": -0.2985912734603754,
+          "tail": 0.08214697835165362,
+          "tilt": -0.20449594393510295
+        },
+        "rolloff": {
+          "attack": 0.19130302884846156,
+          "brightness": 0.9539730235683771,
+          "decay": 0.002909614553832861,
+          "density": -0.1359723515576249,
+          "loudness": -0.2985912734603754,
+          "rolloff": 0.9999999999999998,
+          "tail": -0.042522920366725864,
+          "tilt": 0.7902527720443527
+        },
+        "tail": {
+          "attack": -0.10732472519560313,
+          "brightness": 0.022095329525272402,
+          "decay": 0.3380578889262228,
+          "density": 0.1967989247827965,
+          "loudness": 0.08214697835165362,
+          "rolloff": -0.042522920366725864,
+          "tail": 0.9999999999999998,
+          "tilt": 0.07757039312629002
+        },
+        "tilt": {
+          "attack": 0.2407184754956079,
+          "brightness": 0.8869117265876254,
+          "decay": 0.07440695051120819,
+          "density": -0.09455191283060528,
+          "loudness": -0.20449594393510295,
+          "rolloff": 0.7902527720443527,
+          "tail": 0.07757039312629002,
+          "tilt": 0.9999999999999998
+        }
+      },
+      "stability_threshold": 0.3568248232305542,
+      "stable_factors": [
+        "brightness",
+        "rolloff",
+        "tilt",
+        "loudness"
+      ]
+    },
+    "factors": [
+      "brightness",
+      "rolloff",
+      "tilt",
+      "attack",
+      "density",
+      "decay",
+      "tail",
+      "loudness"
+    ],
+    "random_abs_cosine_baseline": 0.1784124116152771
+  }
+}

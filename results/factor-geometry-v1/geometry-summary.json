@@ -1,0 +1,58 @@
+{
+  "factors": {
+    "brightness": "spectral_centroid_mean_hz",
+    "onset_rate": "onset_rate_per_second"
+  },
+  "summary": {
+    "by_factor": {
+      "brightness": {
+        "best_encodable": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.2086233377456665
+        },
+        "cv_spearman_best": {
+          "block": 17,
+          "site": "transformer.single_transformer_blocks.17",
+          "stack": "single",
+          "value": 0.8391219783273134
+        },
+        "r2_dual_mean": -0.7453990360101065,
+        "r2_single_mean": -0.1043744464715322,
+        "stability_cos_mean": 0.14292774721980095
+      },
+      "onset_rate": {
+        "best_encodable": {
+          "block": 11,
+          "site": "transformer.single_transformer_blocks.11",
+          "stack": "single",
+          "value": 0.15022451877593995
+        },
+        "cv_spearman_best": {
+          "block": 3,
+          "site": "transformer.transformer_blocks.3",
+          "stack": "dual",
+          "value": 0.7677132536815783
+        },
+        "r2_dual_mean": -0.40526443322499595,
+        "r2_single_mean": -0.04416366020838419,
+        "stability_cos_mean": 0.08978455389539401
+      }
+    },
+    "d_model": 1024,
+    "disentanglement": {
+      "cross_cosine_mean": 0.03744189126882702,
+      "random_abs_cosine_baseline": 0.024933892525089544,
+      "within_factor_stability_mean": {
+        "brightness": 0.15862385494013628,
+        "onset_rate": 0.047875265668456755
+      }
+    },
+    "factors": [
+      "brightness",
+      "onset_rate"
+    ],
+    "random_abs_cosine_baseline": 0.024933892525089544
+  }
+}

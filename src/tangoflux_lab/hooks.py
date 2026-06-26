@@ -233,11 +233,13 @@ class ProbeFeatureRecorder(AbstractContextManager["ProbeFeatureRecorder"]):
         site_stacks: dict[str, str],
         *,
         audio_tokens: int | None = None,
+        time_bins: int = 1,
     ):
         self.model = model
         self.site_output_indices = site_output_indices
         self.site_stacks = site_stacks
         self.audio_tokens = audio_tokens
+        self.time_bins = max(1, int(time_bins))
         self.handles: list[Any] = []
         self.calls: dict[str, int] = {}
         self.sums: dict[str, torch.Tensor] = {}
@@ -279,7 +281,15 @@ class ProbeFeatureRecorder(AbstractContextManager["ProbeFeatureRecorder"]):
                 return
             audio = self._audio_slice(name, tensor)
             self.token_dims[name] = int(audio.shape[1])
-            pooled = audio.mean(dim=1).to(device="cpu")  # [batch, d_model]
+            # Pool over the audio-token (time) axis. With time_bins>1, split the audio
+            # tokens into K consecutive temporal bins and concatenate their means, so the
+            # feature preserves coarse temporal structure: [batch, time_bins * d_model].
+            if self.time_bins > 1 and audio.shape[1] >= self.time_bins:
+                chunks = torch.chunk(audio, self.time_bins, dim=1)
+                pooled = torch.cat([chunk.mean(dim=1) for chunk in chunks], dim=1)
+            else:
+                pooled = audio.mean(dim=1)  # [batch, d_model]
+            pooled = pooled.to(device="cpu")
             if name in self.sums:
                 self.sums[name] = self.sums[name] + pooled
             else:
@@ -304,12 +314,16 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
         *,
         alpha: float = 1.0,
         suffix_tokens: int | None = None,
+        step_window: tuple[int, int] | None = None,
+        direction: dict[str, Any] | None = None,
     ):
         self.model = model
         self.spec = spec
         self.source_activations = source_activations
         self.alpha = float(alpha)
         self.suffix_tokens = suffix_tokens
+        self.step_window = step_window
+        self.direction = direction or {}
         self.handles: list[Any] = []
         self.calls: dict[str, int] = {}
 
@@ -334,11 +348,23 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
             self.calls[name] = call_index + 1
             if self.spec.max_calls is not None and call_index >= self.spec.max_calls:
                 return output
+            # Flow-time gate: each forward call is one denoising step (CFG is batched),
+            # so call_index == step index. Outside the window we pass through unpatched.
+            if self.step_window is not None:
+                start, end = self.step_window
+                if not (start <= call_index < end):
+                    return output
             source_values = self.source_activations.get(name, [])
             if call_index >= len(source_values):
                 return output
             current = _get_tensor(output, self.spec.output_index)
             source = source_values[call_index].to(device=current.device, dtype=current.dtype)
+            if name in self.direction:
+                # Directional patching: inject only the source's component along the
+                # factor direction, leaving orthogonal content (e.g. loudness) intact.
+                d = self.direction[name].to(device=current.device, dtype=current.dtype)
+                patched = _directional_patch(current, source, d, self.alpha, self.suffix_tokens)
+                return _replace_tensor(output, self.spec.output_index, patched)
             if source.shape == current.shape:
                 patched = current.lerp(source, self.alpha)
                 return _replace_tensor(output, self.spec.output_index, patched)
@@ -351,6 +377,33 @@ class ActivationPatcher(AbstractContextManager["ActivationPatcher"]):
             return _replace_tensor(output, self.spec.output_index, patched)
 
         return hook
+
+
+def _directional_patch(
+    current: torch.Tensor,
+    source: torch.Tensor,
+    direction: torch.Tensor,
+    alpha: float,
+    suffix_tokens: int | None,
+) -> torch.Tensor:
+    """Replace only the source's component along ``direction`` (unit vector).
+
+    Leaves the orthogonal complement of ``current`` untouched, so a brightness-axis
+    patch should move spectral centroid without dragging loudness. Operates on the
+    trailing ``suffix_tokens`` audio tokens when set (merged single-stream blocks).
+    """
+    d = direction / direction.norm().clamp_min(1e-8)
+    patched = current.clone()
+    cur = patched[:, -suffix_tokens:, :] if suffix_tokens else patched
+    src = source[:, -suffix_tokens:, :] if suffix_tokens else source
+    if src.shape[1] != cur.shape[1]:  # token-count mismatch: align trailing tokens
+        n = min(src.shape[1], cur.shape[1])
+        src = src[:, -n:, :]
+        cur = cur[:, -n:, :]
+    proj_cur = (cur * d).sum(dim=-1, keepdim=True)
+    proj_src = (src * d).sum(dim=-1, keepdim=True)
+    cur.add_(alpha * (proj_src - proj_cur) * d)
+    return patched
 
 
 def _patch_suffix(
@@ -391,13 +444,19 @@ class SteeringApplier(AbstractContextManager["SteeringApplier"]):
         *,
         scale: float,
         suffix_tokens: int | None = None,
+        token_range: tuple[int, int] | None = None,
+        token_mask: torch.Tensor | list[bool] | list[int] | list[float] | None = None,
     ):
         self.model = model
         self.spec = spec
         self.steering_vectors = steering_vectors
         self.scale = float(scale)
         self.suffix_tokens = suffix_tokens
+        self.token_range = token_range
+        self.token_mask = token_mask
         self.handles: list[Any] = []
+        if token_range is not None and token_mask is not None:
+            raise ValueError("Pass only one of token_range or token_mask.")
 
     def __enter__(self) -> "SteeringApplier":
         for name, module in self.model.named_modules():
@@ -420,22 +479,71 @@ class SteeringApplier(AbstractContextManager["SteeringApplier"]):
             vector = self.steering_vectors[name].to(device=current.device, dtype=current.dtype)
             while vector.ndim < current.ndim:
                 vector = vector.unsqueeze(0)
-            if (
-                self.suffix_tokens is not None
-                and current.ndim >= 2
-                and current.shape[1] >= self.suffix_tokens
-            ):
-                # Add the steering vector only to the trailing audio tokens, leaving
-                # leading text tokens untouched (merged single-stream blocks).
-                steered = current.clone()
-                steered[:, -self.suffix_tokens :, ...] = (
-                    current[:, -self.suffix_tokens :, ...] + self.scale * vector
-                )
+            if self._uses_token_subset(current):
+                steered = self._apply_token_subset(current, vector)
             else:
                 steered = current + self.scale * vector
             return _replace_tensor(output, self.spec.output_index, steered)
 
         return hook
+
+    def _uses_token_subset(self, current: torch.Tensor) -> bool:
+        return (
+            current.ndim >= 2
+            and (
+                self.suffix_tokens is not None
+                or self.token_range is not None
+                or self.token_mask is not None
+            )
+        )
+
+    def _audio_bounds(self, current: torch.Tensor) -> tuple[int, int]:
+        token_count = int(current.shape[1])
+        if self.suffix_tokens is None:
+            return 0, token_count
+        if self.suffix_tokens <= 0:
+            raise ValueError("suffix_tokens must be positive")
+        if token_count < self.suffix_tokens:
+            raise ValueError(
+                f"suffix_tokens={self.suffix_tokens} exceeds token dimension: "
+                f"current={tuple(current.shape)}"
+            )
+        return token_count - int(self.suffix_tokens), token_count
+
+    def _selected_token_indices(self, current: torch.Tensor) -> torch.Tensor:
+        audio_start, audio_end = self._audio_bounds(current)
+        audio_len = audio_end - audio_start
+        device = current.device
+        if self.token_mask is not None:
+            mask = torch.as_tensor(self.token_mask, device=device, dtype=torch.bool)
+            if mask.ndim != 1:
+                raise ValueError("token_mask must be one-dimensional")
+            if int(mask.numel()) != audio_len:
+                raise ValueError(
+                    f"token_mask length {int(mask.numel())} must match selected audio "
+                    f"token count {audio_len}"
+                )
+            local_indices = torch.nonzero(mask, as_tuple=False).flatten()
+            return local_indices + audio_start
+        if self.token_range is not None:
+            start, end = self.token_range
+            start = int(start)
+            end = int(end)
+            if start < 0 or end < start or end > audio_len:
+                raise ValueError(
+                    f"token_range=({start}, {end}) must be within audio token "
+                    f"axis length {audio_len}"
+                )
+            return torch.arange(audio_start + start, audio_start + end, device=device)
+        return torch.arange(audio_start, audio_end, device=device)
+
+    def _apply_token_subset(self, current: torch.Tensor, vector: torch.Tensor) -> torch.Tensor:
+        token_indices = self._selected_token_indices(current)
+        steered = current.clone()
+        if token_indices.numel() == 0:
+            return steered
+        steered[:, token_indices, ...] = current[:, token_indices, ...] + self.scale * vector
+        return steered
 
 
 def mean_activation_difference(

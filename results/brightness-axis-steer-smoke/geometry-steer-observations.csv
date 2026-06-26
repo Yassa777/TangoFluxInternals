@@ -1,0 +1,5 @@
+status,pair_id,job_id,axis,factor_metric,site,stack,block,scale,audio_suffix_tokens,spectral_centroid_mean_hz,rms_dbfs,high_to_low_db,crest_factor_db,spectral_flatness_mean,onset_strength_max
+ok,corpus-000,corpus-000-single-sample-000-seed-30000,brightness,spectral_centroid_mean_hz,transformer.transformer_blocks.3,dual,3,0.0,,1043.966064453125,-16.63026946176702,-23.242801353491345,9.294414950839801,1.592078297107946e-05,1.5334856510162354
+ok,corpus-000,corpus-000-single-sample-000-seed-30000,brightness,spectral_centroid_mean_hz,transformer.transformer_blocks.3,dual,3,0.5,,1039.73291015625,-16.455033073343557,-22.743991285680742,9.323761574598016,1.557682298880536e-05,1.5574798583984375
+ok,corpus-000,corpus-000-single-sample-000-seed-30000,loudness,rms_dbfs,transformer.transformer_blocks.3,dual,3,0.0,,1043.966064453125,-16.63026946176702,-23.242801353491345,9.294414950839801,1.592078297107946e-05,1.5334856510162354
+ok,corpus-000,corpus-000-single-sample-000-seed-30000,loudness,rms_dbfs,transformer.transformer_blocks.3,dual,3,0.5,,1044.546630859375,-16.896715298732428,-23.926397695052902,9.258859801867667,1.6080181012512185e-05,1.5210646390914917

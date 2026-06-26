@@ -33,6 +33,16 @@ steering does not isolate a clean reverberation control direction.
 Brightness remains the clearest activation-patching proof of concept: centroid
 patching moves audio toward the counterfactual source in most rows.
 
+The 2026-06-19 future-experiment batch extends the representation-geometry work:
+K=16/32/64 temporal maps now run through volume-backed feature capture, spectral
+and loudness additive steering has causal specificity measurements, AudioLDM2 has
+an end-to-end second-model pilot, and token-window brightness steering has a first
+localization result. The result is mixed: F0 is robustly recovered at high temporal
+resolution, density is recovered at K=16/K=32, brightness/loudness steering moves
+the intended metrics but with limited specificity, AudioLDM2 is pilot-only, and
+time-localized steering bleeds across windows. Detailed tables are in
+`docs/future_experiment_results_2026_06_19.md`.
+
 ## Repository State and Core Components
 
 | Area | Files | Purpose |
@@ -493,4 +503,3 @@ The dry/reverberant result is useful as a contrast:
 6. Keep reporting off-target movement for every intervention. The most useful
    negative results so far came from specificity checks, not from on-target
    movement alone.
-
